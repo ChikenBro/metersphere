@@ -24,7 +24,7 @@ yarn-error.log*
 *.sln
 *.sw?
 
-
+.github/*
 src/main/resources/static
 src/main/resources/templates
 target
