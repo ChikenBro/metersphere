@@ -32,6 +32,7 @@ import io.metersphere.track.issue.domain.zentao.ZentaoBuild;
 import io.metersphere.track.request.testcase.AuthUserIssueRequest;
 import io.metersphere.track.request.testcase.IssuesRequest;
 import io.metersphere.track.request.testcase.IssuesUpdateRequest;
+import io.metersphere.track.service.task.SyncJiraIssueTask;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -80,6 +81,8 @@ public class IssuesService {
     private SystemParameterService systemParameterService;
     @Resource
     private TestPlanTestCaseService testPlanTestCaseService;
+    @Resource
+    private SyncJiraIssueTask syncJiraIssueTask;
 
     public void testAuth(String orgId, String platform) {
         IssuesRequest issuesRequest = new IssuesRequest();
@@ -441,6 +444,7 @@ public class IssuesService {
             List<IssuesDao> issues = extIssuesMapper.getIssueForSync(projectId);
 
             if (CollectionUtils.isEmpty(issues)) {
+                syncJiraIssueTask.getIssueList(projectId, issues);
                 return;
             }
 

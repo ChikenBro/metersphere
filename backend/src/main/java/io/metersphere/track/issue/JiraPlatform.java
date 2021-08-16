@@ -141,7 +141,7 @@ public class JiraPlatform extends AbstractIssuePlatform {
             RestTemplate restTemplate = new RestTemplate();
             //post
             ResponseEntity<String> responseEntity = null;
-            responseEntity = restTemplate.exchange(url + "/rest/api/2/search?jql=project="+key+"+AND+issuetype="+type+"&fields=summary,issuetype",
+            responseEntity = restTemplate.exchange(url + "/rest/api/2/search?jql=project=" + key + "+AND+issuetype=" + type + "&fields=summary,issuetype",
                     HttpMethod.GET, requestEntity, String.class);
             String body = responseEntity.getBody();
             JSONObject jsonObject = JSONObject.parseObject(body);
@@ -223,6 +223,8 @@ public class JiraPlatform extends AbstractIssuePlatform {
                         JSONObject param = new JSONObject();
                         param.put("id", item.getValue());
                         fields.put(item.getCustomData(), param);
+                        // 处理自定义字段
+                        handleMuDuCustomData(item, fields);
                     } else {
                         fields.put(item.getCustomData(), item.getValue());
                     }
@@ -244,6 +246,24 @@ public class JiraPlatform extends AbstractIssuePlatform {
 
         // 插入缺陷表
         insertIssues(result.getKey(), issuesRequest);
+    }
+
+    private void handleMuDuCustomData(CustomFieldItemDTO item, JSONObject fields) {
+        if ("assignee".equals(item.getCustomData())) {
+            JSONObject object = new JSONObject();
+            object.put("name", item.getValue());
+            fields.put(item.getCustomData(), object);
+        }
+        if ("fixVersions".equals(item.getCustomData())) {
+            JSONArray array = JSON.parseArray(item.getValue());
+            List<JSONObject> objects = new ArrayList<>();
+            array.forEach(vl -> {
+                JSONObject object = new JSONObject();
+                object.put("name", vl);
+                objects.add(object);
+            });
+            fields.put(item.getCustomData(), objects);
+        }
     }
 
     @Override
