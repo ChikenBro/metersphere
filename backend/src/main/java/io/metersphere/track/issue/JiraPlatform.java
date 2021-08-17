@@ -3,6 +3,7 @@ package io.metersphere.track.issue;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Maps;
 import io.metersphere.base.domain.*;
 import io.metersphere.commons.constants.IssuesManagePlatform;
 import io.metersphere.commons.constants.IssuesStatus;
@@ -34,6 +35,7 @@ import org.springframework.web.client.RestTemplate;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class JiraPlatform extends AbstractIssuePlatform {
 
@@ -120,28 +122,16 @@ public class JiraPlatform extends AbstractIssuePlatform {
         List<DemandDTO> list = new ArrayList<>();
 
         try {
-            String key = validateJiraKey(projectId);
-            String config = getPlatformConfig(IssuesManagePlatform.Jira.toString());
-            JSONObject object = JSON.parseObject(config);
-
-            if (object == null) {
-                MSException.throwException("jira config is null");
-            }
-
-            String account = object.getString("account");
-            String password = object.getString("password");
-            String url = object.getString("url");
-            String type = object.getString("storytype");
-            String auth = EncryptUtils.base64Encoding(account + ":" + password);
+            Map<String, String> jiraInfo = getJiraInfo("storytype");
             HttpHeaders requestHeaders = new HttpHeaders();
-            requestHeaders.add("Authorization", "Basic " + auth);
+            requestHeaders.add("Authorization", "Basic " + jiraInfo.get("auth"));
             requestHeaders.setContentType(org.springframework.http.MediaType.APPLICATION_JSON);
             //HttpEntity
             HttpEntity<String> requestEntity = new HttpEntity<>(requestHeaders);
             RestTemplate restTemplate = new RestTemplate();
             //post
             ResponseEntity<String> responseEntity = null;
-            responseEntity = restTemplate.exchange(url + "/rest/api/2/search?jql=project=" + key + "+AND+issuetype=" + type + "&fields=summary,issuetype",
+            responseEntity = restTemplate.exchange(jiraInfo.get("url") + "/rest/api/2/search?jql=project=" + jiraInfo.get("key") + "+AND+issuetype=" + jiraInfo.get("type") + "&fields=summary,issuetype",
                     HttpMethod.GET, requestEntity, String.class);
             String body = responseEntity.getBody();
             JSONObject jsonObject = JSONObject.parseObject(body);
@@ -180,6 +170,28 @@ public class JiraPlatform extends AbstractIssuePlatform {
             MSException.throwException("未关联Jira 项目Key");
         }
         return jiraKey;
+    }
+
+    protected Map<String, String> getJiraInfo(String issueType) {
+        Map<String, String> stringMap = Maps.newHashMap();
+        String key = validateJiraKey(projectId);
+        String config = getPlatformConfig(IssuesManagePlatform.Jira.toString());
+        JSONObject object = JSON.parseObject(config);
+
+        if (object == null) {
+            MSException.throwException("jira config is null");
+        }
+
+        String account = object.getString("account");
+        String password = object.getString("password");
+        String url = object.getString("url");
+        String type = object.getString(issueType);
+        String auth = EncryptUtils.base64Encoding(account + ":" + password);
+        stringMap.put("key", key);
+        stringMap.put("url", url);
+        stringMap.put("type", type);
+        stringMap.put("auth", auth);
+        return stringMap;
     }
 
     @Override

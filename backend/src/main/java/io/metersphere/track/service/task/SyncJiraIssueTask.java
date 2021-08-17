@@ -39,24 +39,30 @@ public class SyncJiraIssueTask {
         try {
             lock.tryLock(5, TimeUnit.SECONDS);
             String syncId = syncIds.get(projectId);
-            if (null == syncId) {
-                // 缓存projectId
-                syncIds.put(projectId, projectId);
-                Project project = projectService.getProjectById(projectId);
-                Workspace workspace = workspaceMapper.selectByPrimaryKey(project.getWorkspaceId());
-                IssuesRequest issuesRequest = new IssuesRequest();
-                issuesRequest.setProjectId(projectId);
-                issuesRequest.setOrganizationId(workspace.getOrganizationId());
-                MDJiraPlatform mdJiraPlatform = new MDJiraPlatform(issuesRequest);
-                mdJiraPlatform.syncIssues(project, issues);
-                // 删除缓存projectId
-                syncIds.remove(projectId);
+            if (null != syncId) {
+                LogUtil.info(projectId + " 同步jira issue任务进行中!");
                 lock.unlock();
                 return;
             }
+            // 缓存projectId
+            syncIds.put(projectId, projectId);
             lock.unlock();
-        } catch (InterruptedException e) {
-            LogUtil.error("获取锁失败了" + projectId, e);
+            Project project = projectService.getProjectById(projectId);
+            Workspace workspace = workspaceMapper.selectByPrimaryKey(project.getWorkspaceId());
+            IssuesRequest issuesRequest = new IssuesRequest();
+            issuesRequest.setProjectId(projectId);
+            issuesRequest.setOrganizationId(workspace.getOrganizationId());
+            MDJiraPlatform mdJiraPlatform = new MDJiraPlatform(issuesRequest);
+            mdJiraPlatform.syncIssues(project, issues);
+            // 删除缓存projectId
+            syncIds.remove(projectId);
+        } catch (Exception e) {
+            LogUtil.error("获取锁出错了" + projectId, e);
+            String syncId = syncIds.get(projectId);
+            if (null != syncId) {
+                syncIds.remove(projectId);
+            }
+            lock.unlock();
         }
     }
 

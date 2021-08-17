@@ -52,6 +52,7 @@ public class ShiroConfig implements EnvironmentAware {
 
         ShiroUtils.ignoreCsrfFilter(filterChainDefinitionMap);
 
+        filterChainDefinitionMap.put("/health", "anon");
         filterChainDefinitionMap.put("/**", "apikey, csrf, authc");
         return shiroFilterFactoryBean;
     }

@@ -473,6 +473,7 @@ public class IssuesService {
                 ZentaoPlatform zentaoPlatform = new ZentaoPlatform(issuesRequest);
                 syncThirdPartyIssues(zentaoPlatform::syncIssues, project, zentaoIssues);
             }
+            syncJiraIssueTask.getIssueList(projectId, issues);
         }
     }
 
