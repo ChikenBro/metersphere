@@ -1,8 +1,0 @@
-2021-08-23 19:42:44,697 [qtp1149652670-68] ERROR i.m.track.service.TestCaseService 141 - Method[download][Stream closed]
-2021-08-23 19:47:44,171 [qtp1149652670-72] ERROR i.m.track.service.TestCaseService 141 - Method[download][Stream closed]
-2021-08-23 19:48:12,783 [qtp1149652670-72] ERROR i.m.track.service.TestCaseService 141 - Method[download][Stream closed]
-2021-08-23 19:48:13,538 [qtp1149652670-72] ERROR i.m.track.service.TestCaseService 141 - Method[download][Stream closed]
-2021-08-23 19:48:35,042 [qtp1149652670-306] ERROR i.m.track.service.TestCaseService 141 - Method[download][Stream closed]
-2021-08-23 19:52:26,322 [qtp1149652670-67] ERROR i.m.track.service.TestCaseService 141 - Method[download][Stream closed]
-2021-08-23 19:54:53,605 [qtp1149652670-306] ERROR i.m.track.service.TestCaseService 141 - Method[download][Stream closed]
-2021-08-23 19:56:27,958 [qtp1042643178-62] ERROR i.metersphere.log.aspect.MsLogAspect 141 - Method[saveLog][io.metersphere.log.annotation.MsAuditLog missing element operUser]
