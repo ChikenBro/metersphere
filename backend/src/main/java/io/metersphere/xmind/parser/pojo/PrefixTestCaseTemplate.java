@@ -14,6 +14,8 @@ public class PrefixTestCaseTemplate {
 
     private String caseTitle;
 
+    private String customNum;
+
     private String precondition;
 
     private String priority;

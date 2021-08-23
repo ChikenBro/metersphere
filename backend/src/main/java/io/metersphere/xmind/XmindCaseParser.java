@@ -452,7 +452,7 @@ public class XmindCaseParser {
         for (PrefixTestCaseTemplate testcase : testCases) {
             formatTestCase(testcase);
         }
-        return null;
+        return new ArrayList<>();
     }
 
     /**
@@ -471,15 +471,14 @@ public class XmindCaseParser {
         testCase.setPrerequisite(attacheds.getPrecondition());
         testCase.setMethod("manual");
         testCase.setType("functional");
+        testCase.setCustomNum(attacheds.getCustomNum());
         testCase.setSteps(attacheds.getCaseStep().toString());
-
-//        // 用例等级和用例性质处理
-
+        //步骤类型
+        testCase.setStepModel("STEP");
         //校验合规性
-//        if (validate(testCase)) {
-//            testCases.add(testCase);
-//        }
-        testCases.add(testCase);
+        if (validate(testCase)) {
+            testCases.add(testCase);
+        }
     }
 
 
@@ -737,14 +736,14 @@ public class XmindCaseParser {
      * 处理常规用例
      */
     private PrefixTestCaseTemplate handleCase(List<Attached> roots, String treeId, String superTitle, Marker priority) {
-        String precondition = getRecondition(roots.get(0));
+        PrefixTestCaseTemplate testCaseTemplate = new PrefixTestCaseTemplate();
+        testCaseTemplate = getRecondition(testCaseTemplate, roots.get(0));
         //判断第一行是否为前置条件
-        if (!precondition.equals("")) {
+        if (!testCaseTemplate.getPrecondition().equals("")) {
             roots.remove(0);
         }
-        System.out.println(precondition);
-        PrefixTestCaseTemplate testCaseTemplate = new PrefixTestCaseTemplate();
-        testCaseTemplate.setPrecondition(precondition);
+//        System.out.println(precondition);
+//        testCaseTemplate.setPrecondition(precondition);
         testCaseTemplate.setCaseTitle(superTitle);
         testCaseTemplate.setTreeId(treeId);
         testCaseTemplate.setPriority(handleCasePriority(priority));
@@ -793,14 +792,37 @@ public class XmindCaseParser {
     }
 
     /**
-     * 获取前置条件
+     * 获取前置条件和更新id
      */
-    private String getRecondition(Attached root) {
+    private PrefixTestCaseTemplate getRecondition(PrefixTestCaseTemplate testCaseTemplate, Attached root) {
+        String precondition;
+        String customNum;
+        //第一列为前置条件
         if (root.getTitle().split("前置条件").length > 1) {
-            String precondition = root.getTitle().replace("前置条件:", "").replace("前置条件：", "");
-            return precondition;
+            precondition = root.getTitle().replace("前置条件:", "").replace("前置条件：", "");
+            testCaseTemplate.setPrecondition(precondition);
+            //前置条件后无更新用例id
+            if (root.getChildren() == null) {
+                testCaseTemplate.setCustomNum(null);
+            } else if (root.getChildren().getAttached().get(0).getTitle().split("id").length > 1) {
+                customNum = root.getChildren().getAttached().get(0).getTitle().replace("id:", "").replace("id：", "");
+                testCaseTemplate.setCustomNum(customNum);
+            } else {
+                testCaseTemplate.setCustomNum(null);
+            }
+            return testCaseTemplate;
         }
-        return "";
+        //第一列为更新用例id
+        if (root.getTitle().split("id").length > 1) {
+            customNum = root.getTitle().replace("id:", "").replace("id：", "");
+            testCaseTemplate.setPrecondition("");
+            testCaseTemplate.setCustomNum(customNum);
+            return testCaseTemplate;
+        }
+        //第一列无前置条件与更新用例id
+        testCaseTemplate.setPrecondition("");
+        testCaseTemplate.setCustomNum(null);
+        return testCaseTemplate;
     }
 
     public List<TestCaseWithBLOBs> getContinueValidatedCase() {

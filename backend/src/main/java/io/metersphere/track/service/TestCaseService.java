@@ -54,9 +54,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URLEncoder;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -515,7 +513,7 @@ public class TestCaseService {
                     errList.add(excelErrData);
                     excelResponse.setErrList(errList);
                 }
-                if (errList == null) {
+                if (errList.isEmpty()) {
                     List<String> names = new LinkedList<>();
                     List<String> ids = new LinkedList<>();
                     if (CollectionUtils.isNotEmpty(xmindParser.getNodePaths())) {
@@ -576,7 +574,7 @@ public class TestCaseService {
 
         }
         //如果包含错误信息就导出错误信息
-        if (errList != null) {
+        if (!errList.isEmpty()) {
             excelResponse.setSuccess(false);
             excelResponse.setErrList(errList);
             excelResponse.setIsUpdated(isUpdated);
