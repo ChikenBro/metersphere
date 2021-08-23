@@ -8,7 +8,6 @@ import io.metersphere.commons.utils.LogUtil;
 import io.metersphere.service.ProjectService;
 import io.metersphere.track.issue.MDJiraPlatform;
 import io.metersphere.track.request.testcase.IssuesRequest;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -62,7 +61,6 @@ public class SyncJiraIssueTask {
             if (null != syncId) {
                 syncIds.remove(projectId);
             }
-            lock.unlock();
         }
     }
 

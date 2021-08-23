@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.metersphere.base.mapper.TestPlanMembersMapper">
+  <resultMap id="BaseResultMap" type="io.metersphere.base.domain.TestPlanMembers">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="test_plan_id" jdbcType="VARCHAR" property="testPlanId" />
+    <result column="project_id" jdbcType="VARCHAR" property="projectId" />
+    <result column="tester" jdbcType="VARCHAR" property="tester" />
+    <result column="creator" jdbcType="VARCHAR" property="creator" />
+    <result column="test_case_total" jdbcType="INTEGER" property="testCaseTotal" />
+    <result column="execute_test_case" jdbcType="INTEGER" property="executeTestCase" />
+    <result column="test_case_pass" jdbcType="INTEGER" property="testCasePass" />
+    <result column="test_case_fail" jdbcType="INTEGER" property="testCaseFail" />
+    <result column="test_case_block" jdbcType="INTEGER" property="testCaseBlock" />
+    <result column="create_time" jdbcType="BIGINT" property="createTime" />
+    <result column="update_time" jdbcType="BIGINT" property="updateTime" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="io.metersphere.base.domain.TestPlanMembers">
+    <result column="ext_content" jdbcType="LONGVARCHAR" property="extContent" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, test_plan_id, project_id, tester, creator, test_case_total, execute_test_case, 
+    test_case_pass, test_case_fail, test_case_block, create_time, update_time
+  </sql>
+  <sql id="Blob_Column_List">
+    ext_content
+  </sql>
+  <select id="selectByExampleWithBLOBs" parameterType="io.metersphere.base.domain.TestPlanMembersExample" resultMap="ResultMapWithBLOBs">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from test_plan_members
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByExample" parameterType="io.metersphere.base.domain.TestPlanMembersExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from test_plan_members
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from test_plan_members
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from test_plan_members
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="io.metersphere.base.domain.TestPlanMembersExample">
+    delete from test_plan_members
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="io.metersphere.base.domain.TestPlanMembers">
+    insert into test_plan_members (id, test_plan_id, project_id, 
+      tester, creator, test_case_total, 
+      execute_test_case, test_case_pass, test_case_fail, 
+      test_case_block, create_time, update_time, 
+      ext_content)
+    values (#{id,jdbcType=INTEGER}, #{testPlanId,jdbcType=VARCHAR}, #{projectId,jdbcType=VARCHAR}, 
+      #{tester,jdbcType=VARCHAR}, #{creator,jdbcType=VARCHAR}, #{testCaseTotal,jdbcType=INTEGER}, 
+      #{executeTestCase,jdbcType=INTEGER}, #{testCasePass,jdbcType=INTEGER}, #{testCaseFail,jdbcType=INTEGER}, 
+      #{testCaseBlock,jdbcType=INTEGER}, #{createTime,jdbcType=BIGINT}, #{updateTime,jdbcType=BIGINT}, 
+      #{extContent,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="io.metersphere.base.domain.TestPlanMembers">
+    insert into test_plan_members
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="testPlanId != null">
+        test_plan_id,
+      </if>
+      <if test="projectId != null">
+        project_id,
+      </if>
+      <if test="tester != null">
+        tester,
+      </if>
+      <if test="creator != null">
+        creator,
+      </if>
+      <if test="testCaseTotal != null">
+        test_case_total,
+      </if>
+      <if test="executeTestCase != null">
+        execute_test_case,
+      </if>
+      <if test="testCasePass != null">
+        test_case_pass,
+      </if>
+      <if test="testCaseFail != null">
+        test_case_fail,
+      </if>
+      <if test="testCaseBlock != null">
+        test_case_block,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="extContent != null">
+        ext_content,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="testPlanId != null">
+        #{testPlanId,jdbcType=VARCHAR},
+      </if>
+      <if test="projectId != null">
+        #{projectId,jdbcType=VARCHAR},
+      </if>
+      <if test="tester != null">
+        #{tester,jdbcType=VARCHAR},
+      </if>
+      <if test="creator != null">
+        #{creator,jdbcType=VARCHAR},
+      </if>
+      <if test="testCaseTotal != null">
+        #{testCaseTotal,jdbcType=INTEGER},
+      </if>
+      <if test="executeTestCase != null">
+        #{executeTestCase,jdbcType=INTEGER},
+      </if>
+      <if test="testCasePass != null">
+        #{testCasePass,jdbcType=INTEGER},
+      </if>
+      <if test="testCaseFail != null">
+        #{testCaseFail,jdbcType=INTEGER},
+      </if>
+      <if test="testCaseBlock != null">
+        #{testCaseBlock,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=BIGINT},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=BIGINT},
+      </if>
+      <if test="extContent != null">
+        #{extContent,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="io.metersphere.base.domain.TestPlanMembersExample" resultType="java.lang.Long">
+    select count(*) from test_plan_members
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update test_plan_members
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.testPlanId != null">
+        test_plan_id = #{record.testPlanId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.projectId != null">
+        project_id = #{record.projectId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.tester != null">
+        tester = #{record.tester,jdbcType=VARCHAR},
+      </if>
+      <if test="record.creator != null">
+        creator = #{record.creator,jdbcType=VARCHAR},
+      </if>
+      <if test="record.testCaseTotal != null">
+        test_case_total = #{record.testCaseTotal,jdbcType=INTEGER},
+      </if>
+      <if test="record.executeTestCase != null">
+        execute_test_case = #{record.executeTestCase,jdbcType=INTEGER},
+      </if>
+      <if test="record.testCasePass != null">
+        test_case_pass = #{record.testCasePass,jdbcType=INTEGER},
+      </if>
+      <if test="record.testCaseFail != null">
+        test_case_fail = #{record.testCaseFail,jdbcType=INTEGER},
+      </if>
+      <if test="record.testCaseBlock != null">
+        test_case_block = #{record.testCaseBlock,jdbcType=INTEGER},
+      </if>
+      <if test="record.createTime != null">
+        create_time = #{record.createTime,jdbcType=BIGINT},
+      </if>
+      <if test="record.updateTime != null">
+        update_time = #{record.updateTime,jdbcType=BIGINT},
+      </if>
+      <if test="record.extContent != null">
+        ext_content = #{record.extContent,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExampleWithBLOBs" parameterType="map">
+    update test_plan_members
+    set id = #{record.id,jdbcType=INTEGER},
+      test_plan_id = #{record.testPlanId,jdbcType=VARCHAR},
+      project_id = #{record.projectId,jdbcType=VARCHAR},
+      tester = #{record.tester,jdbcType=VARCHAR},
+      creator = #{record.creator,jdbcType=VARCHAR},
+      test_case_total = #{record.testCaseTotal,jdbcType=INTEGER},
+      execute_test_case = #{record.executeTestCase,jdbcType=INTEGER},
+      test_case_pass = #{record.testCasePass,jdbcType=INTEGER},
+      test_case_fail = #{record.testCaseFail,jdbcType=INTEGER},
+      test_case_block = #{record.testCaseBlock,jdbcType=INTEGER},
+      create_time = #{record.createTime,jdbcType=BIGINT},
+      update_time = #{record.updateTime,jdbcType=BIGINT},
+      ext_content = #{record.extContent,jdbcType=LONGVARCHAR}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update test_plan_members
+    set id = #{record.id,jdbcType=INTEGER},
+      test_plan_id = #{record.testPlanId,jdbcType=VARCHAR},
+      project_id = #{record.projectId,jdbcType=VARCHAR},
+      tester = #{record.tester,jdbcType=VARCHAR},
+      creator = #{record.creator,jdbcType=VARCHAR},
+      test_case_total = #{record.testCaseTotal,jdbcType=INTEGER},
+      execute_test_case = #{record.executeTestCase,jdbcType=INTEGER},
+      test_case_pass = #{record.testCasePass,jdbcType=INTEGER},
+      test_case_fail = #{record.testCaseFail,jdbcType=INTEGER},
+      test_case_block = #{record.testCaseBlock,jdbcType=INTEGER},
+      create_time = #{record.createTime,jdbcType=BIGINT},
+      update_time = #{record.updateTime,jdbcType=BIGINT}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="io.metersphere.base.domain.TestPlanMembers">
+    update test_plan_members
+    <set>
+      <if test="testPlanId != null">
+        test_plan_id = #{testPlanId,jdbcType=VARCHAR},
+      </if>
+      <if test="projectId != null">
+        project_id = #{projectId,jdbcType=VARCHAR},
+      </if>
+      <if test="tester != null">
+        tester = #{tester,jdbcType=VARCHAR},
+      </if>
+      <if test="creator != null">
+        creator = #{creator,jdbcType=VARCHAR},
+      </if>
+      <if test="testCaseTotal != null">
+        test_case_total = #{testCaseTotal,jdbcType=INTEGER},
+      </if>
+      <if test="executeTestCase != null">
+        execute_test_case = #{executeTestCase,jdbcType=INTEGER},
+      </if>
+      <if test="testCasePass != null">
+        test_case_pass = #{testCasePass,jdbcType=INTEGER},
+      </if>
+      <if test="testCaseFail != null">
+        test_case_fail = #{testCaseFail,jdbcType=INTEGER},
+      </if>
+      <if test="testCaseBlock != null">
+        test_case_block = #{testCaseBlock,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=BIGINT},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=BIGINT},
+      </if>
+      <if test="extContent != null">
+        ext_content = #{extContent,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="io.metersphere.base.domain.TestPlanMembers">
+    update test_plan_members
+    set test_plan_id = #{testPlanId,jdbcType=VARCHAR},
+      project_id = #{projectId,jdbcType=VARCHAR},
+      tester = #{tester,jdbcType=VARCHAR},
+      creator = #{creator,jdbcType=VARCHAR},
+      test_case_total = #{testCaseTotal,jdbcType=INTEGER},
+      execute_test_case = #{executeTestCase,jdbcType=INTEGER},
+      test_case_pass = #{testCasePass,jdbcType=INTEGER},
+      test_case_fail = #{testCaseFail,jdbcType=INTEGER},
+      test_case_block = #{testCaseBlock,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=BIGINT},
+      update_time = #{updateTime,jdbcType=BIGINT},
+      ext_content = #{extContent,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="io.metersphere.base.domain.TestPlanMembers">
+    update test_plan_members
+    set test_plan_id = #{testPlanId,jdbcType=VARCHAR},
+      project_id = #{projectId,jdbcType=VARCHAR},
+      tester = #{tester,jdbcType=VARCHAR},
+      creator = #{creator,jdbcType=VARCHAR},
+      test_case_total = #{testCaseTotal,jdbcType=INTEGER},
+      execute_test_case = #{executeTestCase,jdbcType=INTEGER},
+      test_case_pass = #{testCasePass,jdbcType=INTEGER},
+      test_case_fail = #{testCaseFail,jdbcType=INTEGER},
+      test_case_block = #{testCaseBlock,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=BIGINT},
+      update_time = #{updateTime,jdbcType=BIGINT}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

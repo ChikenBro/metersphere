@@ -490,7 +490,7 @@ export default {
     select_project: 'please select project',
     select_group: 'please select group',
     add_user_group_batch: 'Batch Add User Group',
-    add_project_batch : 'Batch Add User To Project',
+    add_project_batch: 'Batch Add User To Project',
     add_project_batch_tip: 'Add a read-only user group for members by default (system)',
   },
   group: {
@@ -801,8 +801,8 @@ export default {
         batch_delete: "Batch deletion",
         delete_confirm: "Confirm deletion",
         batch_to_performance_confirm: "Confirm Batch Create Performance Test",
-        batch_copy_confirm:"Confirm batch copy",
-        batch_copy_end:"Batch Copy Over",
+        batch_copy_confirm: "Confirm batch copy",
+        batch_copy_end: "Batch Copy Over",
         delete_case_confirm: "Confirm case deletion",
         delete_confirm_step: "Confirm deletion step",
         assertions_rule: "Assertion rule",
@@ -1332,6 +1332,7 @@ export default {
     date: "Date"
   },
   test_track: {
+    sync_jira_test_case: 'Synchronously testcase for jira',
     sync_add_api_load: 'Synchronously add associated api and load tests',
     next: 'Next',
     total_size: 'Total {0}',
