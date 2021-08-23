@@ -24,7 +24,9 @@ import io.metersphere.service.CheckPermissionService;
 import io.metersphere.service.OrganizationService;
 import io.metersphere.service.UserService;
 import io.metersphere.service.WorkspaceService;
+import io.metersphere.track.service.SyncTestCaseService;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -48,6 +50,8 @@ public class UserController {
     private WorkspaceService workspaceService;
     @Resource
     private CheckPermissionService checkPermissionService;
+    @Autowired
+    private SyncTestCaseService syncTestCaseService;
 
     @PostMapping("/special/add")
     @MsAuditLog(module = "system_user", type = OperLogConstants.CREATE, content = "#msClass.getLogDetails(#user)", msClass = UserService.class)

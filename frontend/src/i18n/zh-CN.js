@@ -1337,6 +1337,7 @@ export default {
     date: "日期"
   },
   test_track: {
+    sync_jira_test_case: '同步jira用例',
     sync_add_api_load: '同步添加关联的接口和性能测试',
     next: '下一条',
     total_size: '共 {0} 条',

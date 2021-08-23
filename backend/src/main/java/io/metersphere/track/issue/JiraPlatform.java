@@ -13,6 +13,7 @@ import io.metersphere.commons.utils.LogUtil;
 import io.metersphere.commons.utils.SessionUtils;
 import io.metersphere.dto.CustomFieldItemDTO;
 import io.metersphere.dto.UserDTO;
+import io.metersphere.service.UserService;
 import io.metersphere.track.dto.DemandDTO;
 import io.metersphere.track.issue.client.JiraClientV2;
 import io.metersphere.track.issue.domain.Jira.JiraAddIssueResponse;
@@ -36,6 +37,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class JiraPlatform extends AbstractIssuePlatform {
 
@@ -90,7 +93,9 @@ public class JiraPlatform extends AbstractIssuePlatform {
         status = getStatus(fields);
         JSONObject assignee = (JSONObject) fields.get("assignee");
         String description = fields.getString("description");
-
+        if (null == description) {
+            description = "";
+        }
         Parser parser = Parser.builder().build();
         Node document = parser.parse(description);
         HtmlRenderer renderer = HtmlRenderer.builder().build();
@@ -263,6 +268,14 @@ public class JiraPlatform extends AbstractIssuePlatform {
     private void handleMuDuCustomData(CustomFieldItemDTO item, JSONObject fields) {
         if ("assignee".equals(item.getCustomData())) {
             JSONObject object = new JSONObject();
+            User user = this.userService.selectUser(item.getValue(), "");
+            if ("LDAP".equals(user.getSource())) {
+                Pattern pattern = Pattern.compile("([\\s\\S].+)@mudu.tv");
+                Matcher matcher = pattern.matcher(user.getEmail());
+                if (matcher.find()) {
+                    item.setValue(matcher.group(1));
+                }
+            }
             object.put("name", item.getValue());
             fields.put(item.getCustomData(), object);
         }

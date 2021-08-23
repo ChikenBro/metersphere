@@ -135,7 +135,10 @@ public class TestCaseService {
 
     public TestCaseWithBLOBs addTestCase(TestCaseWithBLOBs testCase) {
         testCase.setName(testCase.getName());
-        checkTestCaseExist(testCase);
+        if (null != checkTestCaseExist(testCase)) {
+            LogUtil.info("已存在相同数据: " + testCase.getId());
+            return testCase;
+        }
         testCase.setId(testCase.getId());
         testCase.setCreateTime(System.currentTimeMillis());
         testCase.setUpdateTime(System.currentTimeMillis());
@@ -485,6 +488,7 @@ public class TestCaseService {
         for (TestCase testCase : testCases) {
             if (useCunstomId) {
                 savedIds.add(testCase.getCustomNum());
+
             } else {
                 savedIds.add(String.valueOf(testCase.getNum()));
             }
