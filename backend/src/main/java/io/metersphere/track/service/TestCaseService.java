@@ -54,9 +54,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URLEncoder;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -488,6 +486,7 @@ public class TestCaseService {
         for (TestCase testCase : testCases) {
             if (useCunstomId) {
                 savedIds.add(testCase.getCustomNum());
+
             } else {
                 savedIds.add(String.valueOf(testCase.getNum()));
             }
@@ -499,9 +498,11 @@ public class TestCaseService {
             MSException.throwException(Translator.get("upload_fail"));
         }
         if (multipartFile.getOriginalFilename().endsWith(".xmind")) {
+            XmindCaseParser xmindParser = new XmindCaseParser(this, userId, projectId, testCaseNames, useCunstomId, importType);
             try {
-                XmindCaseParser xmindParser = new XmindCaseParser(this, userId, projectId, testCaseNames, useCunstomId, importType);
-                errList = xmindParser.parse(multipartFile);
+//                errList = xmindParser.parse(multipartFile);
+                // 改动
+                errList = xmindParser.realizationTestCase(multipartFile);
                 if (CollectionUtils.isEmpty(xmindParser.getNodePaths())
                         && CollectionUtils.isEmpty(xmindParser.getTestCase())
                         && CollectionUtils.isEmpty(xmindParser.getUpdateTestCase())) {

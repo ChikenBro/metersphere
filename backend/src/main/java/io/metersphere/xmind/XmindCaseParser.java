@@ -13,13 +13,15 @@ import io.metersphere.excel.utils.FunctionCaseImportEnum;
 import io.metersphere.i18n.Translator;
 import io.metersphere.track.service.TestCaseService;
 import io.metersphere.xmind.parser.XmindParser;
-import io.metersphere.xmind.parser.pojo.Attached;
-import io.metersphere.xmind.parser.pojo.JsonRootBean;
+import io.metersphere.xmind.parser.pojo.*;
 import io.metersphere.xmind.utils.DetailUtil;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.lang3.StringUtils;
+import org.dom4j.DocumentException;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -46,6 +48,17 @@ public class XmindCaseParser {
      * 转换后的案例信息
      */
     private List<TestCaseWithBLOBs> testCases;
+
+    /**
+     * 前置用例-> testCases
+     */
+    private List<PrefixTestCaseTemplate> prefixTestCase = new ArrayList<>();
+
+    /**
+     * 一级标题
+     */
+    private String oneTitle;
+
     /**
      * 需要更新的用例
      */
@@ -59,6 +72,11 @@ public class XmindCaseParser {
      * 记录没有用例的目录
      */
     private List<String> nodePaths;
+
+    /**
+     * 记录有用例的数据的目录
+     */
+    private List<TitleSet> caseNode = new ArrayList<>();
 
     private List<TestCaseWithBLOBs> continueValidatedCase;
 
@@ -160,16 +178,15 @@ public class XmindCaseParser {
 
 
         //用例名称判断
-        if(StringUtils.isEmpty(data.getName())){
+        if (StringUtils.isEmpty(data.getName())) {
             validatePass = false;
             process.add("name" + Translator.get("cannot_be_null"), nodePath + "");
-        }else {
+        } else {
             if (data.getName().length() > 200) {
                 validatePass = false;
                 process.add(Translator.get("test_case") + Translator.get("test_track.length_less_than") + "200", nodePath + data.getName());
             }
         }
-
 
 
         if (!StringUtils.isEmpty(nodePath)) {
@@ -424,7 +441,46 @@ public class XmindCaseParser {
         if (validate(testCase)) {
             testCases.add(testCase);
         }
+
     }
+
+    /**
+     * 处理testcase，不返回错误信息
+     */
+    public List<ExcelErrData<TestCaseExcelData>> realizationTestCase(MultipartFile multipartFile) throws DocumentException, ArchiveException, IOException {
+        List<PrefixTestCaseTemplate> testCases = parseTestCase(multipartFile);
+        for (PrefixTestCaseTemplate testcase : testCases) {
+            formatTestCase(testcase);
+        }
+        return new ArrayList<>();
+    }
+
+    /**
+     * 格式化一个用例-重写
+     */
+    private void formatTestCase(PrefixTestCaseTemplate attacheds) {
+        TestCaseWithBLOBs testCase = new TestCaseWithBLOBs();
+        testCase.setNodePath(attacheds.getModulePath());
+        testCase.setProjectId(projectId);
+        testCase.setName(attacheds.getCaseTitle());
+        testCase.setMaintainer(maintainer);
+        //配置优先级
+        int i = Integer.parseInt(attacheds.getPriority()) - 1;
+        testCase.setPriority(priorityList.get(i));
+        //前置条件
+        testCase.setPrerequisite(attacheds.getPrecondition());
+        testCase.setMethod("manual");
+        testCase.setType("functional");
+        testCase.setCustomNum(attacheds.getCustomNum());
+        testCase.setSteps(attacheds.getCaseStep().toString());
+        //步骤类型
+        testCase.setStepModel("STEP");
+        //校验合规性
+        if (validate(testCase)) {
+            testCases.add(testCase);
+        }
+    }
+
 
     /**
      * 导入思维导图处理
@@ -466,6 +522,307 @@ public class XmindCaseParser {
             return process.parse(ex.getMessage());
         }
         return process.parse();
+    }
+
+
+    public List<PrefixTestCaseTemplate> parseTestCase(MultipartFile multipartFile) throws DocumentException, ArchiveException, IOException {
+        // 获取思维导图内容
+        List<JsonRootBean> roots = XmindParser.parseObject(multipartFile);
+        JsonRootBean root = roots.get(0);
+        //一级标题
+        oneTitle = root.getRootTopic().getTitle();
+        Children children = root.getRootTopic().getChildren();
+        System.out.println(children);
+
+        // 获取所有用例数据,解析模块
+        handleNode(children);
+        System.out.println(caseNode);
+
+        //解析成用例内容
+        parseCase(children, "");
+        System.out.println(prefixTestCase);
+        return prefixTestCase;
+    }
+
+    /**
+     * 处理模块
+     */
+    public void handleNode(Children children) {
+        List<TitleSet> titleSets = new ArrayList<>();
+        // 拼接上下级为一组，直到用例标题
+        List<TitleSet> nodeTitle = parseNode(children, titleSets);
+        //获取所有模块节点名称-id唯一，title可能重复 比如path 1/1/2
+        Map<String, String> map = new HashMap<>();
+        for (TitleSet node : nodeTitle) {
+            map.put(node.getFirstId(), node.getFirstTitle());
+        }
+        //筛选用例数据
+        for (TitleSet n : nodeTitle) {
+            if (map.containsKey(n.getId())) {
+                continue;
+            } else {
+                caseNode.add(n);
+            }
+        }
+
+        // 拼接模块
+        for (TitleSet node : caseNode) {
+            String firstTitle = node.getFirstTitle();
+            String firstId = node.getFirstId();
+            List<String> path = new ArrayList<>();
+            List<String> allNode = splicingPath(firstTitle, firstId, nodeTitle, path);
+            //替换用例下的路径
+            node.setFirstTitle(handleNodeName(allNode));
+        }
+    }
+
+    /**
+     * 拼接处理节点名称
+     */
+    public String handleNodeName(List<String> allNode) {
+        //数组反转
+        Collections.reverse(allNode);
+        String nodeName = "";
+        for (String node : allNode) {
+            nodeName = nodeName + "/" + node;
+        }
+        //增加一级标题
+//        nodeName = oneTitle + nodeName;
+        return nodeName;
+    }
+
+    /**
+     * 获取用例上级所有节点名称
+     */
+    public List<String> splicingPath(String firstTitle, String firstId, List<TitleSet> nodeTitle, List<String> nodeModules) {
+        nodeModules.add(firstTitle);
+        while (true) {
+            List<String> list = getSuperTitle(nodeTitle, firstTitle, firstId);
+            String superTitle = list.get(0);
+            firstId = list.get(1);
+            if (superTitle.equals("")) {
+                return nodeModules;
+            } else {
+                nodeModules.add(superTitle);
+                firstTitle = superTitle;
+                // 处理无限循环
+                if (nodeModules.size() > 15) {
+                    return nodeModules;
+                }
+            }
+        }
+    }
+
+    /**
+     * 获取上级标题：模块节点
+     */
+    public List<String> getSuperTitle(List<TitleSet> nodeTitle, String firstTitle, String firstId) {
+        List<String> list = new ArrayList<>();
+        for (TitleSet node : nodeTitle) {
+            if (firstTitle.equals(node.getTitle()) && firstId.equals(node.getId())) {
+                firstTitle = node.getFirstTitle();
+                firstId = node.getFirstId();
+                list.add(firstTitle);
+                list.add(firstId);
+                return list;
+            }
+        }
+        list.add("");
+        list.add(firstId);
+        return list;
+    }
+
+    /**
+     * 处理模块
+     */
+    public List<TitleSet> parseNode(Children children, List<TitleSet> titleSets) {
+        for (Attached root : children.getAttached()) {
+            String firstTitle = root.getTitle();
+            String firstId = root.getId();
+            // 如果有优先级，忽略后面节点 或者 没有下级
+            if (root.getMarkerRefs() != null || root.getChildren() == null) {
+                continue;
+            }
+            // 有前置条件，忽略后面节点
+            List<Attached> topic = root.getChildren().getAttached();
+            if (topic.get(0).getTitle().contains("前置条件:") || topic.get(0).getTitle().contains("前置条件：")) {
+                continue;
+            }
+            // 如果下级不为空
+            if (root.getChildren() != null) {
+                List<Attached> datas = root.getChildren().getAttached();
+                for (Attached data : datas) {
+                    TitleSet titleSet = new TitleSet();
+                    String title = data.getTitle();
+                    String id = data.getId();
+                    titleSet.setFirstTitle(firstTitle);
+                    titleSet.setFirstId(firstId);
+                    titleSet.setTitle(title);
+                    titleSet.setId(id);
+                    titleSets.add(titleSet);
+                }
+                parseNode(root.getChildren(), titleSets);
+            }
+        }
+        return titleSets;
+    }
+
+    /**
+     * 处理用例
+     */
+    private void parseCase(Children children, String treeId) {
+        for (Attached root : children.getAttached()) {
+            // 如果没有下级
+            if (root.getChildren() == null || root.getChildren().getAttached() == null) {
+                //当前节点有优先级
+                if (root.getMarkerRefs() != null) {
+                    PrefixTestCaseTemplate caseStep = testPoint(root);
+                    prefixTestCase.add(caseStep);
+                    continue;
+                } else {
+                    //当前节点无优先级
+                    continue;
+                }
+
+            } else {
+                //如果勾选用例优先级 或者 下级有前置条件
+                String context = root.getChildren().getAttached().get(0).getTitle();
+                if (root.getMarkerRefs() != null || context.split("前置条件：").length > 1 || context.split("前置条件:").length > 1) {
+                    //如果标记❌,忽略下面所有用例
+                    Marker marker = root.getMarkerRefs();
+                    if (marker != null && root.getMarkerRefs().getMarkerRef().get(0).markerId.equals("symbol-wrong")) {
+                        continue;
+                    }
+                    //下级有前置条件
+                    PrefixTestCaseTemplate caseStep = handleCase(root.getChildren().getAttached(), root.getId(), root.getTitle(), marker);
+                    if (caseStep == null) {
+                        break;
+                    }
+                    System.out.println(caseStep);
+                    prefixTestCase.add(caseStep);
+                    continue;
+                } else {
+                    String newTreeId = root.getId();
+                    parseCase(root.getChildren(), newTreeId);
+                }
+            }
+        }
+    }
+
+    /**
+     * 处理只有优先级的用例标题-测试点
+     */
+    private PrefixTestCaseTemplate testPoint(Attached roots) {
+        PrefixTestCaseTemplate testCaseTemplate = new PrefixTestCaseTemplate();
+        //只有测试点
+        testCaseTemplate.setCaseTitle(roots.getTitle());
+        testCaseTemplate.setPrecondition("");
+        testCaseTemplate.setTreeId(roots.getId());
+        testCaseTemplate.setPriority(handleCasePriority(roots.getMarkerRefs()));
+        for (TitleSet node : caseNode) {
+            if (roots.getTitle().equals(node.getTitle()) && roots.getId().equals(node.getId())) {
+                testCaseTemplate.setModulePath(node.getFirstTitle());
+                nodePaths.add(node.getFirstTitle());
+                break;
+            }
+        }
+        //空数组
+        List<Map> lists = new ArrayList<>();
+        testCaseTemplate.setCaseStep(lists);
+        return testCaseTemplate;
+    }
+
+    /**
+     * 处理常规用例
+     */
+    private PrefixTestCaseTemplate handleCase(List<Attached> roots, String treeId, String superTitle, Marker priority) {
+        PrefixTestCaseTemplate testCaseTemplate = new PrefixTestCaseTemplate();
+        testCaseTemplate = getRecondition(testCaseTemplate, roots.get(0));
+        //判断第一行是否为前置条件
+        if (!testCaseTemplate.getPrecondition().equals("")) {
+            roots.remove(0);
+        }
+//        System.out.println(precondition);
+//        testCaseTemplate.setPrecondition(precondition);
+        testCaseTemplate.setCaseTitle(superTitle);
+        testCaseTemplate.setTreeId(treeId);
+        testCaseTemplate.setPriority(handleCasePriority(priority));
+        for (TitleSet node : caseNode) {
+            if (superTitle.equals(node.getTitle()) && treeId.equals(node.getId())) {
+                testCaseTemplate.setModulePath(node.getFirstTitle());
+                nodePaths.add(node.getFirstTitle());
+                break;
+            }
+        }
+        //步骤结果
+        List<Map> lists = new ArrayList<>();
+        int num = 1;
+        for (Attached root : roots) {
+            JSONObject map = new JSONObject(true);
+            String step = root.getTitle();
+            String expect;
+            //如果没有下级-也就是无结果，默认expect为空
+            if (root.getChildren() != null) {
+                expect = root.getChildren().getAttached().get(0).getTitle();
+            } else {
+                expect = "";
+            }
+            map.put("num", num);
+            map.put("desc", step);
+            map.put("result", expect);
+            lists.add(map);
+            num++;
+        }
+        testCaseTemplate.setCaseStep(lists);
+        return testCaseTemplate;
+    }
+
+    /**
+     * 处理用例优先级
+     */
+    private String handleCasePriority(Marker priority) {
+        if (priority == null) {
+            return "3";
+        }
+        String pri = priority.getMarkerRef().get(0).markerId.replace("priority-", "");
+        if (pri.length() > 1) {
+            return "3";
+        }
+        return pri;
+    }
+
+    /**
+     * 获取前置条件和更新id
+     */
+    private PrefixTestCaseTemplate getRecondition(PrefixTestCaseTemplate testCaseTemplate, Attached root) {
+        String precondition;
+        String customNum;
+        //第一列为前置条件
+        if (root.getTitle().split("前置条件").length > 1) {
+            precondition = root.getTitle().replace("前置条件:", "").replace("前置条件：", "");
+            testCaseTemplate.setPrecondition(precondition);
+            //前置条件后无更新用例id
+            if (root.getChildren() == null) {
+                testCaseTemplate.setCustomNum(null);
+            } else if (root.getChildren().getAttached().get(0).getTitle().split("id").length > 1) {
+                customNum = root.getChildren().getAttached().get(0).getTitle().replace("id:", "").replace("id：", "");
+                testCaseTemplate.setCustomNum(customNum);
+            } else {
+                testCaseTemplate.setCustomNum(null);
+            }
+            return testCaseTemplate;
+        }
+        //第一列为更新用例id
+        if (root.getTitle().split("id").length > 1) {
+            customNum = root.getTitle().replace("id:", "").replace("id：", "");
+            testCaseTemplate.setPrecondition("");
+            testCaseTemplate.setCustomNum(customNum);
+            return testCaseTemplate;
+        }
+        //第一列无前置条件与更新用例id
+        testCaseTemplate.setPrecondition("");
+        testCaseTemplate.setCustomNum(null);
+        return testCaseTemplate;
     }
 
     public List<TestCaseWithBLOBs> getContinueValidatedCase() {
