@@ -79,8 +79,13 @@
                       </el-row>
                     </el-form>
 
-                    <form-rich-text-item :label-width="formLabelWidth" :disabled="true" :title="$t('test_track.case.prerequisite')" :data="testCase" prop="prerequisite"/>
+                    <form-rich-text-item :label-width="formLabelWidth" v-if="testCase.stepModel !== 'Cucumber'" :disabled="true" :title="$t('test_track.case.prerequisite')" :data="testCase" prop="prerequisite"/>
                     <step-change-item :disable="true" :label-width="formLabelWidth" :form="testCase"/>
+                    <el-form-item :label-width="formLabelWidth" label="Scenario" prop="stepDescription"
+                                  v-if="testCase.stepModel === 'Cucumber'">
+                      <ms-code-edit :mode="mode" height="400px" :read-only="readOnly" :data.sync="testCase.stepDescription"
+                                    :modes="modes" ref="codeEdit"/>
+                    </el-form-item>
                     <test-plan-case-step-results-item :label-width="formLabelWidth" :is-read-only="isReadOnly" v-if="testCase.stepModel === 'STEP'" :test-case="testCase"/>
                     <form-rich-text-item :label-width="formLabelWidth" v-if="testCase.stepModel === 'TEXT'" :disabled="true" :title="$t('test_track.case.step_desc')" :data="testCase" prop="stepDescription"/>
                     <form-rich-text-item :label-width="formLabelWidth" v-if="testCase.stepModel === 'TEXT'" :disabled="true" :title="$t('test_track.case.expected_results')" :data="testCase" prop="expectedResult"/>
@@ -140,6 +145,7 @@ import IssueDescriptionTableItem from "@/business/components/track/issue/IssueDe
 import StepChangeItem from "@/business/components/track/case/components/StepChangeItem";
 import TestCaseStepItem from "@/business/components/track/case/components/TestCaseStepItem";
 import TestPlanCaseStepResultsItem from "@/business/components/track/plan/view/comonents/functional/TestPlanCaseStepResultsItem";
+import MsCodeEdit from "@/business/components/common/components/MsCodeEdit";
 
 export default {
   name: "FunctionalTestCaseEdit",
@@ -160,10 +166,14 @@ export default {
     ApiTestResult,
     ApiTestDetail,
     TestPlanTestCaseStatusButton,
-    TestCaseAttachment
+    TestCaseAttachment,
+    MsCodeEdit
   },
   data() {
     return {
+      readOnly:true,
+      modes: ['text', 'json', 'xml', 'html', 'gherkin'],
+      mode: "gherkin",
       result: {},
       showDialog: false,
       testCase: {},

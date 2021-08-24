@@ -7,6 +7,7 @@ import com.google.common.collect.ImmutableMap;
 import io.metersphere.base.domain.TestCaseWithBLOBs;
 import io.metersphere.commons.constants.TestCaseConstants;
 import io.metersphere.commons.utils.BeanUtils;
+import io.metersphere.commons.utils.LogUtil;
 import io.metersphere.excel.domain.ExcelErrData;
 import io.metersphere.excel.domain.TestCaseExcelData;
 import io.metersphere.excel.utils.FunctionCaseImportEnum;
@@ -458,21 +459,21 @@ public class XmindCaseParser {
     /**
      * 格式化一个用例-重写
      */
-    private void formatTestCase(PrefixTestCaseTemplate attacheds) {
+    private void formatTestCase(PrefixTestCaseTemplate attached) {
         TestCaseWithBLOBs testCase = new TestCaseWithBLOBs();
-        testCase.setNodePath(attacheds.getModulePath());
+        testCase.setNodePath(attached.getModulePath());
         testCase.setProjectId(projectId);
-        testCase.setName(attacheds.getCaseTitle());
+        testCase.setName(attached.getCaseTitle());
         testCase.setMaintainer(maintainer);
-        //配置优先级
-        int i = Integer.parseInt(attacheds.getPriority()) - 1;
+        //用例优先级
+        int i = Integer.parseInt(attached.getPriority()) - 1;
         testCase.setPriority(priorityList.get(i));
         //前置条件
-        testCase.setPrerequisite(attacheds.getPrecondition());
+        testCase.setPrerequisite(attached.getPrecondition());
         testCase.setMethod("manual");
         testCase.setType("functional");
-        testCase.setCustomNum(attacheds.getCustomNum());
-        testCase.setSteps(attacheds.getCaseStep().toString());
+        testCase.setCustomNum(attached.getCustomNum());
+        testCase.setSteps(attached.getCaseStep().toString());
         //步骤类型
         testCase.setStepModel("STEP");
         //校验合规性
@@ -532,15 +533,15 @@ public class XmindCaseParser {
         //一级标题
         oneTitle = root.getRootTopic().getTitle();
         Children children = root.getRootTopic().getChildren();
-        System.out.println(children);
+//        System.out.println(children);
 
         // 获取所有用例数据,解析模块
         handleNode(children);
-        System.out.println(caseNode);
+        LogUtil.info("当前测试模块: " + caseNode);
 
         //解析成用例内容
         parseCase(children, "");
-        System.out.println(prefixTestCase);
+        LogUtil.info("当前测试: " + prefixTestCase);
         return prefixTestCase;
     }
 
@@ -597,7 +598,7 @@ public class XmindCaseParser {
     public List<String> splicingPath(String firstTitle, String firstId, List<TitleSet> nodeTitle, List<String> nodeModules) {
         nodeModules.add(firstTitle);
         while (true) {
-            List<String> list = getSuperTitle(nodeTitle, firstTitle, firstId);
+            List<String> list = getParentNodeTitle(nodeTitle, firstTitle, firstId);
             String superTitle = list.get(0);
             firstId = list.get(1);
             if (superTitle.equals("")) {
@@ -616,7 +617,7 @@ public class XmindCaseParser {
     /**
      * 获取上级标题：模块节点
      */
-    public List<String> getSuperTitle(List<TitleSet> nodeTitle, String firstTitle, String firstId) {
+    public List<String> getParentNodeTitle(List<TitleSet> nodeTitle, String firstTitle, String firstId) {
         List<String> list = new ArrayList<>();
         for (TitleSet node : nodeTitle) {
             if (firstTitle.equals(node.getTitle()) && firstId.equals(node.getId())) {
@@ -695,10 +696,10 @@ public class XmindCaseParser {
                     }
                     //下级有前置条件
                     PrefixTestCaseTemplate caseStep = handleCase(root.getChildren().getAttached(), root.getId(), root.getTitle(), marker);
-                    if (caseStep == null) {
-                        break;
-                    }
-                    System.out.println(caseStep);
+//                    if (caseStep == null) {
+//                        break;
+//                    }
+//                    System.out.println(caseStep);
                     prefixTestCase.add(caseStep);
                     continue;
                 } else {
@@ -736,8 +737,7 @@ public class XmindCaseParser {
      * 处理常规用例
      */
     private PrefixTestCaseTemplate handleCase(List<Attached> roots, String treeId, String superTitle, Marker priority) {
-        PrefixTestCaseTemplate testCaseTemplate = new PrefixTestCaseTemplate();
-        testCaseTemplate = getRecondition(testCaseTemplate, roots.get(0));
+        PrefixTestCaseTemplate testCaseTemplate = getRecondition(roots.get(0));
         //判断第一行是否为前置条件
         if (!testCaseTemplate.getPrecondition().equals("")) {
             roots.remove(0);
@@ -794,9 +794,11 @@ public class XmindCaseParser {
     /**
      * 获取前置条件和更新id
      */
-    private PrefixTestCaseTemplate getRecondition(PrefixTestCaseTemplate testCaseTemplate, Attached root) {
+    private PrefixTestCaseTemplate getRecondition(Attached root) {
         String precondition;
         String customNum;
+
+        PrefixTestCaseTemplate testCaseTemplate = new PrefixTestCaseTemplate();
         //第一列为前置条件
         if (root.getTitle().split("前置条件").length > 1) {
             precondition = root.getTitle().replace("前置条件:", "").replace("前置条件：", "");

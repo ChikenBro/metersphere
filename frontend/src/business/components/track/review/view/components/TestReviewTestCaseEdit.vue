@@ -90,9 +90,14 @@
                       </el-row>
                     </el-form>
 
-                    <form-rich-text-item :label-width="formLabelWidth" :disabled="true" :title="$t('test_track.case.prerequisite')"
+                    <form-rich-text-item :label-width="formLabelWidth" v-if="testCase.stepModel !== 'Cucumber'" :disabled="true" :title="$t('test_track.case.prerequisite')"
                                          :data="testCase" prop="prerequisite"/>
                     <step-change-item :disable="true" :label-width="formLabelWidth" :form="testCase"/>
+                    <el-form-item :label-width="formLabelWidth" label="Scenario" prop="stepDescription"
+                                  v-if="testCase.stepModel === 'Cucumber'">
+                      <ms-code-edit :mode="mode" height="400px" :read-only="readOnly" :data.sync="testCase.stepDescription"
+                                    :modes="modes" ref="codeEdit"/>
+                    </el-form-item>
                     <form-rich-text-item :label-width="formLabelWidth" :disabled="true" v-if="testCase.stepModel === 'TEXT'" :title="$t('test_track.case.step_desc')" :data="testCase" prop="stepDescription"/>
                     <form-rich-text-item  :label-width="formLabelWidth" :disabled="true" v-if="testCase.stepModel === 'TEXT'" :title="$t('test_track.case.expected_results')" :data="testCase" prop="expectedResult"/>
 
@@ -146,6 +151,7 @@ import FormRichTextItem from "@/business/components/track/case/components/FormRi
 import CustomFiledComponent from "@/business/components/settings/workspace/template/CustomFiledComponent";
 import StepChangeItem from "@/business/components/track/case/components/StepChangeItem";
 import TestCaseStepItem from "@/business/components/track/case/components/TestCaseStepItem";
+import MsCodeEdit from "@/business/components/common/components/MsCodeEdit";
 
 export default {
   name: "TestReviewTestCaseEdit",
@@ -163,11 +169,15 @@ export default {
     ReviewComment,
     TestCaseAttachment,
     ApiCaseItem,
-    MsEditApiScenario
+    MsEditApiScenario,
+    MsCodeEdit
 
   },
   data() {
     return {
+      readOnly:true,
+      modes: ['text', 'json', 'xml', 'html', 'gherkin'],
+      mode: "gherkin",
       result: {},
       showDialog: false,
       testCase: {},

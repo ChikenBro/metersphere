@@ -772,12 +772,14 @@ public class TestCaseService {
             response.setHeader("Content-disposition", "attachment;filename=" + URLEncoder.encode("思维导图用例模版", "UTF-8") + ".xmind");
             String fileName = null;
             if (StringUtils.equals(importType, FunctionCaseImportEnum.Update.name())) {
-                fileName = "xmind_update.xml";
+//                fileName = "xmind_update.xml";
+                fileName = "md_testcase_tpl.xml";
             } else {
                 if (isUseCustomId) {
                     fileName = "xmind_custom_id.xml";
                 } else {
-                    fileName = "xmind_system_id.xml";
+//                    fileName = "xmind_system_id.xml";
+                    fileName = "md_testcase_tpl.xml";
                 }
             }
             download(fileName, response);

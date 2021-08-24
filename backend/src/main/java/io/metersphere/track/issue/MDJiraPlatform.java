@@ -176,7 +176,7 @@ public class MDJiraPlatform extends JiraPlatform {
             stepSearches.forEach(element -> {
                 XrayTestStep step = new XrayTestStep();
                 step.setId(element.getId());
-                step.setStep(element.getDefinition());
+                step.setStep(element.getDefinition().replace("\\n", "\n"));
                 testSteps.add(step);
             });
             return testSteps;

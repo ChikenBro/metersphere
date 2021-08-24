@@ -156,6 +156,7 @@ export default {
       this.isActive = false;
       this.$nextTick(() => {
         this.isActive = true;
+          console.log('xxx', this.importJson);
       });
     },
     setJsonImport(data) {
