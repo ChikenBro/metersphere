@@ -71,7 +71,7 @@ public class SyncTestCaseService {
         }
         TestCaseNode testCaseNode = testCaseNodeMapper.selectByPrimaryKey(msNodeId);
         if (null == testCaseNode) {
-            throw MSException.getException("没有测试用例模块不存在");
+            throw MSException.getException("测试用例模块不存在, nodeId: " + msNodeId);
         }
         List<FolderInfo> folderIds = Lists.newArrayList();
         getNodeIds(xrayTreeNodes, folderIds, projectId, msNodeId, msNodePath);

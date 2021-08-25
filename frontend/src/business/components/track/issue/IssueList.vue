@@ -49,6 +49,11 @@
             :field="item"
             sortable
             :fields-width="fieldsWidth">
+             <template v-slot="scope">
+              <el-link :href="linkBaseUrl + scope.row.id" type="primary" target="_blank" >
+                {{scope.row.num}}
+              </el-link>
+            </template>
           </ms-table-column>
 
           <ms-table-column
@@ -87,20 +92,20 @@
             prop="creatorName">
           </ms-table-column>
 
-          <ms-table-column
-            :field="item"
-            :fields-width="fieldsWidth"
-            :label="$t('test_track.issue.issue_resource')"
-            prop="resourceName">
-            <template v-slot="scope">
-              <el-link v-if="scope.row.resourceName" @click="$router.push('/track/plan/view/' + scope.row.resourceId)">
-                {{ scope.row.resourceName }}
-              </el-link>
-              <span v-else>
-              --
-            </span>
-            </template>
-          </ms-table-column>
+<!--          <ms-table-column-->
+<!--            :field="item"-->
+<!--            :fields-width="fieldsWidth"-->
+<!--            :label="$t('test_track.issue.issue_resource')"-->
+<!--            prop="resourceName">-->
+<!--            <template v-slot="scope">-->
+<!--              <el-link v-if="scope.row.resourceName" @click="$router.push('/track/plan/view/' + scope.row.resourceId)">-->
+<!--                {{ scope.row.resourceName }}-->
+<!--              </el-link>-->
+<!--              <span v-else>-->
+<!--              &#45;&#45;-->
+<!--            </span>-->
+<!--            </template>-->
+<!--          </ms-table-column>-->
         <ms-table-column prop="createTime"
                        :field="item"
                        :fields-width="fieldsWidth"
@@ -194,6 +199,7 @@ export default {
   },
   data() {
     return {
+      linkBaseUrl: "https://jira.mudutv.com/browse/",
       page: getPageInfo(),
       fields: [],
       tableHeaderKey:"ISSUE_LIST",

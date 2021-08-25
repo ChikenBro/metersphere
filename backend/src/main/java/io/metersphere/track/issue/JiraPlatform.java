@@ -104,6 +104,24 @@ public class JiraPlatform extends AbstractIssuePlatform {
         if (assignee != null) {
             lastmodify = assignee.getString("displayName");
         }
+        // 自定义assignee
+        List<CustomFieldItemDTO> cfs = JSON.parseArray(item.getCustomFields(), CustomFieldItemDTO.class);
+        if (null != cfs) {
+            for (CustomFieldItemDTO cf : cfs) {
+                if (cf.getCustomData().equals("assignee")) {
+                    if (assignee != null) {
+                        try {
+                            String userId = getUserId(assignee.getString("name"), assignee.getString("emailAddress"));
+                            cf.setValue(userId);
+                        } catch (Exception e) {
+                            LogUtil.error(e);
+                            cf.setValue(assignee.getString("name"));
+                        }
+                    }
+                }
+            }
+        }
+        item.setCustomFields(JSON.toJSONString(cfs));
         item.setId(jiraIssue.getKey());
         item.setTitle(fields.getString("summary"));
         item.setCreateTime(fields.getLong("created"));
@@ -248,6 +266,12 @@ public class JiraPlatform extends AbstractIssuePlatform {
                 }
             }
         });
+        // 报告者
+        String userName = getUserName(issuesRequest.getCreator());
+        JSONObject issueParams = (JSONObject) addJiraIssueParam.get("fields");
+        JSONObject reporter = new JSONObject();
+        reporter.put("name", userName);
+        issueParams.put("reporter", reporter);
         JiraAddIssueResponse result = jiraClientV2.addIssue(JSONObject.toJSONString(addJiraIssueParam));
         JiraIssue issues = jiraClientV2.getIssues(result.getId());
 
@@ -268,13 +292,9 @@ public class JiraPlatform extends AbstractIssuePlatform {
     private void handleMuDuCustomData(CustomFieldItemDTO item, JSONObject fields) {
         if ("assignee".equals(item.getCustomData())) {
             JSONObject object = new JSONObject();
-            User user = this.userService.selectUser(item.getValue(), "");
-            if ("LDAP".equals(user.getSource())) {
-                Pattern pattern = Pattern.compile("([\\s\\S].+)@mudu.tv");
-                Matcher matcher = pattern.matcher(user.getEmail());
-                if (matcher.find()) {
-                    item.setValue(matcher.group(1));
-                }
+            String userName = getUserName(item.getValue());
+            if (StringUtils.isNotBlank(userName)) {
+                item.setValue(userName);
             }
             object.put("name", item.getValue());
             fields.put(item.getCustomData(), object);
@@ -287,6 +307,15 @@ public class JiraPlatform extends AbstractIssuePlatform {
                 object.put("name", vl);
                 objects.add(object);
             });
+            fields.put(item.getCustomData(), objects);
+        }
+        if ("components".equals(item.getCustomData())) {
+            List<JSONObject> objects = new ArrayList<>();
+            if (StringUtils.isNotEmpty(item.getValue())) {
+                JSONObject component = new JSONObject();
+                component.put("id", item.getValue());
+                objects.add(component);
+            }
             fields.put(item.getCustomData(), objects);
         }
     }

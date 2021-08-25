@@ -37,7 +37,7 @@
         <include refid="io.metersphere.base.mapper.ext.ExtBaseMapper.orders"/>
     </select>
     <select id="getIssueForSync" resultType="io.metersphere.base.domain.IssuesDao">
-        select id,platform
+        select id,platform,custom_fields
         from issues
         where project_id = #{projectId} and platform != 'Local';
     </select>

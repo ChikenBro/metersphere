@@ -63,7 +63,17 @@ public class MDJiraPlatform extends JiraPlatform {
                 issuesWithBLOBs.setDescription(htmlDesc2MsDesc(issuesWithBLOBs.getDescription()));
                 // creator
                 JSONObject creator = item.getFields().getJSONObject("reporter");
-                issuesWithBLOBs.setCreator(creator.getString("name"));
+                String creatorUserId = "";
+                try {
+                    creatorUserId = getUserId(creator.getString("name"), creator.getString("emailAddress"));
+                } catch (MSException e) {
+                    LogUtil.error(e);
+                }
+                if (StringUtils.isEmpty(creatorUserId)) {
+                    issuesWithBLOBs.setCreator(creator.getString("name"));
+                } else {
+                    issuesWithBLOBs.setCreator(creatorUserId);
+                }
                 // 自定义字段
                 List<CustomFieldItemDTO> customFields = Lists.newArrayList();
                 IssueTemplateDao issueTemplateDao = issueTemplateService.getTemplate(project.getId());
@@ -87,15 +97,35 @@ public class MDJiraPlatform extends JiraPlatform {
                     if ("customfield_10101".equals(customField.getCustomData())) {
                         String fieldString = item.getFields().getString(customField.getCustomData());
                         customFieldItemDTO.setValue(fieldString);
-                    } else {
-                        JSONObject fieldObject = item.getFields().getJSONObject(customField.getCustomData());
-                        if ("assignee".equals(customField.getCustomData())) {
-                            customFieldItemDTO.setValue(fieldObject.getString("name"));
-                            customFields.add(customFieldItemDTO);
-                            return;
-                        }
-                        customFieldItemDTO.setValue(fieldObject.getString("id"));
+                        customFields.add(customFieldItemDTO);
+                        return;
                     }
+                    if ("components".equals(customField.getCustomData())) {
+                        JSONArray jsonArray = item.getFields().getJSONArray(customField.getCustomData());
+                        if (jsonArray.size() > 0) {
+                            JSONObject jsonObject = (JSONObject) jsonArray.get(0);
+                            customFieldItemDTO.setValue(jsonObject.get("id").toString());
+                        }
+                        customFields.add(customFieldItemDTO);
+                        return;
+                    }
+                    JSONObject fieldObject = item.getFields().getJSONObject(customField.getCustomData());
+                    if ("assignee".equals(customField.getCustomData())) {
+                        String assigneeUserId = "";
+                        try {
+                            assigneeUserId = getUserId(fieldObject.getString("name"), fieldObject.getString("emailAddress"));
+                        } catch (Exception e) {
+                            LogUtil.error(e);
+                        }
+                        if (StringUtils.isEmpty(assigneeUserId)) {
+                            customFieldItemDTO.setValue(fieldObject.getString("name"));
+                        } else {
+                            customFieldItemDTO.setValue(assigneeUserId);
+                        }
+                        customFields.add(customFieldItemDTO);
+                        return;
+                    }
+                    customFieldItemDTO.setValue(fieldObject.getString("id"));
                     customFields.add(customFieldItemDTO);
                 });
                 issuesWithBLOBs.setCustomFields(JSON.toJSONString(customFields));
@@ -115,22 +145,29 @@ public class MDJiraPlatform extends JiraPlatform {
         String jql = String.format("project = %s AND issuetype = %s  AND  resolution = Unresolved ORDER BY priority DESC, updated DESC",
                 jiraInfo.get("key"),
                 jiraInfo.get("type"));
-        searchReq.setJql(jql);
-        searchReq.setStartAt(1);
-        searchReq.setMaxResults(50);
-        searchReq.setFields(Lists.newArrayList());
-        //HttpEntity
-        HttpEntity<JiraSearchReq> requestEntity = new HttpEntity<>(searchReq, requestHeaders);
         RestTemplate restTemplate = new RestTemplate();
-        //post
-        ResponseEntity<String> responseEntity = null;
-        responseEntity = restTemplate.exchange(jiraInfo.get("url") + "/rest/api/2/search", HttpMethod.POST, requestEntity, String.class);
-        String body = responseEntity.getBody();
-        JiraSearchResp searchResponse = JSONObject.parseObject(body, JiraSearchResp.class);
-        if (null == searchResponse) {
-            return Lists.newArrayList();
+        List<JiraIssue> allIssues = Lists.newArrayList();
+        for (int i = 0; i < 6; i++) {
+            searchReq.setJql(jql);
+            searchReq.setStartAt(i + 1);
+            searchReq.setMaxResults(50);
+            searchReq.setFields(Lists.newArrayList());
+            //HttpEntity
+            HttpEntity<JiraSearchReq> requestEntity = new HttpEntity<>(searchReq, requestHeaders);
+            //post
+            ResponseEntity<String> responseEntity = null;
+            responseEntity = restTemplate.exchange(jiraInfo.get("url") + "/rest/api/2/search", HttpMethod.POST, requestEntity, String.class);
+            String body = responseEntity.getBody();
+            JiraSearchResp searchResponse = JSONObject.parseObject(body, JiraSearchResp.class);
+            if (null == searchResponse) {
+                return allIssues;
+            }
+            allIssues.addAll(searchResponse.getIssues());
+            if ((searchResponse.getTotal() / 50) <= i) {
+                return allIssues;
+            }
         }
-        return searchResponse.getIssues();
+        return allIssues;
     }
 
     public XrayFolders getXrayFolders(String projectKey) {
@@ -191,7 +228,7 @@ public class MDJiraPlatform extends JiraPlatform {
             XrayTestStep step = new XrayTestStep();
             step.setId(element.getId());
             step.setStep(element.getStep().getRaw());
-            step.setResult(element.getStep().getRaw());
+            step.setResult(element.getResult().getRaw());
             testSteps.add(step);
         });
         return testSteps;

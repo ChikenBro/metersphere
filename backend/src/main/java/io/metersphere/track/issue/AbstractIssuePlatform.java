@@ -159,18 +159,18 @@ public abstract class AbstractIssuePlatform implements IssuesPlatform {
     protected void handleTestCaseIssues(IssuesUpdateRequest issuesRequest) {
         String issuesId = issuesRequest.getId();
         if (StringUtils.isNotBlank(issuesRequest.getTestCaseId())) {
-          insertTestCaseIssues(issuesId, issuesRequest.getTestCaseId());
-      } else {
-          List<String> testCaseIds = issuesRequest.getTestCaseIds();
-          TestCaseIssuesExample example = new TestCaseIssuesExample();
-          example.createCriteria().andIssuesIdEqualTo(issuesId);
-          testCaseIssuesMapper.deleteByExample(example);
-          if (!CollectionUtils.isEmpty(testCaseIds)) {
-              testCaseIds.forEach(caseId -> {
-                  insertTestCaseIssues(issuesId, caseId);
-              });
-          }
-      }
+            insertTestCaseIssues(issuesId, issuesRequest.getTestCaseId());
+        } else {
+            List<String> testCaseIds = issuesRequest.getTestCaseIds();
+            TestCaseIssuesExample example = new TestCaseIssuesExample();
+            example.createCriteria().andIssuesIdEqualTo(issuesId);
+            testCaseIssuesMapper.deleteByExample(example);
+            if (!CollectionUtils.isEmpty(testCaseIds)) {
+                testCaseIds.forEach(caseId -> {
+                    insertTestCaseIssues(issuesId, caseId);
+                });
+            }
+        }
     }
 
     protected void insertIssuesWithoutContext(String id, IssuesUpdateRequest issuesRequest) {
@@ -216,6 +216,7 @@ public abstract class AbstractIssuePlatform implements IssuesPlatform {
 
     /**
      * 将html格式的缺陷描述转成ms平台的格式
+     *
      * @param htmlDesc
      * @return
      */
@@ -242,7 +243,7 @@ public abstract class AbstractIssuePlatform implements IssuesPlatform {
         while (matcher.find()) {
             String path = matcher.group(2);
             if (endpoint.endsWith("/")) {
-                endpoint = endpoint.substring(0, endpoint.length() -1);
+                endpoint = endpoint.substring(0, endpoint.length() - 1);
             }
             path = " <img src=\"" + endpoint + path + "\"/>";
             result = matcher.replaceFirst(path);
@@ -278,7 +279,7 @@ public abstract class AbstractIssuePlatform implements IssuesPlatform {
             if (url.contains("/resource/md/get/")) {
                 String path = url.substring(url.indexOf("/resource/md/get/"));
                 String name = path.substring(path.indexOf("/resource/md/get/") + 26);
-                String mdLink = "![" + name + "](" + path +  ")";
+                String mdLink = "![" + name + "](" + path + ")";
                 result = matcher.replaceFirst(mdLink);
                 matcher = pattern.matcher(result);
             }
@@ -310,5 +311,28 @@ public abstract class AbstractIssuePlatform implements IssuesPlatform {
 
     protected UserDTO.PlatformInfo getUserPlatInfo(String orgId) {
         return userService.getCurrentPlatformInfo(orgId);
+    }
+
+    protected String getUserName(String userId) {
+        User user = this.userService.selectUser(userId, "");
+        if (null == user) {
+            throw MSException.getException("用户不存在");
+        }
+        if ("LDAP".equals(user.getSource())) {
+            Pattern pattern = Pattern.compile("([\\s\\S].+)@mudu.tv");
+            Matcher matcher = pattern.matcher(user.getEmail());
+            if (matcher.find()) {
+                return matcher.group(1);
+            }
+        }
+        return user.getId();
+    }
+
+    protected String getUserId(String userName, String email) {
+        User user = this.userService.selectUser(userName, email);
+        if (null == user) {
+            throw MSException.getException("用户不存在");
+        }
+        return user.getId();
     }
 }
