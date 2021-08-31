@@ -18,13 +18,18 @@ import io.metersphere.track.issue.domain.Jira.XrayTestCases;
 import io.metersphere.track.issue.domain.Jira.XrayTestStep;
 import io.metersphere.track.issue.domain.Jira.XrayTreeNode;
 import io.metersphere.track.request.testcase.IssuesRequest;
+import io.metersphere.track.response.SyncResult;
 import io.metersphere.track.service.utils.TestCasePriority;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.python.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,79 +49,104 @@ public class SyncTestCaseService {
     private TestCaseService testCaseService;
 
     private MDJiraPlatform mdJiraPlatform;
-
+    private Lock lock = new ReentrantLock();
+    private Map<String, String> cacheSyncProject = new HashMap<>();
 
     public List<TestCaseNodeDTO> getTestCaseNode(String projectId) {
         XrayFolders xrayFolders = getXrayTestCaseNode(projectId);
         return transferTestCaseNode(xrayFolders, projectId);
     }
 
-    public void syncTestCase(String projectId, String remoteNodePath, String msNodeId, String msNodePath) {
-        ProjectCaseConfig caseConfig = projectCaseConfigMapper.selectByProjectId(projectId);
-        // 查询节点是否包含子节点
-        String[] nodePath = remoteNodePath.split("/");
-        XrayFolders xrayFolders = getXrayTestCaseNode(projectId);
-        List<XrayTreeNode> xrayTreeNodes = Lists.newArrayList();
-        for (int i = 0; i < nodePath.length; i++) {
-            int finalI = i;
-            if (xrayTreeNodes.size() == 0) {
-                xrayTreeNodes = xrayFolders.getFolders()
-                        .stream()
-                        .filter(v -> v.getName().equals(nodePath[finalI]))
-                        .collect(Collectors.toList());
-            } else {
-                // TODO: 待优化
-                xrayTreeNodes = xrayTreeNodes.get(0).getFolders().stream().filter(v -> v.getName().equals(nodePath[finalI])).collect(Collectors.toList());
+    public SyncResult syncTestCase(String projectId, String remoteNodePath, String msNodeId, String msNodePath) {
+        SyncResult syncResult = new SyncResult();
+        syncResult.setSyncOk(false);
+        try {
+            lock.tryLock(3, TimeUnit.SECONDS);
+            if (ObjectUtils.isNotEmpty(cacheSyncProject.get(projectId))) {
+                syncResult.setMessage("当前项目正在同步中，请稍等");
+                return syncResult;
             }
+            cacheSyncProject.put(projectId, projectId);
+            lock.unlock();
+        } catch (InterruptedException e) {
+            syncResult.setMessage("当前同步太多了，服务处理不过来");
+            return syncResult;
         }
-        TestCaseNode testCaseNode = testCaseNodeMapper.selectByPrimaryKey(msNodeId);
-        if (null == testCaseNode) {
-            throw MSException.getException("测试用例模块不存在, nodeId: " + msNodeId);
-        }
-        List<FolderInfo> folderIds = Lists.newArrayList();
-        getNodeIds(xrayTreeNodes, folderIds, projectId, msNodeId, msNodePath);
-        // 待同步模块是否根节点
-        for (FolderInfo folderInfo : folderIds) {
-            XrayTestCases xrayTestCases = this.mdJiraPlatform.getXrayTests(caseConfig.getCaseProjectKey(), folderInfo.getId());
-            // 获取节点用例内容
-            if (xrayTestCases.getTotal() == 0) {
-                continue;
-            }
-            // 测试用例入库
-            xrayTestCases.getTests().forEach(testcase -> {
-                try {
-                    List<XrayTestStep> xrayTestStepList =
-                            this.mdJiraPlatform.getXrayTestCaseSteps(testcase.getKey(), testcase.getId(), testcase.getTestType());
-                    TestCaseWithBLOBs caseWithBLOBs = new TestCaseWithBLOBs();
-                    caseWithBLOBs.setName(testcase.getSummary());
-                    caseWithBLOBs.setId(UUID.randomUUID().toString());
-                    caseWithBLOBs.setNodeId(folderInfo.getMsNodeId());
-                    caseWithBLOBs.setNodePath(folderInfo.getMsNodePath());
-                    caseWithBLOBs.setProjectId(projectId);
-                    caseWithBLOBs.setMaintainer(SessionUtils.getUserId());
-                    caseWithBLOBs.setPriority(TestCasePriority.getPriority(testcase.getPriority()));
-                    caseWithBLOBs.setType("function");
-                    if (testcase.getTestType().equals("Cucumber")) {
-                        caseWithBLOBs.setStepModel("Cucumber");
-                        caseWithBLOBs.setStepDescription(xrayTestStepList.get(0).getStep());
-                    } else {
-                        caseWithBLOBs.setStepModel("STEP");
-                        List<JSONObject> jsonObjects = new ArrayList<>();
-                        for (int i = 0; i < xrayTestStepList.size(); i++) {
-                            JSONObject jsonObject = new JSONObject();
-                            jsonObject.put("num", i + 1);
-                            jsonObject.put("desc", xrayTestStepList.get(i).getStep());
-                            jsonObject.put("result", xrayTestStepList.get(i).getResult());
-                            jsonObjects.add(jsonObject);
-                        }
-                        caseWithBLOBs.setSteps(JSON.toJSONString(jsonObjects));
-                    }
-                    testCaseService.addTestCase(caseWithBLOBs);
-                } catch (Exception e) {
-                    LogUtil.error("用例保存出错", e);
+        try {
+            ProjectCaseConfig caseConfig = projectCaseConfigMapper.selectByProjectId(projectId);
+            // 查询节点是否包含子节点
+            String[] nodePath = remoteNodePath.split("/");
+            XrayFolders xrayFolders = getXrayTestCaseNode(projectId);
+            List<XrayTreeNode> xrayTreeNodes = Lists.newArrayList();
+            for (int i = 0; i < nodePath.length; i++) {
+                int finalI = i;
+                if (xrayTreeNodes.size() == 0) {
+                    xrayTreeNodes = xrayFolders.getFolders()
+                            .stream()
+                            .filter(v -> v.getName().equals(nodePath[finalI]))
+                            .collect(Collectors.toList());
+                } else {
+                    // TODO: 待优化
+                    xrayTreeNodes = xrayTreeNodes.get(0).getFolders().stream().filter(v -> v.getName().equals(nodePath[finalI])).collect(Collectors.toList());
                 }
-            });
+            }
+            TestCaseNode testCaseNode = testCaseNodeMapper.selectByPrimaryKey(msNodeId);
+            if (null == testCaseNode) {
+                throw MSException.getException("测试用例模块不存在, nodeId: " + msNodeId);
+            }
+            List<FolderInfo> folderIds = Lists.newArrayList();
+            getNodeIds(xrayTreeNodes, folderIds, projectId, msNodeId, msNodePath);
+            // 待同步模块是否根节点
+            for (FolderInfo folderInfo : folderIds) {
+                XrayTestCases xrayTestCases = this.mdJiraPlatform.getXrayTests(caseConfig.getCaseProjectKey(), folderInfo.getId());
+                // 获取节点用例内容
+                if (xrayTestCases.getTotal() == 0) {
+                    continue;
+                }
+                // 测试用例入库
+                xrayTestCases.getTests().forEach(testcase -> {
+                    try {
+                        List<XrayTestStep> xrayTestStepList =
+                                this.mdJiraPlatform.getXrayTestCaseSteps(testcase.getKey(), testcase.getId(), testcase.getTestType());
+                        TestCaseWithBLOBs caseWithBLOBs = new TestCaseWithBLOBs();
+                        caseWithBLOBs.setName(testcase.getSummary());
+                        caseWithBLOBs.setId(UUID.randomUUID().toString());
+                        caseWithBLOBs.setNodeId(folderInfo.getMsNodeId());
+                        caseWithBLOBs.setNodePath(folderInfo.getMsNodePath());
+                        caseWithBLOBs.setProjectId(projectId);
+                        caseWithBLOBs.setMaintainer(SessionUtils.getUserId());
+                        caseWithBLOBs.setPriority(TestCasePriority.getPriority(testcase.getPriority()));
+                        caseWithBLOBs.setType("function");
+                        if (testcase.getTestType().equals("Cucumber")) {
+                            caseWithBLOBs.setStepModel("Cucumber");
+                            caseWithBLOBs.setStepDescription(xrayTestStepList.get(0).getStep());
+                        } else {
+                            caseWithBLOBs.setStepModel("STEP");
+                            List<JSONObject> jsonObjects = new ArrayList<>();
+                            for (int i = 0; i < xrayTestStepList.size(); i++) {
+                                JSONObject jsonObject = new JSONObject();
+                                jsonObject.put("num", i + 1);
+                                jsonObject.put("desc", xrayTestStepList.get(i).getStep());
+                                jsonObject.put("result", xrayTestStepList.get(i).getResult());
+                                jsonObjects.add(jsonObject);
+                            }
+                            caseWithBLOBs.setSteps(JSON.toJSONString(jsonObjects));
+                        }
+                        testCaseService.addTestCase(caseWithBLOBs);
+                    } catch (Exception e) {
+                        LogUtil.error("用例保存出错", e);
+                    }
+                });
+                syncResult.setSyncOk(true);
+            }
+        } catch (Exception e) {
+            LogUtil.error("同步出错了", e);
+            if (ObjectUtils.isNotEmpty(cacheSyncProject.get(projectId))) {
+                cacheSyncProject.remove(projectId);
+            }
+            syncResult.setMessage("同步出错了,请联系管理员");
         }
+        return syncResult;
     }
 
     private void getNodeIds(List<XrayTreeNode> xrayTreeNodes, List<FolderInfo> folderIds, String projectId, String nodeId, String nodePath) {

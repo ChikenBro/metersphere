@@ -30,13 +30,11 @@ public class SyncJiraIssueTask {
     @Autowired
     private WorkspaceMapper workspaceMapper;
 
-
-    @Async
     public void getIssueList(String projectId, List<IssuesDao> issues) {
         // 加锁
         LogUtil.info(projectId + " 开始同步jira issue!");
         try {
-            lock.tryLock(5, TimeUnit.SECONDS);
+            lock.tryLock(3, TimeUnit.SECONDS);
             String syncId = syncIds.get(projectId);
             if (null != syncId) {
                 LogUtil.info(projectId + " 同步jira issue任务进行中!");

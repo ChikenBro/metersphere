@@ -145,6 +145,10 @@ public class CustomFieldService {
         return new ArrayList<>();
     }
 
+    public CustomField getFieldById(String id) {
+        return customFieldMapper.selectByPrimaryKey(id);
+    }
+
     public List<CustomField> getDefaultField(QueryCustomFieldRequest request) {
         CustomFieldExample example = new CustomFieldExample();
         example.createCriteria()

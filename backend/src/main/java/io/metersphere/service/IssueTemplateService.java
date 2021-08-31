@@ -1,8 +1,11 @@
 package io.metersphere.service;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import io.metersphere.base.domain.*;
 import io.metersphere.base.mapper.IssueTemplateMapper;
+import io.metersphere.base.mapper.WorkspaceMapper;
 import io.metersphere.base.mapper.ext.ExtIssueTemplateMapper;
 import io.metersphere.commons.constants.TemplateConstants;
 import io.metersphere.commons.exception.MSException;
@@ -18,15 +21,16 @@ import io.metersphere.log.utils.ReflexObjectUtil;
 import io.metersphere.log.vo.DetailColumn;
 import io.metersphere.log.vo.OperatingLogDetails;
 import io.metersphere.log.vo.system.SystemReference;
+import io.metersphere.track.issue.MDJiraPlatform;
+import io.metersphere.track.request.testcase.IssuesRequest;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
@@ -46,6 +50,9 @@ public class IssueTemplateService extends TemplateBaseService {
 
     @Resource
     ProjectService projectService;
+
+    @Resource
+    WorkspaceMapper workspaceMapper;
 
     public String add(UpdateIssueTemplateRequest request) {
         checkExist(request);
@@ -82,6 +89,7 @@ public class IssueTemplateService extends TemplateBaseService {
             String originId = request.getId();
             // 如果是全局字段，则创建对应工作空间字段
             String id = add(request);
+            handlerMDIssueJiraTemplate(request, id);
             projectService.updateIssueTemplate(originId, id);
         } else {
             checkExist(request);
@@ -93,6 +101,94 @@ public class IssueTemplateService extends TemplateBaseService {
             customFieldTemplateService.create(request.getCustomFields(), request.getId(),
                     TemplateConstants.FieldTemplateScene.ISSUE.name());
         }
+    }
+
+    private void handlerMDIssueJiraTemplate(UpdateIssueTemplateRequest request, String templateId) {
+        // 默认工作空间不自动添加jira字段
+        Workspace workspace = workspaceMapper.selectByPrimaryKey(request.getWorkspaceId());
+        if (workspace.getName().equals("默认工作空间")) {
+            return;
+        }
+        // workspace首次添加缺陷管理
+        IssueTemplateExample issueTplExample = new IssueTemplateExample();
+        issueTplExample.createCriteria().andWorkspaceIdEqualTo(request.getWorkspaceId());
+        List<IssueTemplate> issueTemplates = issueTemplateMapper.selectByExample(issueTplExample);
+        if (issueTemplates.size() > 1) {
+            return;
+        }
+        // jira project
+        List<Project> projects = projectService.getProjectListByWorkSpaceId(request.getWorkspaceId());
+        if (StringUtils.isEmpty(projects.get(0).getJiraKey())) {
+            return;
+        }
+        IssuesRequest issuesRequest = new IssuesRequest();
+        issuesRequest.setProjectId(projects.get(0).getId());
+        issuesRequest.setOrganizationId(workspace.getOrganizationId());
+        MDJiraPlatform mdJiraPlatform = new MDJiraPlatform(issuesRequest);
+        JSONObject jsonObject = mdJiraPlatform.getProject(projects.get(0).getJiraKey());
+        // 获取默认工作空间的jira配置
+        WorkspaceExample workspaceExample = new WorkspaceExample();
+        workspaceExample.createCriteria().andNameEqualTo("默认工作空间");
+        List<Workspace> workspaceList = workspaceMapper.selectByExample(workspaceExample);
+        Workspace defaultWorkspace = workspaceList.get(0);
+        // 获取默认工作空间jira模板Id
+        IssueTemplateExample defaultIssueTplExample = new IssueTemplateExample();
+        defaultIssueTplExample.createCriteria().andWorkspaceIdEqualTo(defaultWorkspace.getId());
+        List<IssueTemplate> defaultIssueTemplates = issueTemplateMapper.selectByExample(defaultIssueTplExample);
+        String defaultTemplateId = defaultIssueTemplates.get(0).getId();
+        // 获取默认空间jira自定义字段
+        List<CustomFieldTemplate> defaultCustomFieldTemplateList = customFieldTemplateService.getCustomFields(defaultTemplateId);
+        List<CustomFieldTemplate> customFieldTemplateList = new ArrayList<>();
+
+        defaultCustomFieldTemplateList.forEach(f -> {
+            if (TemplateConstants.FieldTemplateScene.ISSUE.name().equals(f.getScene())) {
+                CustomField defaultCustomField =  customFieldService.getFieldById(f.getFieldId());
+                // 添加自定义字段
+                CustomField customField = new CustomField();
+                customField.setWorkspaceId(request.getWorkspaceId());
+                customField.setName(defaultCustomField.getName());
+                customField.setType(defaultCustomField.getType());
+                if (f.getCustomData().equals("fixVersions")) {
+                    // 获取versions
+                   List<JSONObject> fixVersions = jsonObject.getJSONArray("versions")
+                           .stream()
+                           .map(e -> {
+                               JSONObject version = (JSONObject) e;
+                               JSONObject object = new JSONObject();
+                               object.put("text",version.getString("name"));
+                               object.put("value",version.getString("name"));
+                               return object;
+                           }).collect(Collectors.toList());
+                   defaultCustomField.setOptions(JSON.toJSONString(fixVersions));
+                }
+                if (f.getCustomData().equals("components")) {
+                    // 获取components
+                    List<JSONObject> components = jsonObject.getJSONArray("components").stream().map(e -> {
+                        JSONObject component = (JSONObject)e;
+                        JSONObject object = new JSONObject();
+                        object.put("text",component.getString("name"));
+                        object.put("value",component.getString("id"));
+                        return object;
+                    }).collect(Collectors.toList());
+                    defaultCustomField.setOptions(JSON.toJSONString(components));
+                }
+                customField.setOptions(defaultCustomField.getOptions());
+                customField.setScene(TemplateConstants.FieldTemplateScene.ISSUE.name());
+                String newCustomFieldId =  customFieldService.add(customField);
+                // issue模板
+                CustomFieldTemplate customFieldTemplate = new CustomFieldTemplate();
+                customFieldTemplate.setFieldId(newCustomFieldId);
+                customFieldTemplate.setRequired(f.getRequired());
+                customFieldTemplate.setScene(f.getScene());
+                customFieldTemplate.setCustomData(f.getCustomData());
+                customFieldTemplate.setKey(f.getKey());
+                customFieldTemplate.setDefaultValue(f.getDefaultValue());
+                customFieldTemplateList.add(customFieldTemplate);
+            }
+        });
+        request.setCustomFields(customFieldTemplateList);
+        customFieldTemplateService.create(request.getCustomFields(), templateId,
+                TemplateConstants.FieldTemplateScene.ISSUE.name());
     }
 
     /**

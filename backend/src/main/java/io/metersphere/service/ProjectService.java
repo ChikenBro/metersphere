@@ -126,18 +126,18 @@ public class ProjectService {
     private String genSystemId() {
         String maxSystemIdInDb = extProjectMapper.getMaxSystemId();
         String systemId = "10001";
-        if(StringUtils.isNotEmpty(maxSystemIdInDb)){
+        if (StringUtils.isNotEmpty(maxSystemIdInDb)) {
             systemId = String.valueOf(Long.parseLong(maxSystemIdInDb) + 1);
         }
         return systemId;
     }
 
-    public Project checkSystemId(Project project){
-        if(project!=null){
+    public Project checkSystemId(Project project) {
+        if (project != null) {
             ProjectExample example = new ProjectExample();
             example.createCriteria().andSystemIdEqualTo(project.getSystemId());
             long count = projectMapper.countByExample(example);
-            if(count > 1){
+            if (count > 1) {
                 String systemId = this.genSystemId();
                 Project updateModel = new Project();
                 updateModel.setId(project.getId());
@@ -476,5 +476,11 @@ public class ProjectService {
 
     public List<String> getProjectIds() {
         return extProjectMapper.getProjectIds();
+    }
+
+    public List<Project> getProjectListByWorkSpaceId(String workSpaceId) {
+        ProjectExample example = new ProjectExample();
+        example.createCriteria().andWorkspaceIdEqualTo(workSpaceId);
+        return projectMapper.selectByExample(example);
     }
 }

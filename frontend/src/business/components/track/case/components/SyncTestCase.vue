@@ -49,103 +49,111 @@
 </template>
 
 <script>
-    import {getCurrentProjectID} from "@/common/js/utils";
-    import MsDialogFooter from "@/business/components/common/components/MsDialogFooter";
-    import NodeTree from "@/business/components/track/common/NodeTree";
+import {getCurrentProjectID} from "@/common/js/utils";
+import MsDialogFooter from "@/business/components/common/components/MsDialogFooter";
+import NodeTree from "@/business/components/track/common/NodeTree";
 
-    export default {
-        name: "SyncTestCase",
-        components: {MsDialogFooter, NodeTree},
-        data() {
-            return {
-                openType: "relevance",
-                result: {},
-                remoteResult: {},
-                visible: false,
-                syncLoading: false,
-                currentModule: {},
-                userOptions: [],
-                remoteTreeNodes: [],
-                msNodeId: '',
-                msNodePath: '',
-                remoteNodeId: '-1',
-                remoteNodePath: '',
-            }
+export default {
+    name: "SyncTestCase",
+    components: {MsDialogFooter, NodeTree},
+    data() {
+        return {
+            openType: "relevance",
+            result: {},
+            remoteResult: {},
+            visible: false,
+            syncLoading: false,
+            currentModule: {},
+            userOptions: [],
+            remoteTreeNodes: [],
+            msNodeId: '',
+            msNodePath: '',
+            remoteNodeId: '-1',
+            remoteNodePath: '',
+        }
+    },
+    props: {
+        treeNodes: {
+            type: Array
+        }
+    },
+    computed: {
+        projectId() {
+            return getCurrentProjectID();
+        }
+    },
+    methods: {
+        init() {
+            this.$nextTick(() => {
+                this.$refs["msNodeTree"].init();
+                this.$refs["syncNodeTree"].init();
+            });
         },
-        props: {
-            treeNodes: {
-                type: Array
-            }
+        cancel() {
+            this.visible = false;
         },
-        computed: {
-            projectId() {
-                return getCurrentProjectID();
-            }
+        getJiraCaseModules() {
+            this.remoteResult.loading = true;
+            const pId = getCurrentProjectID();
+            this.$get('sync/testcase/module/' + pId + '/list', response => {
+                this.remoteTreeNodes = response.data;
+                this.remoteResult.loading = false;
+            });
         },
-        methods: {
-            init() {
-                this.$nextTick(() => {
-                    this.$refs["msNodeTree"].init();
-                    this.$refs["syncNodeTree"].init();
-                });
-            },
-            cancel() {
-                this.visible = false;
-            },
-            getJiraCaseModules() {
-                this.remoteResult.loading = true;
-                const pId = getCurrentProjectID();
-                this.$get('sync/testcase/module/' + pId + '/list', response => {
-                    this.remoteTreeNodes = response.data;
-                    this.remoteResult.loading = false;
-                });
-            },
-            saveTestCase() {
-                this.syncLoading = true;
-                const pId = getCurrentProjectID();
-                if (this.nodeId === 'root') {
-                    this.$message.error('请选择本地用例子节点同步！');
-                    return;
+        saveTestCase() {
+            this.syncLoading = true;
+            const pId = getCurrentProjectID();
+            if (this.msNodeId === 'root') {
+                this.$message.error('请选择本地用例子节点同步！');
+                this.syncLoading = false;
+                return;
+            }
+            if (this.remoteNodeId === 'root') {
+                this.$message.error('请选择远程用例子节点同步！');
+                this.syncLoading = false;
+                return;
+            }
+            if (this.msNodeId == null || this.msNodeId ==="") {
+                this.$message.error('请选择本地用例节点同步！');
+                this.syncLoading = false;
+                return;
+            }
+            if (this.remoteNodeId == null || this.remoteNodeId === "-1") {
+                this.$message.error('请选择远程用例节点同步！');
+                this.syncLoading = false;
+                return;
+            }
+            const reqBody = {
+                "projectId": pId,
+                "remoteNodeId": this.remoteNodeId,
+                "remoteNodePath": this.remoteNodePath,
+                "msNodeId": this.msNodeId,
+                "msNodePath": this.msNodePath,
+            };
+            this.$post('sync/testcase/' + pId, reqBody, response => {
+                if (!response.data.isSyncOk) {
+                    this.$message.error(response.data.message);
                 }
-                if (this.remoteNodeId === 'root') {
-                    this.$message.error('请选择远程用例子节点同步！');
-                    return;
-                }
-                const reqData = {
-                    "projectId": pId,
-                    "remoteNodeId": this.remoteNodeId,
-                    "remoteNodePath": this.remoteNodePath,
-                    "msNodeId": this.nodeId,
-                    "msNodePath": this.nodePath,
-                };
-                this.$post('sync/testcase/' + pId, reqData, response => {
-                    console.log('sync', response);
-                    this.$emit('refresh');
-                    this.syncLoading = false;
-                });
-            },
-            nodeChange(node, nodeIds, nodeNames) {
-                this.nodeId = node.data.id;
-                this.nodePath = node.data.path;
-                console.log('node', node);
-                console.log('nodeIds', nodeIds);
-                console.log('nodeNames', nodeNames);
-            },
-            syncNodeChange(node, nodeIds, nodeNames) {
-                this.remoteNodeId = node.data.id;
-                this.remoteNodePath = node.data.parentId;
-                console.log('node', node);
-                console.log('nodeIds', nodeIds);
-                console.log('nodeNames', nodeNames);
-            },
-            open(currentModule) {
-                this.currentModule = currentModule;
-                this.getJiraCaseModules();
-                this.visible = true;
-                this.init();
-            }
+                this.$emit('refresh');
+                this.syncLoading = false;
+            });
+        },
+        nodeChange(node, nodeIds, nodeNames) {
+            this.msNodeId = node.data.id;
+            this.msNodePath = node.data.path;
+        },
+        syncNodeChange(node, nodeIds, nodeNames) {
+            this.remoteNodeId = node.data.id;
+            this.remoteNodePath = node.data.parentId;
+        },
+        open(currentModule) {
+            this.currentModule = currentModule;
+            this.getJiraCaseModules();
+            this.visible = true;
+            this.init();
         }
     }
+}
 </script>
 
 <style scoped>

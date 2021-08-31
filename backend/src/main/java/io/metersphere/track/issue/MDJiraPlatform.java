@@ -109,8 +109,8 @@ public class MDJiraPlatform extends JiraPlatform {
                         customFields.add(customFieldItemDTO);
                         return;
                     }
-                    JSONObject fieldObject = item.getFields().getJSONObject(customField.getCustomData());
                     if ("assignee".equals(customField.getCustomData())) {
+                        JSONObject fieldObject = item.getFields().getJSONObject(customField.getCustomData());
                         String assigneeUserId = "";
                         try {
                             assigneeUserId = getUserId(fieldObject.getString("name"), fieldObject.getString("emailAddress"));
@@ -125,7 +125,12 @@ public class MDJiraPlatform extends JiraPlatform {
                         customFields.add(customFieldItemDTO);
                         return;
                     }
-                    customFieldItemDTO.setValue(fieldObject.getString("id"));
+                    JSONObject fieldObject = item.getFields().getJSONObject(customField.getCustomData());
+                    if (null == fieldObject) {
+                        customFieldItemDTO.setValue("");
+                    } else {
+                        customFieldItemDTO.setValue(fieldObject.getString("id"));
+                    }
                     customFields.add(customFieldItemDTO);
                 });
                 issuesWithBLOBs.setCustomFields(JSON.toJSONString(customFields));
@@ -134,6 +139,15 @@ public class MDJiraPlatform extends JiraPlatform {
                 LogUtil.error("同步出错了", e);
             }
         });
+    }
+
+    public JSONObject getProject(String jiraKey) {
+        String reqUrl = String.format("%s/rest/api/2/project/%s", jiraInfo.get("url"), jiraKey);
+        ResponseEntity<String> responseEntity = getStringResponseEntity(reqUrl);
+        if (!responseEntity.getStatusCode().is2xxSuccessful()) {
+            throw MSException.getException("获取jira项目信息出错了");
+        }
+        return JSONObject.parseObject(responseEntity.getBody());
     }
 
     public List<JiraIssue> getIssues() {

@@ -14,7 +14,17 @@ CREATE TABLE test_plan_members  (
     `create_time` bigint(13) NOT NULL COMMENT 'Create timestamp',
     `update_time` bigint(13) NOT NULL COMMENT 'Update timestamp',
     PRIMARY KEY (`id`)
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4;
+
+-- jira用例配置表
+CREATE TABLE project_case_config  (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `project_id` varchar(50)   NOT NULL COMMENT 'Project ID',
+    `case_project_key` varchar(50)  NOT NULL COMMENT 'Case Project Jira Key',
+    `create_time` bigint(13) NOT NULL COMMENT 'Create timestamp',
+    `update_time` bigint(13) NOT NULL COMMENT 'Update timestamp',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4;
 
 -- 缺陷趋势表
 CREATE TABLE issue_trend  (
@@ -34,6 +44,6 @@ CREATE TABLE issue_trend  (
     `create_time` bigint(13) NOT NULL COMMENT 'Create timestamp',
     `update_time` bigint(13) NOT NULL COMMENT 'Update timestamp',
     PRIMARY KEY (`id`)
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4;
 
 
