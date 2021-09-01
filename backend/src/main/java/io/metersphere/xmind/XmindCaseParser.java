@@ -478,6 +478,7 @@ public class XmindCaseParser {
         testCase.setStepModel("STEP");
         //校验合规性
         if (validate(testCase)) {
+            LogUtil.info("脑图测试用例: " + testCase);
             testCases.add(testCase);
         }
     }
@@ -533,15 +534,11 @@ public class XmindCaseParser {
         //一级标题
         oneTitle = root.getRootTopic().getTitle();
         Children children = root.getRootTopic().getChildren();
-//        System.out.println(children);
-
         // 获取所有用例数据,解析模块
         handleNode(children);
         LogUtil.info("当前测试模块: " + caseNode);
-
         //解析成用例内容
         parseCase(children, "");
-        LogUtil.info("当前测试: " + prefixTestCase);
         return prefixTestCase;
     }
 

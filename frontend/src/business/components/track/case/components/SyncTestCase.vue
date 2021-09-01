@@ -131,7 +131,7 @@ export default {
                 "msNodePath": this.msNodePath,
             };
             this.$post('sync/testcase/' + pId, reqBody, response => {
-                if (!response.data.isSyncOk) {
+                if (!response.data.syncOk) {
                     this.$message.error(response.data.message);
                 }
                 this.$emit('refresh');
