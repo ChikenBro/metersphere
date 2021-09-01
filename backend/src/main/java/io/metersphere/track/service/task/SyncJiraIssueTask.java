@@ -8,6 +8,7 @@ import io.metersphere.commons.utils.LogUtil;
 import io.metersphere.service.ProjectService;
 import io.metersphere.track.issue.MDJiraPlatform;
 import io.metersphere.track.request.testcase.IssuesRequest;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -22,28 +23,22 @@ import java.util.concurrent.locks.ReentrantLock;
 @Component
 public class SyncJiraIssueTask {
 
-    private Lock lock = new ReentrantLock();
-    private Map<String, String> syncIds = new HashMap<>();
-
     @Autowired
     private ProjectService projectService;
+
     @Autowired
     private WorkspaceMapper workspaceMapper;
+
+    private Map<String, String> syncIds = new HashMap<>();
 
     public void getIssueList(String projectId, List<IssuesDao> issues) {
         // 加锁
         LogUtil.info(projectId + " 开始同步jira issue!");
         try {
-            lock.tryLock(3, TimeUnit.SECONDS);
-            String syncId = syncIds.get(projectId);
-            if (null != syncId) {
-                LogUtil.info(projectId + " 同步jira issue任务进行中!");
-                lock.unlock();
+            boolean isSyncIssue = getSyncIssueProjectId(projectId);
+            if (isSyncIssue) {
                 return;
             }
-            // 缓存projectId
-            syncIds.put(projectId, projectId);
-            lock.unlock();
             Project project = projectService.getProjectById(projectId);
             Workspace workspace = workspaceMapper.selectByPrimaryKey(project.getWorkspaceId());
             IssuesRequest issuesRequest = new IssuesRequest();
@@ -60,6 +55,14 @@ public class SyncJiraIssueTask {
                 syncIds.remove(projectId);
             }
         }
+    }
+
+    private synchronized boolean getSyncIssueProjectId(String projectId) {
+        if (ObjectUtils.isNotEmpty(syncIds.get(projectId))) {
+            return true;
+        }
+        syncIds.put(projectId, projectId);
+        return false;
     }
 
 }

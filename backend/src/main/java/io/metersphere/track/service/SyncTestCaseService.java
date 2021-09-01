@@ -49,7 +49,7 @@ public class SyncTestCaseService {
     private TestCaseService testCaseService;
 
     private MDJiraPlatform mdJiraPlatform;
-    private Lock lock = new ReentrantLock();
+
     private Map<String, String> cacheSyncProject = new HashMap<>();
 
     public List<TestCaseNodeDTO> getTestCaseNode(String projectId) {
@@ -60,16 +60,9 @@ public class SyncTestCaseService {
     public SyncResult syncTestCase(String projectId, String remoteNodePath, String msNodeId, String msNodePath) {
         SyncResult syncResult = new SyncResult();
         syncResult.setSyncOk(false);
-        try {
-            lock.tryLock(3, TimeUnit.SECONDS);
-            if (ObjectUtils.isNotEmpty(cacheSyncProject.get(projectId))) {
-                syncResult.setMessage("当前项目正在同步中，请稍等");
-                return syncResult;
-            }
-            cacheSyncProject.put(projectId, projectId);
-            lock.unlock();
-        } catch (InterruptedException e) {
-            syncResult.setMessage("当前同步太多了，服务处理不过来");
+        boolean isSync = getSyncProject(projectId);
+        if (isSync) {
+            syncResult.setMessage("当前项目正在同步中，请稍等");
             return syncResult;
         }
         try {
@@ -145,10 +138,24 @@ public class SyncTestCaseService {
                 cacheSyncProject.remove(projectId);
             }
             syncResult.setMessage("同步出错了,请联系管理员");
+            return syncResult;
         }
         // 清除缓存
         cacheSyncProject.remove(projectId);
         return syncResult;
+    }
+
+    /**
+     * 加个锁
+     * @param projectId
+     * @return boolean
+     */
+    private synchronized boolean getSyncProject(String projectId) {
+        if (ObjectUtils.isNotEmpty(cacheSyncProject.get(projectId))) {
+            return true;
+        }
+        cacheSyncProject.put(projectId, projectId);
+        return false;
     }
 
     private void getNodeIds(List<XrayTreeNode> xrayTreeNodes, List<FolderInfo> folderIds, String projectId, String nodeId, String nodePath) {
