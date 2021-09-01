@@ -146,6 +146,8 @@ public class SyncTestCaseService {
             }
             syncResult.setMessage("同步出错了,请联系管理员");
         }
+        // 清除缓存
+        cacheSyncProject.remove(projectId);
         return syncResult;
     }
 
