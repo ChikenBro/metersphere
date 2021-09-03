@@ -290,6 +290,7 @@ public class JiraPlatform extends AbstractIssuePlatform {
     }
 
     private void handleMuDuCustomData(CustomFieldItemDTO item, JSONObject fields) {
+        LogUtil.info("jira custom value " + item);
         if ("assignee".equals(item.getCustomData())) {
             JSONObject object = new JSONObject();
             String userName = getUserName(item.getValue());
@@ -303,8 +304,9 @@ public class JiraPlatform extends AbstractIssuePlatform {
             JSONArray array = JSON.parseArray(item.getValue());
             List<JSONObject> objects = new ArrayList<>();
             array.forEach(vl -> {
+                JSONObject fixVersion = (JSONObject)vl;
                 JSONObject object = new JSONObject();
-                object.put("name", vl);
+                object.put("name", fixVersion.getString("value"));
                 objects.add(object);
             });
             fields.put(item.getCustomData(), objects);

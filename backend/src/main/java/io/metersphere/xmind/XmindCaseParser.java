@@ -676,29 +676,22 @@ public class XmindCaseParser {
                 if (root.getMarkerRefs() != null) {
                     PrefixTestCaseTemplate caseStep = testPoint(root);
                     prefixTestCase.add(caseStep);
-                    continue;
-                } else {
-                    //当前节点无优先级
-                    continue;
                 }
-
             } else {
                 //如果勾选用例优先级 或者 下级有前置条件
                 String context = root.getChildren().getAttached().get(0).getTitle();
                 if (root.getMarkerRefs() != null || context.split("前置条件：").length > 1 || context.split("前置条件:").length > 1) {
                     //如果标记❌,忽略下面所有用例
                     Marker marker = root.getMarkerRefs();
-                    if (marker != null && root.getMarkerRefs().getMarkerRef().get(0).markerId.equals("symbol-wrong")) {
-                        continue;
+                    if (null != marker) {
+                        Optional<markerId> OptMarkerId = marker.getMarkerRef().stream().filter(v -> v.markerId.equals("symbol-wrong")).findFirst();
+                        if (OptMarkerId.isPresent()) {
+                            continue;
+                        }
                     }
                     //下级有前置条件
                     PrefixTestCaseTemplate caseStep = handleCase(root.getChildren().getAttached(), root.getId(), root.getTitle(), marker);
-//                    if (caseStep == null) {
-//                        break;
-//                    }
-//                    System.out.println(caseStep);
                     prefixTestCase.add(caseStep);
-                    continue;
                 } else {
                     String newTreeId = root.getId();
                     parseCase(root.getChildren(), newTreeId);
@@ -737,10 +730,9 @@ public class XmindCaseParser {
         PrefixTestCaseTemplate testCaseTemplate = getRecondition(roots.get(0));
         //判断第一行是否为前置条件
         if (!testCaseTemplate.getPrecondition().equals("")) {
+            // 第一行是前置条件,删除
             roots.remove(0);
         }
-//        System.out.println(precondition);
-//        testCaseTemplate.setPrecondition(precondition);
         testCaseTemplate.setCaseTitle(superTitle);
         testCaseTemplate.setTreeId(treeId);
         testCaseTemplate.setPriority(handleCasePriority(priority));
@@ -755,23 +747,42 @@ public class XmindCaseParser {
         List<Map> lists = new ArrayList<>();
         int num = 1;
         for (Attached root : roots) {
-            JSONObject map = new JSONObject(true);
             String step = root.getTitle();
             String expect;
             //如果没有下级-也就是无结果，默认expect为空
             if (root.getChildren() != null) {
-                expect = root.getChildren().getAttached().get(0).getTitle();
+                List<Attached> results = root.getChildren().getAttached();
+                for (Attached result : results) {
+                    //只有2级
+                    if ((result.getChildren() == null)) {
+                        expect = result.getTitle();
+                        //3级，取后面2级为步骤和结果
+                    } else {
+                        step = result.getTitle();
+                        expect = result.getChildren().getAttached().get(0).getTitle();
+                    }
+                    lists.add(setStepAndExpect(num, step, expect));
+                    num++;
+                }
             } else {
                 expect = "";
+                lists.add(setStepAndExpect(num, step, expect));
+                num++;
             }
-            map.put("num", num);
-            map.put("desc", step);
-            map.put("result", expect);
-            lists.add(map);
-            num++;
         }
         testCaseTemplate.setCaseStep(lists);
         return testCaseTemplate;
+    }
+
+    /**
+     * 添加步骤结果到map中
+     */
+    private Map setStepAndExpect(int num, String step, String expect) {
+        JSONObject map = new JSONObject(true);
+        map.put("num", num);
+        map.put("desc", step);
+        map.put("result", expect);
+        return map;
     }
 
     /**
@@ -811,7 +822,7 @@ public class XmindCaseParser {
             }
             return testCaseTemplate;
         }
-        //第一列为更新用例id
+        //更新用例，第一列为用例id
         if (root.getTitle().split("id").length > 1) {
             customNum = root.getTitle().replace("id:", "").replace("id：", "");
             testCaseTemplate.setPrecondition("");
