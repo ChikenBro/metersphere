@@ -1,0 +1,386 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.metersphere.base.mapper.IssueTrendMapper">
+  <resultMap id="BaseResultMap" type="io.metersphere.base.domain.IssueTrend">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="project_id" jdbcType="VARCHAR" property="projectId" />
+    <result column="jira_key" jdbcType="VARCHAR" property="jiraKey" />
+    <result column="issue_week" jdbcType="INTEGER" property="issueWeek" />
+    <result column="start_week_time" jdbcType="VARCHAR" property="startWeekTime" />
+    <result column="end_week_time" jdbcType="VARCHAR" property="endWeekTime" />
+    <result column="issue_total" jdbcType="INTEGER" property="issueTotal" />
+    <result column="resolution_issue_total" jdbcType="INTEGER" property="resolutionIssueTotal" />
+    <result column="resolution_week_issue" jdbcType="INTEGER" property="resolutionWeekIssue" />
+    <result column="resolution_history_issue" jdbcType="INTEGER" property="resolutionHistoryIssue" />
+    <result column="test_env_issue" jdbcType="INTEGER" property="testEnvIssue" />
+    <result column="uat_env_issue" jdbcType="INTEGER" property="uatEnvIssue" />
+    <result column="prod_env_issue" jdbcType="INTEGER" property="prodEnvIssue" />
+    <result column="create_time" jdbcType="BIGINT" property="createTime" />
+    <result column="update_time" jdbcType="BIGINT" property="updateTime" />
+    <result column="issue_year" jdbcType="INTEGER" property="issueYear" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, project_id, jira_key, issue_week, start_week_time, end_week_time, issue_total, 
+    resolution_issue_total, resolution_week_issue, resolution_history_issue, test_env_issue, 
+    uat_env_issue, prod_env_issue, create_time, update_time, issue_year
+  </sql>
+  <select id="selectByExample" parameterType="io.metersphere.base.domain.IssueTrendExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from issue_trend
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from issue_trend
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from issue_trend
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="io.metersphere.base.domain.IssueTrendExample">
+    delete from issue_trend
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="io.metersphere.base.domain.IssueTrend">
+    insert into issue_trend (id, project_id, jira_key, 
+      issue_week, start_week_time, end_week_time, 
+      issue_total, resolution_issue_total, resolution_week_issue, 
+      resolution_history_issue, test_env_issue, uat_env_issue, 
+      prod_env_issue, create_time, update_time, 
+      issue_year)
+    values (#{id,jdbcType=INTEGER}, #{projectId,jdbcType=VARCHAR}, #{jiraKey,jdbcType=VARCHAR}, 
+      #{issueWeek,jdbcType=INTEGER}, #{startWeekTime,jdbcType=VARCHAR}, #{endWeekTime,jdbcType=VARCHAR}, 
+      #{issueTotal,jdbcType=INTEGER}, #{resolutionIssueTotal,jdbcType=INTEGER}, #{resolutionWeekIssue,jdbcType=INTEGER}, 
+      #{resolutionHistoryIssue,jdbcType=INTEGER}, #{testEnvIssue,jdbcType=INTEGER}, #{uatEnvIssue,jdbcType=INTEGER}, 
+      #{prodEnvIssue,jdbcType=INTEGER}, #{createTime,jdbcType=BIGINT}, #{updateTime,jdbcType=BIGINT}, 
+      #{issueYear,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="io.metersphere.base.domain.IssueTrend">
+    insert into issue_trend
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="projectId != null">
+        project_id,
+      </if>
+      <if test="jiraKey != null">
+        jira_key,
+      </if>
+      <if test="issueWeek != null">
+        issue_week,
+      </if>
+      <if test="startWeekTime != null">
+        start_week_time,
+      </if>
+      <if test="endWeekTime != null">
+        end_week_time,
+      </if>
+      <if test="issueTotal != null">
+        issue_total,
+      </if>
+      <if test="resolutionIssueTotal != null">
+        resolution_issue_total,
+      </if>
+      <if test="resolutionWeekIssue != null">
+        resolution_week_issue,
+      </if>
+      <if test="resolutionHistoryIssue != null">
+        resolution_history_issue,
+      </if>
+      <if test="testEnvIssue != null">
+        test_env_issue,
+      </if>
+      <if test="uatEnvIssue != null">
+        uat_env_issue,
+      </if>
+      <if test="prodEnvIssue != null">
+        prod_env_issue,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="issueYear != null">
+        issue_year,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="projectId != null">
+        #{projectId,jdbcType=VARCHAR},
+      </if>
+      <if test="jiraKey != null">
+        #{jiraKey,jdbcType=VARCHAR},
+      </if>
+      <if test="issueWeek != null">
+        #{issueWeek,jdbcType=INTEGER},
+      </if>
+      <if test="startWeekTime != null">
+        #{startWeekTime,jdbcType=VARCHAR},
+      </if>
+      <if test="endWeekTime != null">
+        #{endWeekTime,jdbcType=VARCHAR},
+      </if>
+      <if test="issueTotal != null">
+        #{issueTotal,jdbcType=INTEGER},
+      </if>
+      <if test="resolutionIssueTotal != null">
+        #{resolutionIssueTotal,jdbcType=INTEGER},
+      </if>
+      <if test="resolutionWeekIssue != null">
+        #{resolutionWeekIssue,jdbcType=INTEGER},
+      </if>
+      <if test="resolutionHistoryIssue != null">
+        #{resolutionHistoryIssue,jdbcType=INTEGER},
+      </if>
+      <if test="testEnvIssue != null">
+        #{testEnvIssue,jdbcType=INTEGER},
+      </if>
+      <if test="uatEnvIssue != null">
+        #{uatEnvIssue,jdbcType=INTEGER},
+      </if>
+      <if test="prodEnvIssue != null">
+        #{prodEnvIssue,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=BIGINT},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=BIGINT},
+      </if>
+      <if test="issueYear != null">
+        #{issueYear,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="io.metersphere.base.domain.IssueTrendExample" resultType="java.lang.Long">
+    select count(*) from issue_trend
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update issue_trend
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.projectId != null">
+        project_id = #{record.projectId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.jiraKey != null">
+        jira_key = #{record.jiraKey,jdbcType=VARCHAR},
+      </if>
+      <if test="record.issueWeek != null">
+        issue_week = #{record.issueWeek,jdbcType=INTEGER},
+      </if>
+      <if test="record.startWeekTime != null">
+        start_week_time = #{record.startWeekTime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.endWeekTime != null">
+        end_week_time = #{record.endWeekTime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.issueTotal != null">
+        issue_total = #{record.issueTotal,jdbcType=INTEGER},
+      </if>
+      <if test="record.resolutionIssueTotal != null">
+        resolution_issue_total = #{record.resolutionIssueTotal,jdbcType=INTEGER},
+      </if>
+      <if test="record.resolutionWeekIssue != null">
+        resolution_week_issue = #{record.resolutionWeekIssue,jdbcType=INTEGER},
+      </if>
+      <if test="record.resolutionHistoryIssue != null">
+        resolution_history_issue = #{record.resolutionHistoryIssue,jdbcType=INTEGER},
+      </if>
+      <if test="record.testEnvIssue != null">
+        test_env_issue = #{record.testEnvIssue,jdbcType=INTEGER},
+      </if>
+      <if test="record.uatEnvIssue != null">
+        uat_env_issue = #{record.uatEnvIssue,jdbcType=INTEGER},
+      </if>
+      <if test="record.prodEnvIssue != null">
+        prod_env_issue = #{record.prodEnvIssue,jdbcType=INTEGER},
+      </if>
+      <if test="record.createTime != null">
+        create_time = #{record.createTime,jdbcType=BIGINT},
+      </if>
+      <if test="record.updateTime != null">
+        update_time = #{record.updateTime,jdbcType=BIGINT},
+      </if>
+      <if test="record.issueYear != null">
+        issue_year = #{record.issueYear,jdbcType=INTEGER},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update issue_trend
+    set id = #{record.id,jdbcType=INTEGER},
+      project_id = #{record.projectId,jdbcType=VARCHAR},
+      jira_key = #{record.jiraKey,jdbcType=VARCHAR},
+      issue_week = #{record.issueWeek,jdbcType=INTEGER},
+      start_week_time = #{record.startWeekTime,jdbcType=VARCHAR},
+      end_week_time = #{record.endWeekTime,jdbcType=VARCHAR},
+      issue_total = #{record.issueTotal,jdbcType=INTEGER},
+      resolution_issue_total = #{record.resolutionIssueTotal,jdbcType=INTEGER},
+      resolution_week_issue = #{record.resolutionWeekIssue,jdbcType=INTEGER},
+      resolution_history_issue = #{record.resolutionHistoryIssue,jdbcType=INTEGER},
+      test_env_issue = #{record.testEnvIssue,jdbcType=INTEGER},
+      uat_env_issue = #{record.uatEnvIssue,jdbcType=INTEGER},
+      prod_env_issue = #{record.prodEnvIssue,jdbcType=INTEGER},
+      create_time = #{record.createTime,jdbcType=BIGINT},
+      update_time = #{record.updateTime,jdbcType=BIGINT},
+      issue_year = #{record.issueYear,jdbcType=INTEGER}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="io.metersphere.base.domain.IssueTrend">
+    update issue_trend
+    <set>
+      <if test="projectId != null">
+        project_id = #{projectId,jdbcType=VARCHAR},
+      </if>
+      <if test="jiraKey != null">
+        jira_key = #{jiraKey,jdbcType=VARCHAR},
+      </if>
+      <if test="issueWeek != null">
+        issue_week = #{issueWeek,jdbcType=INTEGER},
+      </if>
+      <if test="startWeekTime != null">
+        start_week_time = #{startWeekTime,jdbcType=VARCHAR},
+      </if>
+      <if test="endWeekTime != null">
+        end_week_time = #{endWeekTime,jdbcType=VARCHAR},
+      </if>
+      <if test="issueTotal != null">
+        issue_total = #{issueTotal,jdbcType=INTEGER},
+      </if>
+      <if test="resolutionIssueTotal != null">
+        resolution_issue_total = #{resolutionIssueTotal,jdbcType=INTEGER},
+      </if>
+      <if test="resolutionWeekIssue != null">
+        resolution_week_issue = #{resolutionWeekIssue,jdbcType=INTEGER},
+      </if>
+      <if test="resolutionHistoryIssue != null">
+        resolution_history_issue = #{resolutionHistoryIssue,jdbcType=INTEGER},
+      </if>
+      <if test="testEnvIssue != null">
+        test_env_issue = #{testEnvIssue,jdbcType=INTEGER},
+      </if>
+      <if test="uatEnvIssue != null">
+        uat_env_issue = #{uatEnvIssue,jdbcType=INTEGER},
+      </if>
+      <if test="prodEnvIssue != null">
+        prod_env_issue = #{prodEnvIssue,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=BIGINT},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=BIGINT},
+      </if>
+      <if test="issueYear != null">
+        issue_year = #{issueYear,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="io.metersphere.base.domain.IssueTrend">
+    update issue_trend
+    set project_id = #{projectId,jdbcType=VARCHAR},
+      jira_key = #{jiraKey,jdbcType=VARCHAR},
+      issue_week = #{issueWeek,jdbcType=INTEGER},
+      start_week_time = #{startWeekTime,jdbcType=VARCHAR},
+      end_week_time = #{endWeekTime,jdbcType=VARCHAR},
+      issue_total = #{issueTotal,jdbcType=INTEGER},
+      resolution_issue_total = #{resolutionIssueTotal,jdbcType=INTEGER},
+      resolution_week_issue = #{resolutionWeekIssue,jdbcType=INTEGER},
+      resolution_history_issue = #{resolutionHistoryIssue,jdbcType=INTEGER},
+      test_env_issue = #{testEnvIssue,jdbcType=INTEGER},
+      uat_env_issue = #{uatEnvIssue,jdbcType=INTEGER},
+      prod_env_issue = #{prodEnvIssue,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=BIGINT},
+      update_time = #{updateTime,jdbcType=BIGINT},
+      issue_year = #{issueYear,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

@@ -43,7 +43,8 @@ public class MDJiraPlatform extends JiraPlatform {
 
     @Override
     public void syncIssues(Project project, List<IssuesDao> issues) {
-        List<JiraIssue> jiraIssues = getIssues();
+        String searchCondition = "project = %s AND issuetype = %s AND resolution = Unresolved ORDER BY priority DESC, updated DESC";
+        List<JiraIssue> jiraIssues = getIssues(searchCondition);
         // 批量入库
         jiraIssues.forEach(item -> {
             // 是否已存在数据
@@ -150,20 +151,22 @@ public class MDJiraPlatform extends JiraPlatform {
         return JSONObject.parseObject(responseEntity.getBody());
     }
 
-    public List<JiraIssue> getIssues() {
+    public List<JiraIssue> getIssues(String searchCondition) {
         HttpHeaders requestHeaders = new HttpHeaders();
         requestHeaders.add("Authorization", "Basic " + jiraInfo.get("auth"));
         requestHeaders.setContentType(org.springframework.http.MediaType.APPLICATION_JSON);
         // body
         JiraSearchReq searchReq = new JiraSearchReq();
-        String jql = String.format("project = %s AND issuetype = %s  AND  resolution = Unresolved ORDER BY priority DESC, updated DESC",
+        String jql = String.format(searchCondition,
                 jiraInfo.get("key"),
                 jiraInfo.get("type"));
         RestTemplate restTemplate = new RestTemplate();
         List<JiraIssue> allIssues = Lists.newArrayList();
+        // 第一条数据从0开始
+        int startAt = 0;
         for (int i = 0; i < 6; i++) {
             searchReq.setJql(jql);
-            searchReq.setStartAt(i + 1);
+            searchReq.setStartAt(startAt);
             searchReq.setMaxResults(50);
             searchReq.setFields(Lists.newArrayList());
             //HttpEntity
@@ -180,6 +183,7 @@ public class MDJiraPlatform extends JiraPlatform {
             if ((searchResponse.getTotal() / 50) <= i) {
                 return allIssues;
             }
+            startAt += 50;
         }
         return allIssues;
     }

@@ -304,9 +304,8 @@ public class JiraPlatform extends AbstractIssuePlatform {
             JSONArray array = JSON.parseArray(item.getValue());
             List<JSONObject> objects = new ArrayList<>();
             array.forEach(vl -> {
-                JSONObject fixVersion = (JSONObject)vl;
                 JSONObject object = new JSONObject();
-                object.put("name", fixVersion.getString("value"));
+                object.put("name", vl);
                 objects.add(object);
             });
             fields.put(item.getCustomData(), objects);
