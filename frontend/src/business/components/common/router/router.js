@@ -1,6 +1,7 @@
 import Vue from "vue";
 import VueRouter from 'vue-router';
 import RouterSidebar from "./RouterSidebar";
+import Tools from "@/business/components/tools/router";
 import Setting from "@/business/components/settings/router";
 import API from "@/business/components/api/router";
 import Performance from "@/business/components/performance/router";
@@ -22,6 +23,7 @@ const router = new VueRouter({
         sidebar: RouterSidebar
       }
     },
+    Tools,
     Setting,
     API,
     Performance,

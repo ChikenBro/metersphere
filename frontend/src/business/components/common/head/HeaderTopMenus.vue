@@ -27,6 +27,9 @@
                   v-if="isReport && check('reportStat')">
       {{ $t('commons.report_statistics.title') }}
     </el-menu-item>
+    <el-menu-item index="/tools" onselectstart="return false">
+      {{ toolsName }}
+    </el-menu-item>
 
     <el-menu-item index="/setting" onselectstart="return false">
       {{ $t('commons.system_setting') }}
@@ -55,6 +58,7 @@ export default {
       isReport: isReport,
       modules: {},
       menuKey: 0,
+      toolsName: '目睹工具'
     };
   },
   props: {
