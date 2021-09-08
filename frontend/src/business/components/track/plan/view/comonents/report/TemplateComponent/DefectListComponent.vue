@@ -43,12 +43,12 @@
         </el-table-column>
 
         <el-table-column
-                prop="status"
+                prop="platformStatus"
                 :label="$t('test_track.module.status')"
                 show-overflow-tooltip>
         </el-table-column>
         <el-table-column
-          prop="currentOwner"
+          prop="lastmodify"
           :label="$t('test_track.module.current_owner')"
           show-overflow-tooltip>
         </el-table-column>

@@ -57,6 +57,7 @@ public class SyncTestCaseService {
         return transferTestCaseNode(xrayFolders, projectId);
     }
 
+
     public SyncResult syncTestCase(String projectId, String remoteNodePath, String msNodeId, String msNodePath) {
         SyncResult syncResult = new SyncResult();
         syncResult.setSyncOk(false);
@@ -144,7 +145,6 @@ public class SyncTestCaseService {
         cacheSyncProject.remove(projectId);
         return syncResult;
     }
-
     /**
      * 加个锁
      * @param projectId

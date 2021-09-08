@@ -58,7 +58,7 @@
         </el-table-column>
 
         <el-table-column
-          prop="executorName"
+          prop="executor"
           :label="$t('test_track.plan_view.executor')">
         </el-table-column>
 
@@ -107,7 +107,7 @@
                 type: 'api',
                 method: 'auto',
                 nodePath: '/module1/module2',
-                executorName: "Tom",
+                executor: "Tom",
                 status: "Failure",
                 updateTime: new Date(),
               },
@@ -117,7 +117,7 @@
                 type: 'functional',
                 method: 'manual',
                 nodePath: '/module1',
-                executorName: "Micheal",
+                executor: "Micheal",
                 status: "Failure",
                 updateTime: new Date(),
               }
