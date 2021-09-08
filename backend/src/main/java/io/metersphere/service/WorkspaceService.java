@@ -226,6 +226,10 @@ public class WorkspaceService {
         return extWorkspaceMapper.getWorkspaceIdsOrgId(orgId);
     }
 
+    public Workspace getWorkspaceById(String workId) {
+        return workspaceMapper.selectByPrimaryKey(workId);
+    }
+
     public void updateWorkspaceMember(WorkspaceMemberDTO memberDTO) {
         String workspaceId = memberDTO.getWorkspaceId();
         String userId = memberDTO.getId();

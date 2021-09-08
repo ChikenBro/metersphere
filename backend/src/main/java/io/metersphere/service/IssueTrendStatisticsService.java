@@ -1,6 +1,5 @@
 package io.metersphere.service;
 
-import com.google.common.collect.Lists;
 import io.metersphere.base.domain.IssueTrend;
 import io.metersphere.base.domain.IssueTrendExample;
 import io.metersphere.base.mapper.IssueTrendMapper;
@@ -70,7 +69,6 @@ public class IssueTrendStatisticsService {
     }
 
     public List<IssueTrend> getIssueTrendList() {
-
         return getIssueTrends();
     }
 

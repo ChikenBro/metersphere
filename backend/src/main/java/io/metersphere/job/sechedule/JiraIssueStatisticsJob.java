@@ -2,9 +2,13 @@ package io.metersphere.job.sechedule;
 
 import com.alibaba.fastjson.JSONObject;
 import io.metersphere.base.domain.IssueTrend;
+import io.metersphere.base.domain.Project;
+import io.metersphere.base.domain.Workspace;
 import io.metersphere.commons.constants.ScheduleGroup;
 import io.metersphere.commons.utils.CommonBeanFactory;
 import io.metersphere.service.IssueTrendStatisticsService;
+import io.metersphere.service.ProjectService;
+import io.metersphere.service.WorkspaceService;
 import io.metersphere.track.issue.MDJiraPlatform;
 import io.metersphere.track.issue.domain.Jira.JiraIssue;
 import io.metersphere.track.request.testcase.IssuesRequest;
@@ -17,6 +21,8 @@ import java.util.List;
 public class JiraIssueStatisticsJob extends MsScheduleJob {
 
     private IssueTrendStatisticsService statisticsService;
+    private ProjectService projectService;
+    private WorkspaceService workspaceService;
 
     private final String CREATE_JQL = "project = %s AND issuetype = Bug AND created >= %s AND created <= %s";
     private final String UPDATE_JQL = "project = %s AND issuetype = Bug AND resolutiondate >= %s AND resolution in (Done,完成) AND updated >= %s AND updated <= %s";
@@ -24,6 +30,8 @@ public class JiraIssueStatisticsJob extends MsScheduleJob {
 
     public JiraIssueStatisticsJob() {
         this.statisticsService = CommonBeanFactory.getBean(IssueTrendStatisticsService.class);
+        this.projectService = CommonBeanFactory.getBean(ProjectService.class);
+        this.workspaceService = CommonBeanFactory.getBean(WorkspaceService.class);
     }
 
     @Override
@@ -32,10 +40,12 @@ public class JiraIssueStatisticsJob extends MsScheduleJob {
         List<IssueTrend> issueTrends = statisticsService.getIssueTrendByCurrentWeek();
         if (null != issueTrends && issueTrends.size() > 0) {
             issueTrends.forEach(v -> {
+                Project projectById = projectService.getProjectById(v.getProjectId());
+                Workspace workspace = workspaceService.getWorkspaceById(projectById.getWorkspaceId());
                 // jira issue 数据
                 IssuesRequest issuesRequest = new IssuesRequest();
                 issuesRequest.setProjectId(v.getProjectId());
-                issuesRequest.setOrganizationId("");
+                issuesRequest.setOrganizationId(workspace.getOrganizationId());
                 MDJiraPlatform jiraPlatform = new MDJiraPlatform(issuesRequest);
                 // 本周新增issue
                 String weekCreatedJQL = String.format(CREATE_JQL, v.getJiraKey(), v.getStartWeekTime(), v.getEndWeekTime());
