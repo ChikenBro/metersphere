@@ -2,7 +2,9 @@ package io.metersphere.base.mapper;
 
 import io.metersphere.base.domain.ApiScenarioReport;
 import io.metersphere.base.domain.ApiScenarioReportExample;
+
 import java.util.List;
+
 import org.apache.ibatis.annotations.Param;
 
 public interface ApiScenarioReportMapper {
@@ -33,4 +35,6 @@ public interface ApiScenarioReportMapper {
     int updateByPrimaryKeyWithBLOBs(ApiScenarioReport record);
 
     int updateByPrimaryKey(ApiScenarioReport record);
+
+    int updateByReportId(@Param("triggerMode") String triggerMode, @Param("reportName") String reportName);
 }

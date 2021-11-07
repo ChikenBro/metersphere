@@ -196,7 +196,7 @@ export default {
       manual: "手动触发",
       schedule: "定时任务",
       api: "API调用",
-      case: "用例触发"
+      case: "用例触发",
     },
     adv_search: {
       title: '高级搜索',

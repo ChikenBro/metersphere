@@ -3,6 +3,8 @@ package io.metersphere.base.mapper;
 import io.metersphere.base.domain.Project;
 import io.metersphere.base.domain.ProjectExample;
 import java.util.List;
+import java.util.Map;
+
 import org.apache.ibatis.annotations.Param;
 
 public interface ProjectMapper {
@@ -27,4 +29,6 @@ public interface ProjectMapper {
     int updateByPrimaryKeySelective(Project record);
 
     int updateByPrimaryKey(Project record);
+
+    List<Project> selectProjectId(@Param("workspaceId") String workspaceId);
 }

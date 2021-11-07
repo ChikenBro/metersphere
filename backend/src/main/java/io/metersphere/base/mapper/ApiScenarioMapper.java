@@ -3,7 +3,9 @@ package io.metersphere.base.mapper;
 import io.metersphere.base.domain.ApiScenario;
 import io.metersphere.base.domain.ApiScenarioExample;
 import io.metersphere.base.domain.ApiScenarioWithBLOBs;
+
 import java.util.List;
+
 import org.apache.ibatis.annotations.Param;
 
 public interface ApiScenarioMapper {
@@ -34,4 +36,6 @@ public interface ApiScenarioMapper {
     int updateByPrimaryKeyWithBLOBs(ApiScenarioWithBLOBs record);
 
     int updateByPrimaryKey(ApiScenario record);
+
+    List<ApiScenario> selectScenarioId(@Param("scenarioModuleId") String scenarioModuleId);
 }

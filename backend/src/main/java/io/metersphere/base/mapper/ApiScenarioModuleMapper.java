@@ -2,7 +2,9 @@ package io.metersphere.base.mapper;
 
 import io.metersphere.base.domain.ApiScenarioModule;
 import io.metersphere.base.domain.ApiScenarioModuleExample;
+
 import java.util.List;
+
 import org.apache.ibatis.annotations.Param;
 
 public interface ApiScenarioModuleMapper {
@@ -27,4 +29,7 @@ public interface ApiScenarioModuleMapper {
     int updateByPrimaryKeySelective(ApiScenarioModule record);
 
     int updateByPrimaryKey(ApiScenarioModule record);
+
+    List<ApiScenarioModule> selectScenarioModuleId(@Param("projectIds") List<String> projectIds, @Param("serverName") String serverName);
+
 }

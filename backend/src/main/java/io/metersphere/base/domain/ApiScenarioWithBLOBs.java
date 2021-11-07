@@ -8,7 +8,7 @@ import lombok.ToString;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class ApiScenarioWithBLOBs extends ApiScenario implements Serializable {
+public class /**/ApiScenarioWithBLOBs extends ApiScenario implements Serializable {
     private String scenarioDefinition;
 
     private String description;

@@ -36,7 +36,7 @@ public class TestCaseReportController {
     }
 
     @PostMapping("/edit")
-    @MsAuditLog(module = "track_test_case_review", type = OperLogConstants.UPDATE, beforeEvent = "#msClass.getLogDetails(#TestCaseReport.id)", content = "#msClass.getLogDetails(#TestCaseReport.id)", msClass = TestCaseReportService.class)
+    @MsAuditLog(module = "track_test_case_review", type = OperLogConstants.UPDATE, beforeEvent = "#msClass.getLogDetails(#TestCaseRequest.id)", content = "#msClass.getLogDetails(#TestCaseRequest.id)", msClass = TestCaseReportService.class)
     public void edit(@RequestBody TestCaseReport TestCaseReport) {
         testCaseReportService.editTestCaseReport(TestCaseReport);
     }
