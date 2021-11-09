@@ -1,6 +1,8 @@
 package io.metersphere.devops;
 
 import io.metersphere.api.dto.runTestRequest;
+import io.metersphere.commons.constants.OperLogConstants;
+import io.metersphere.log.annotation.MsAuditLog;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -20,7 +22,11 @@ public class RunTestCase {
     @PostMapping(value = "/run")
     public TestCaseRequest runTestCase(@RequestBody runTestRequest request) {
         Map<String, String> map = new HashMap<>();
-        map.put("mdc", "目睹云");
+        map.put("mdc", "新目睹云");
+        map.put("myun", "老目睹云");
+        map.put("mdn", "目睹企播-New");
+        map.put("mde", "目睹企播");
+        map.put("mdl", "目睹直播");
         String localServerName = serverRequest.getServerName();
         int localServerPort = serverRequest.getServerPort();
 

@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class ShiroUtils {
 
-    public static void loadBaseFilterChain(Map<String, String> filterChainDefinitionMap){
+    public static void loadBaseFilterChain(Map<String, String> filterChainDefinitionMap) {
 
         filterChainDefinitionMap.put("/resource/**", "anon");
         filterChainDefinitionMap.put("/*.worker.js", "anon");
@@ -57,6 +57,8 @@ public class ShiroUtils {
         filterChainDefinitionMap.put("/v1/health/**", "anon");
         //mock接口
         filterChainDefinitionMap.put("/mock/**", "anon");
+        //devOps
+        filterChainDefinitionMap.put("/devOps/api/test/case/**", "anon");
     }
 
     public static void ignoreCsrfFilter(Map<String, String> filterChainDefinitionMap) {
@@ -68,14 +70,14 @@ public class ShiroUtils {
         filterChainDefinitionMap.put("/resource/md/get/**", "apikey, authc");
     }
 
-    public static Cookie getSessionIdCookie(){
+    public static Cookie getSessionIdCookie() {
         SimpleCookie sessionIdCookie = new SimpleCookie();
         sessionIdCookie.setPath("/");
         sessionIdCookie.setName("MS_SESSION_ID");
         return sessionIdCookie;
     }
 
-    public static SessionManager getSessionManager(Long sessionTimeout, CacheManager cacheManager){
+    public static SessionManager getSessionManager(Long sessionTimeout, CacheManager cacheManager) {
         DefaultWebSessionManager sessionManager = new DefaultWebSessionManager();
         sessionManager.setSessionIdUrlRewritingEnabled(false);
         sessionManager.setDeleteInvalidSessions(true);
