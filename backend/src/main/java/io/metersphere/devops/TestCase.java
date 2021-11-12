@@ -9,9 +9,7 @@ import io.metersphere.api.dto.automation.RunModeConfig;
 import io.metersphere.api.dto.automation.RunScenarioRequest;
 import io.metersphere.api.service.ApiAutomationService;
 import io.metersphere.api.service.ApiScenarioReportService;
-import io.metersphere.base.domain.ApiScenario;
-import io.metersphere.base.domain.ApiScenarioModule;
-import io.metersphere.base.domain.Project;
+import io.metersphere.base.domain.*;
 import io.metersphere.base.mapper.*;
 import io.metersphere.base.mapper.ext.ExtApiScenarioReportMapper;
 import io.metersphere.commons.constants.ApiRunMode;
@@ -45,28 +43,45 @@ public class TestCase {
     private ApiScenarioReportService apiReportService;
     @Resource
     private ApiScenarioReportMapper apiScenarioReportMapper;
+    @Resource
+    private ApiTestEnvironmentMapper apiTestEnvironmentMapper;
 
-    public TestCaseRequest getTestCase(String env, String product, String serverName, String productName, String localServerName, int localServerPort) {
+    public TestCaseRequest getTestCase(String env, String product, String serverName, String localServerName, int localServerPort) {
         //筛选可执行的测试用例
-        TestCaseRequest testCaseRequest = this.filterTestCase(env, product, serverName, productName);
-        //无可执行的接口场景
-        if (!testCaseRequest.isIfCase()) {
+        TestCaseRequest testCaseRequest = this.filterTestCase(env, product, serverName);
+        //无可执行的接口场景 或没有测试环境
+        if (testCaseRequest.getScenarioIds().isEmpty()) {
+            testCaseRequest.setMessage("无可执行的接口测试用例");
+            testCaseRequest.setIfCase(false);
             return testCaseRequest;
         }
-
+        if (null == this.getProjectEnv(testCaseRequest)) {
+            testCaseRequest.setMessage("没有配置当前接口测试的环境");
+            testCaseRequest.setIfCase(false);
+            return testCaseRequest;
+        }
+        testCaseRequest.setEnvId(this.getProjectEnv(testCaseRequest));
         testCaseRequest.setLocalServerName(localServerName);
         testCaseRequest.setLocalServerPort(localServerPort);
-        System.out.println(testCaseRequest.getScenarioIds());
-
         //组装接口自动化测试请求
         this.assembleTestCaseRequest(testCaseRequest);
+        // todo 修改数据库方式改成批量
+        for (String ScenarioId : testCaseRequest.getScenarioIds()) {
+            ApiScenarioWithBLOBs apiScenarioWithBLOBs = apiScenarioMapper.selectByPrimaryKey(ScenarioId);
+            String scenarioDefinition = apiScenarioWithBLOBs.getScenarioDefinition();
+            //替换环境变量
+            String envContent = "{\"" + testCaseRequest.getProjectId() + "\"" + ":" + "\"" + testCaseRequest.getEnvId() + "\"}}";
+            String baseScenarioDefinition = scenarioDefinition.split("environmentMap\":")[0] + "environmentMap\":" + envContent;
+            apiScenarioWithBLOBs.setScenarioDefinition(baseScenarioDefinition);
+            apiScenarioWithBLOBs.setId(ScenarioId);
+            apiScenarioMapper.updateByPrimaryKeySelective(apiScenarioWithBLOBs);
+        }
         //运行接口场景
         this.runTestCase(testCaseRequest.getRunScenarioRequest());
         testCaseRequest.setStatus(2);
         //获取接口测试报告内容
         Optional<APIScenarioReportResult> reportResult = this.findTestCaseReport(testCaseRequest);
         testCaseRequest.setReportId(reportResult.get().getId());
-        System.out.println(reportResult);
         testCaseRequest.setTestCaseReportUrl(this.testCaseReportUrl(testCaseRequest));
         //设置触发方式为API调用
         apiScenarioReportMapper.updateByReportId("API", testCaseRequest.getReportName());
@@ -74,46 +89,59 @@ public class TestCase {
     }
 
     /**
+     * 获取可用环境
+     *
+     * @param testCaseRequest
+     * @return 环境id
+     */
+    public String getProjectEnv(TestCaseRequest testCaseRequest) {
+        //是否有存在的环境
+        List<ApiTestEnvironment> projectEnv = apiTestEnvironmentMapper.selectByProjectEnv(testCaseRequest.getProjectId());
+        List optionalEnv = projectEnv.stream().filter(x -> x.getName().equals(testCaseRequest.getEnv() + "环境")).collect(Collectors.toList())
+                .stream().map(ApiTestEnvironment::getId).collect(Collectors.toList());
+        if (optionalEnv.isEmpty()) {
+            return null;
+        }
+        return optionalEnv.get(0).toString();
+    }
+
+    /**
      * 过滤可执行的接口测试场景
      *
-     * @param env         环境
-     * @param product     业务线英文名 mdc
-     * @param serverName  服务名称
-     * @param productName 业务线名称 目睹云
+     * @param env        环境
+     * @param product    业务线英文名 mdc
+     * @param serverName 服务名称
      * @return
      */
-    public TestCaseRequest filterTestCase(String env, String product, String serverName, String productName) {
-        TestCaseRequest testCaseReport = new TestCaseRequest();
-        testCaseReport.setEnv(env);
-        testCaseReport.setProduct(product);
-        testCaseReport.setServerName(serverName);
-        testCaseReport.setProductName(productName);
+    public TestCaseRequest filterTestCase(String env, String product, String serverName) {
+        TestCaseRequest testCaseRequest = new TestCaseRequest();
+        testCaseRequest.setEnv(env);
+        testCaseRequest.setProduct(product);
+        testCaseRequest.setServerName(serverName);
         try {
             //查询业务线id
-            String workspaceId = workspaceMapper.selectByProductName(productName);
+            String workspaceId = workspaceMapper.selectByProductName(product);
             //查询业务线所有项目id
             List<Project> projectIds = projectMapper.selectProjectId(workspaceId);
             List<String> allProjectId = projectIds.stream().map(Project::getId).collect(Collectors.toList());
-
-            //查询模块id    `
+            //查询模块id
             List<ApiScenarioModule> apiScenarioModules = apiScenarioModuleMapper.selectScenarioModuleId(allProjectId, serverName);
             String scenarioModuleId = apiScenarioModules.get(0).getId();
-            testCaseReport.setProjectId(apiScenarioModules.get(0).getProjectId());
+            testCaseRequest.setProjectId(apiScenarioModules.get(0).getProjectId());
             //查询接口自动化模块下所有场景id
             List<ApiScenario> scenarioIds = apiScenarioMapper.selectScenarioId(scenarioModuleId);
             //dev环境只跑P0与P1级接口用例
             if (env.equals("dev")) {
                 List<ApiScenario> devApiScenario = scenarioIds.stream().filter(x -> x.getLevel().equals("P0") || x.getLevel().equals("P1")).collect(Collectors.toList());
                 List<String> devScenarioIds = devApiScenario.stream().map(ApiScenario::getId).collect(Collectors.toList());
-                testCaseReport.setScenarioIds(devScenarioIds);
-                return testCaseReport;
+                testCaseRequest.setScenarioIds(devScenarioIds);
+                return testCaseRequest;
             }
-            testCaseReport.setScenarioIds(scenarioIds.stream().map(ApiScenario::getId).collect(Collectors.toList()));
-            return testCaseReport;
+            testCaseRequest.setScenarioIds(scenarioIds.stream().map(ApiScenario::getId).collect(Collectors.toList()));
+            return testCaseRequest;
         } catch (Exception e) {
             LogUtil.error(e.getMessage(), e);
-            testCaseReport.setIfCase(false);
-            return testCaseReport;
+            return testCaseRequest;
         }
     }
 
@@ -162,6 +190,7 @@ public class TestCase {
      * @param request request
      */
     public void runTestCase(RunScenarioRequest request) {
+        //最大50个接口场景
         apiAutomationService.run(request);
     }
 
@@ -189,8 +218,8 @@ public class TestCase {
      * @return testCaseReportUrl
      */
     public String testCaseReportUrl(TestCaseRequest testCaseRequest) {
-        //没有port
-        if (testCaseRequest.getLocalServerPort() == 0) {
+        //没有port或者为80端口
+        if (testCaseRequest.getLocalServerPort() == 80) {
             return "http://" + testCaseRequest.getLocalServerName() + "/#/api/automation/report/view/" + testCaseRequest.getReportId();
         }
         return "http://" + testCaseRequest.getLocalServerName() + ":" + testCaseRequest.getLocalServerPort() + "/#/api/automation/report/view/" + testCaseRequest.getReportId();
@@ -202,7 +231,6 @@ public class TestCase {
         int status;
         APIScenarioReportResult result = extApiScenarioReportMapper.get(reportId);
         if (null == result) {
-            status = 0;
             map.put("status", 0);
             return map;
         }

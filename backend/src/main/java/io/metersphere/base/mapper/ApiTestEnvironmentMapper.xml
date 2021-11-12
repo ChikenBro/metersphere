@@ -367,4 +367,12 @@
       create_user = #{createUser,jdbcType=VARCHAR}
     where id = #{id,jdbcType=VARCHAR}
   </update>
+  <select id="selectByProjectEnv" parameterType="java.lang.String" resultMap="ResultMapWithBLOBs">
+    select
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from api_test_environment
+    where project_id = #{projectId,jdbcType=VARCHAR}
+  </select>
 </mapper>

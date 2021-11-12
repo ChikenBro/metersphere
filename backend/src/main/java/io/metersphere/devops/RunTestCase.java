@@ -21,20 +21,13 @@ public class RunTestCase {
 
     @PostMapping(value = "/run")
     public TestCaseRequest runTestCase(@RequestBody runTestRequest request) {
-        Map<String, String> map = new HashMap<>();
-        map.put("mdc", "新目睹云");
-        map.put("myun", "老目睹云");
-        map.put("mdn", "目睹企播-New");
-        map.put("mde", "目睹企播");
-        map.put("mdl", "目睹直播");
         String localServerName = serverRequest.getServerName();
         int localServerPort = serverRequest.getServerPort();
 
         String env = request.getEnv();
         String product = request.getProduct();
         String serverName = request.getServerName();
-        String productName = map.get(product);
-        return testCase.getTestCase(env, product, serverName, productName, localServerName, localServerPort);
+        return testCase.getTestCase(env, product, serverName, localServerName, localServerPort);
     }
 
     @GetMapping("/task/{reportId}")

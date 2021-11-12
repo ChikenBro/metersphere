@@ -28,7 +28,7 @@ public interface WorkspaceMapper {
 
     int updateByPrimaryKey(Workspace record);
 
-    String selectByProductName(@Param("productName") String productName);
+    String selectByProductName(@Param("devOpsName") String devOpsName);
 
 
 }

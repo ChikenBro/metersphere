@@ -661,13 +661,14 @@
   </update>
 
     <sql id="Base_ScenarioId_List">
-    id, project_id, `tags`, user_id, `name`,`level`
+    id, project_id, `tags`, user_id, `name`,`level`,`scenario_definition`
   </sql>
     <select id="selectScenarioId" resultType="io.metersphere.base.domain.ApiScenario">
         select
         <include refid="Base_ScenarioId_List"/>
         from api_scenario
         where api_scenario_module_id = #{scenarioModuleId,jdbcType=VARCHAR}
+        and version is not null
         and delete_user_id is null
     </select>
 

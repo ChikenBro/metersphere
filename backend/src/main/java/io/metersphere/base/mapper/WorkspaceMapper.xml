@@ -246,6 +246,6 @@
 
     <select id="selectByProductName" resultType="java.lang.String">
     select id from workspace
-    where `name` = #{productName,jdbcType=VARCHAR}
+    where `devops_name` = #{devOpsName,jdbcType=VARCHAR}
   </select>
 </mapper>

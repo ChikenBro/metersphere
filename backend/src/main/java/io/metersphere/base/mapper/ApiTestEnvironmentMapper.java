@@ -3,7 +3,9 @@ package io.metersphere.base.mapper;
 import io.metersphere.base.domain.ApiTestEnvironment;
 import io.metersphere.base.domain.ApiTestEnvironmentExample;
 import io.metersphere.base.domain.ApiTestEnvironmentWithBLOBs;
+
 import java.util.List;
+
 import org.apache.ibatis.annotations.Param;
 
 public interface ApiTestEnvironmentMapper {
@@ -34,4 +36,6 @@ public interface ApiTestEnvironmentMapper {
     int updateByPrimaryKeyWithBLOBs(ApiTestEnvironmentWithBLOBs record);
 
     int updateByPrimaryKey(ApiTestEnvironment record);
+
+    List<ApiTestEnvironment> selectByProjectEnv(@Param("projectId") String projectId);
 }

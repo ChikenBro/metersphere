@@ -10,9 +10,18 @@ import java.util.List;
 @Setter
 public class TestCaseRequest {
     /**
+     * 是否错误提示
+     */
+    private String message;
+    /**
      * 运行环境
      */
     private String env;
+
+    /**
+     * 运行环境id
+     */
+    private String envId;
 
     /**
      * 业务线
