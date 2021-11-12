@@ -123,18 +123,19 @@ public class MsJmeterParser extends ApiImportAbstractParser<ScenarioImport> {
                 selectModulePath = ApiScenarioImportUtil.getSelectModulePath(selectModule.getName(), selectModule.getParentId());
             }
         }
-        ApiScenarioModule module = ApiScenarioImportUtil.buildModule(selectModule, msScenario.getName(), this.projectId);
+        //导入模块，为什么创建子模块？？？
+//        ApiScenarioModule module = ApiScenarioImportUtil.buildModule(selectModule, msScenario.getName(), this.projectId);
         scenarioWithBLOBs.setName(request.getFileName());
         scenarioWithBLOBs.setProjectId(request.getProjectId());
         if (msScenario != null && CollectionUtils.isNotEmpty(msScenario.getHashTree())) {
             scenarioWithBLOBs.setStepTotal(msScenario.getHashTree().size());
         }
-        if (module != null) {
-            scenarioWithBLOBs.setApiScenarioModuleId(module.getId());
+        if (selectModule != null) {
+            scenarioWithBLOBs.setApiScenarioModuleId(selectModule.getId());
             if (StringUtils.isNotBlank(selectModulePath)) {
-                scenarioWithBLOBs.setModulePath(selectModulePath + "/" + module.getName());
+                scenarioWithBLOBs.setModulePath(selectModulePath + "/" + selectModule.getName());
             } else {
-                scenarioWithBLOBs.setModulePath("/" + module.getName());
+                scenarioWithBLOBs.setModulePath("/" + selectModule.getName());
             }
         }
         scenarioWithBLOBs.setId(UUID.randomUUID().toString());

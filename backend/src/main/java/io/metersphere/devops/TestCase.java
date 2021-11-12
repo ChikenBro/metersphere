@@ -50,6 +50,11 @@ public class TestCase {
         //筛选可执行的测试用例
         TestCaseRequest testCaseRequest = this.filterTestCase(env, product, serverName);
         //无可执行的接口场景 或没有测试环境
+        if(null==testCaseRequest.getScenarioIds()){
+            testCaseRequest.setMessage("模块不存在或业务线不存在");
+            testCaseRequest.setIfCase(false);
+            return testCaseRequest;
+        }
         if (testCaseRequest.getScenarioIds().isEmpty()) {
             testCaseRequest.setMessage("无可执行的接口测试用例");
             testCaseRequest.setIfCase(false);

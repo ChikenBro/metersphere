@@ -43,8 +43,9 @@ public class ApiScenarioReferenceIdService {
     }
 
     public void saveByApiScenario(ApiScenarioWithBLOBs scenario) {
-        this.deleteByScenarioId(scenario.getId());
-
+        if (scenario.getId() != null) {
+            this.deleteByScenarioId(scenario.getId());
+        }
         long createTime = System.currentTimeMillis();
         String createUser = SessionUtils.getUserId();
 
@@ -59,30 +60,32 @@ public class ApiScenarioReferenceIdService {
                         String refId = "";
                         String refrenced = "";
                         String dataType = "";
-                        if(item.containsKey("id")){
+                        if (item.containsKey("id")) {
                             refId = item.getString("id");
                         }
-                        if(item.containsKey("referenced")){
+                        if (item.containsKey("referenced")) {
                             refrenced = item.getString("referenced");
                         }
-                        if(item.containsKey("refType")){
+                        if (item.containsKey("refType")) {
                             dataType = item.getString("refType");
                         }
 
                         if (StringUtils.isNotEmpty(refId) && StringUtils.isNotEmpty(refrenced)) {
                             ApiScenarioReferenceId saveItem = new ApiScenarioReferenceId();
                             saveItem.setId(UUID.randomUUID().toString());
-                            saveItem.setApiScenarioId(scenario.getId());
+//                            saveItem.setApiScenarioId(scenario.getId());
+                            //先解决空指针异常
+                            saveItem.setApiScenarioId("null");
                             saveItem.setCreateTime(createTime);
                             saveItem.setCreateUserId(createUser);
                             saveItem.setReferenceId(refId);
                             saveItem.setReferenceType(refrenced);
                             saveItem.setDataType(dataType);
-                            refreceIdDic.put(refId,saveItem);
+                            refreceIdDic.put(refId, saveItem);
                         }
 
-                        if(item.containsKey("hashTree")){
-                            refreceIdDic.putAll(this.deepParseTestElement(createTime,createUser,scenario.getId(),item.getJSONArray("hashTree")));
+                        if (item.containsKey("hashTree")) {
+                            refreceIdDic.putAll(this.deepParseTestElement(createTime, createUser, scenario.getId(), item.getJSONArray("hashTree")));
                         }
                     }
                 }
@@ -90,40 +93,40 @@ public class ApiScenarioReferenceIdService {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if(MapUtils.isNotEmpty(refreceIdDic)){
-            for (ApiScenarioReferenceId model:refreceIdDic.values()) {
+        if (MapUtils.isNotEmpty(refreceIdDic)) {
+            for (ApiScenarioReferenceId model : refreceIdDic.values()) {
                 apiScenarioReferenceIdMapper.insert(model);
             }
-        }else {
+        } else {
             ApiScenarioReferenceId saveItem = new ApiScenarioReferenceId();
             saveItem.setId(UUID.randomUUID().toString());
-            saveItem.setApiScenarioId(scenario.getId());
+            saveItem.setApiScenarioId(null);
             saveItem.setCreateTime(createTime);
             saveItem.setCreateUserId(createUser);
-            try{
+            try {
                 apiScenarioReferenceIdMapper.insert(saveItem);
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
-    public Map<String,ApiScenarioReferenceId> deepParseTestElement(long createTime,String createUser,String scenarioId,JSONArray testElementList){
-        Map<String,ApiScenarioReferenceId> returnMap = new HashMap<>();
+    public Map<String, ApiScenarioReferenceId> deepParseTestElement(long createTime, String createUser, String scenarioId, JSONArray testElementList) {
+        Map<String, ApiScenarioReferenceId> returnMap = new HashMap<>();
 
-        if(CollectionUtils.isNotEmpty(testElementList)){
+        if (CollectionUtils.isNotEmpty(testElementList)) {
             for (int index = 0; index < testElementList.size(); index++) {
                 JSONObject item = testElementList.getJSONObject(index);
                 String refId = "";
                 String refrenced = "";
                 String dataType = "";
-                if(item.containsKey("id")){
+                if (item.containsKey("id")) {
                     refId = item.getString("id");
                 }
-                if(item.containsKey("referenced")){
+                if (item.containsKey("referenced")) {
                     refrenced = item.getString("referenced");
                 }
-                if(item.containsKey("refType")){
+                if (item.containsKey("refType")) {
                     dataType = item.getString("refType");
                 }
 
@@ -136,10 +139,10 @@ public class ApiScenarioReferenceIdService {
                     saveItem.setReferenceId(refId);
                     saveItem.setReferenceType(refrenced);
                     saveItem.setDataType(dataType);
-                    returnMap.put(refId,saveItem);
+                    returnMap.put(refId, saveItem);
                 }
-                if(item.containsKey("hashTree")){
-                    returnMap.putAll(this.deepParseTestElement(createTime,createUser,scenarioId,item.getJSONArray("hashTree")));
+                if (item.containsKey("hashTree")) {
+                    returnMap.putAll(this.deepParseTestElement(createTime, createUser, scenarioId, item.getJSONArray("hashTree")));
                 }
             }
         }
