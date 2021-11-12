@@ -1,6 +1,7 @@
 package io.metersphere.base.domain;
 
 import java.io.Serializable;
+
 import lombok.Data;
 
 @Data
@@ -54,8 +55,6 @@ public class ApiScenario implements Serializable {
     private Long deleteTime;
 
     private String deleteUserId;
-
-    private String scenarioDefinition;
 
     private static final long serialVersionUID = 1L;
 }
