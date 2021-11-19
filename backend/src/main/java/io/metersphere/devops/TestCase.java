@@ -50,7 +50,7 @@ public class TestCase {
         //筛选可执行的测试用例
         TestCaseRequest testCaseRequest = this.filterTestCase(env, product, serverName);
         //无可执行的接口场景 或没有测试环境
-        if(null==testCaseRequest.getScenarioIds()){
+        if (null == testCaseRequest.getScenarioIds()) {
             testCaseRequest.setMessage("模块不存在或业务线不存在");
             testCaseRequest.setIfCase(false);
             return testCaseRequest;
@@ -102,7 +102,7 @@ public class TestCase {
     public String getProjectEnv(TestCaseRequest testCaseRequest) {
         //是否有存在的环境
         List<ApiTestEnvironment> projectEnv = apiTestEnvironmentMapper.selectByProjectEnv(testCaseRequest.getProjectId());
-        List optionalEnv = projectEnv.stream().filter(x -> x.getName().equals(testCaseRequest.getEnv() + "环境")).collect(Collectors.toList())
+        List optionalEnv = projectEnv.stream().filter(x -> x.getName().equals(testCaseRequest.getEnv())).collect(Collectors.toList())
                 .stream().map(ApiTestEnvironment::getId).collect(Collectors.toList());
         if (optionalEnv.isEmpty()) {
             return null;
