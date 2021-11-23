@@ -14,11 +14,9 @@ import io.metersphere.base.mapper.*;
 import io.metersphere.base.mapper.ext.ExtApiScenarioReportMapper;
 import io.metersphere.commons.constants.ApiRunMode;
 import io.metersphere.commons.constants.TriggerMode;
-import io.metersphere.commons.exception.MSException;
 import io.metersphere.commons.utils.LogUtil;
 import io.metersphere.commons.utils.PageUtils;
 import org.springframework.stereotype.Service;
-
 
 import javax.annotation.Resource;
 import java.text.SimpleDateFormat;
@@ -49,20 +47,8 @@ public class TestCase {
     public TestCaseRequest getTestCase(String env, String product, String serverName, String localServerName, int localServerPort) {
         //筛选可执行的测试用例
         TestCaseRequest testCaseRequest = this.filterTestCase(env, product, serverName);
-        //无可执行的接口场景 或没有测试环境
-        if (null == testCaseRequest.getScenarioIds()) {
-            testCaseRequest.setMessage("模块不存在或业务线不存在");
-            testCaseRequest.setIfCase(false);
-            return testCaseRequest;
-        }
-        if (testCaseRequest.getScenarioIds().isEmpty()) {
-            testCaseRequest.setMessage("无可执行的接口测试用例");
-            testCaseRequest.setIfCase(false);
-            return testCaseRequest;
-        }
-        if (null == this.getProjectEnv(testCaseRequest)) {
-            testCaseRequest.setMessage("没有配置当前接口测试的环境");
-            testCaseRequest.setIfCase(false);
+        //校验测试数据
+        if (!checkTestCaseData(testCaseRequest)) {
             return testCaseRequest;
         }
         testCaseRequest.setEnvId(this.getProjectEnv(testCaseRequest));
@@ -91,6 +77,31 @@ public class TestCase {
         //设置触发方式为API调用
         apiScenarioReportMapper.updateByReportId("API", testCaseRequest.getReportName());
         return testCaseRequest;
+    }
+
+    /**
+     * 校验接口测试数据
+     *
+     * @param testCaseRequest
+     * @return false true
+     */
+    public boolean checkTestCaseData(TestCaseRequest testCaseRequest) {
+        if (null == testCaseRequest.getScenarioIds()) {
+            testCaseRequest.setMessage("模块不存在或业务线不存在");
+            testCaseRequest.setIfCase(false);
+            return false;
+        }
+        if (testCaseRequest.getScenarioIds().isEmpty()) {
+            testCaseRequest.setMessage("无可执行的接口测试用例");
+            testCaseRequest.setIfCase(false);
+            return false;
+        }
+        if (null == this.getProjectEnv(testCaseRequest)) {
+            testCaseRequest.setMessage("没有配置当前接口测试的环境");
+            testCaseRequest.setIfCase(false);
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -164,7 +175,8 @@ public class TestCase {
         runScenarioRequest.setRunMode(ApiRunMode.SCENARIO.name());
         runScenarioRequest.setId(UUID.randomUUID().toString());
         RunModeConfig runModeConfig = new RunModeConfig();
-        runModeConfig.setMode("serial");
+        //运行模式 1、并行:parallel 并行 2、串行:serial
+        runModeConfig.setMode("parallel");
         runModeConfig.setReportType("setReport");
         String reportName = this.setReportName(testCaseRequest.getProduct(), testCaseRequest.getServerName());
         runModeConfig.setReportName(reportName);
