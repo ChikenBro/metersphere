@@ -175,8 +175,8 @@ public class TestCase {
         runScenarioRequest.setRunMode(ApiRunMode.SCENARIO.name());
         runScenarioRequest.setId(UUID.randomUUID().toString());
         RunModeConfig runModeConfig = new RunModeConfig();
-        //运行模式 1、并行:parallel 并行 2、串行:serial
-        runModeConfig.setMode("parallel");
+        //运行模式 1、并行:parallel 2、串行:serial
+        runModeConfig.setMode("serial");
         runModeConfig.setReportType("setReport");
         String reportName = this.setReportName(testCaseRequest.getProduct(), testCaseRequest.getServerName());
         runModeConfig.setReportName(reportName);
