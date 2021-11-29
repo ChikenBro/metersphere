@@ -108,7 +108,7 @@
             permissions: ['PROJECT_API_SCENARIO:READ+CREATE']
           },
           {
-            label: this.$t('api_test.api_import.label'),
+            // label: this.$t('api_test.api_import.label'),
             callback: this.handleImport,
             permissions: ['PROJECT_API_SCENARIO:READ+IMPORT_SCENARIO']
           },
