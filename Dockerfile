@@ -19,10 +19,11 @@ COPY --from=build ${DEPENDENCY}/BOOT-INF/classes /app
 RUN mv /app/jmeter /opt/
 RUN mkdir -p /opt/jmeter/lib/junit
 
+ENV FORMAT_MESSAGES_PATTERN_DISABLE_LOOKUPS=true
 ENV JAVA_CLASSPATH=/app:/app/lib/*
 ENV JAVA_MAIN_CLASS=io.metersphere.Application
 ENV AB_OFF=true
 ENV MS_VERSION=${MS_VERSION}
-ENV JAVA_OPTIONS="-Dfile.encoding=utf-8 -Djava.awt.headless=true"
+ENV JAVA_OPTIONS="-Dfile.encoding=utf-8 -Djava.awt.headless=true  -Dlog4j2.formatMsgNoLookups=true"
 
 CMD ["/deployments/run-java.sh"]
