@@ -128,6 +128,8 @@ public class ApiAutomationService {
     private TcpApiParamService tcpApiParamService;
     @Resource
     private ApiScenarioReferenceIdService apiScenarioReferenceIdService;
+    @Resource
+    private ApiDefinitionMapper apiDefinitionMapper;
 
     public ApiScenarioWithBLOBs getDto(String id) {
         return apiScenarioMapper.selectByPrimaryKey(id);
@@ -564,30 +566,30 @@ public class ApiAutomationService {
     }
 
     public void reduction(List<String> ids) {
-        if(CollectionUtils.isNotEmpty(ids)){
+        if (CollectionUtils.isNotEmpty(ids)) {
             extApiScenarioMapper.checkOriginalStatusByIds(ids);
             //检查原来模块是否还在
             ApiScenarioExample example = new ApiScenarioExample();
             example.createCriteria().andIdIn(ids);
             List<ApiScenario> scenarioList = apiScenarioMapper.selectByExample(example);
-            Map<String,List<ApiScenario>> nodeMap = scenarioList.stream().collect(Collectors.groupingBy(ApiScenario :: getApiScenarioModuleId));
+            Map<String, List<ApiScenario>> nodeMap = scenarioList.stream().collect(Collectors.groupingBy(ApiScenario::getApiScenarioModuleId));
             ApiScenarioModuleService apiScenarioModuleService = CommonBeanFactory.getBean(ApiScenarioModuleService.class);
-            for(Map.Entry<String,List<ApiScenario>> entry : nodeMap.entrySet()){
+            for (Map.Entry<String, List<ApiScenario>> entry : nodeMap.entrySet()) {
                 String nodeId = entry.getKey();
                 List<ApiScenario> scenariosListItem = entry.getValue();
-                Map<String,List<ApiScenario>> projectMap = scenariosListItem.stream().collect(Collectors.groupingBy(ApiScenario :: getProjectId));
-                for(Map.Entry<String,List<ApiScenario>> projectEntry : projectMap.entrySet()){
+                Map<String, List<ApiScenario>> projectMap = scenariosListItem.stream().collect(Collectors.groupingBy(ApiScenario::getProjectId));
+                for (Map.Entry<String, List<ApiScenario>> projectEntry : projectMap.entrySet()) {
                     String projectId = projectEntry.getKey();
                     List<ApiScenario> checkList = projectEntry.getValue();
-                    if(StringUtils.isNotEmpty(projectId)){
+                    if (StringUtils.isNotEmpty(projectId)) {
                         long nodeCount = apiScenarioModuleService.countById(nodeId);
-                        if(nodeCount <= 0){
+                        if (nodeCount <= 0) {
                             ApiScenarioModule node = apiScenarioModuleService.getDefaultNode(projectId);
-                            for (ApiScenario testCase: checkList) {
+                            for (ApiScenario testCase : checkList) {
                                 ApiScenarioWithBLOBs updateCase = new ApiScenarioWithBLOBs();
                                 updateCase.setId(testCase.getId());
                                 updateCase.setApiScenarioModuleId(node.getId());
-                                updateCase.setModulePath("/"+node.getName());
+                                updateCase.setModulePath("/" + node.getName());
                                 apiScenarioMapper.updateByPrimaryKeySelective(updateCase);
                             }
                         }
@@ -2032,12 +2034,25 @@ public class ApiAutomationService {
         if (urlMap.isEmpty()) {
             return 100;
         }
-
+        // urlList 是场景的接口用例数-导入的也可计算
         List<ApiMethodUrlDTO> urlList = new ArrayList<>();
+        //替换$
+        List<ApiMethodUrlDTO> baseUseUrl = new ArrayList<>();
         for (ApiScenarioWithBLOBs model : allScenarioInfoList) {
             List<ApiMethodUrlDTO> useUrl = this.getScenarioUseUrl(model);
-            if (CollectionUtils.isNotEmpty(useUrl)) {
-                for (ApiMethodUrlDTO dto : useUrl) {
+            for (ApiMethodUrlDTO use : useUrl) {
+                String baseUrl = use.url.replace("$", "");
+                if (baseUrl.contains("?")) {
+                    String spiltBaseUrl = baseUrl.split("[?]")[0];
+                    ApiMethodUrlDTO apiMethodUrlDTO = new ApiMethodUrlDTO(spiltBaseUrl,use.method);
+                    baseUseUrl.add(apiMethodUrlDTO);
+                }else {
+                    ApiMethodUrlDTO apiMethodUrlDTO = new ApiMethodUrlDTO(baseUrl,use.method);
+                    baseUseUrl.add(apiMethodUrlDTO);
+                }
+            }
+            if (CollectionUtils.isNotEmpty(baseUseUrl)) {
+                for (ApiMethodUrlDTO dto : baseUseUrl) {
                     if (!urlList.contains(dto)) {
                         urlList.add(dto);
                     }
@@ -2057,7 +2072,8 @@ public class ApiAutomationService {
                 }
             }
         }
-
+        //设置当前场景为已完成-Prepare
+        apiDefinitionMapper.updateById(containsApiIdList);
         int allApiIdCount = 0;
         for (List<String> allApiIdList : urlMap.values()) {
             if (CollectionUtils.isNotEmpty(allApiIdList)) {

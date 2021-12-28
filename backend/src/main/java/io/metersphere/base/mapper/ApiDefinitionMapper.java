@@ -7,6 +7,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
 public interface ApiDefinitionMapper {
+
     long countByExample(ApiDefinitionExample example);
 
     int deleteByExample(ApiDefinitionExample example);
@@ -34,4 +35,6 @@ public interface ApiDefinitionMapper {
     int updateByPrimaryKeyWithBLOBs(ApiDefinitionWithBLOBs record);
 
     int updateByPrimaryKey(ApiDefinition record);
+
+    int updateById(@Param("apiDefinitionIds") List<String> apiDefinitionIds);
 }
