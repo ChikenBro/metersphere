@@ -282,54 +282,13 @@ public class IssueTrendStatisticsService extends Thread{
 
             json_test = JSONObject.parseObject(result);
             return json_test;
-//            testMap.put(mapKey,json_test.getJSONObject("data").getString("totalRow"));
-//            testMap.put
-//            System.out.println(json_test);
-//            for (Object e : json_test.getJSONArray("data")) {
-//                JSONObject e1 = JSONObject.parseObject(e.toString());
-//                System.out.println(e1.get("display_name").toString());
-//            }
+
         } catch (ClientProtocolException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-//        return json_test;
-//        HCB hcb = HCB.custom()
-//                .timeout(1000) //超时
-//                .pool(100, 10) //启用连接池，每个路由最大创建10个链接，总连接数限制为100个
-//                .sslpv(SSLs.SSLProtocolVersion.TLSv1_2) 	//设置ssl版本号，默认SSLv3，也可以调用sslpv("TLSv1.2")
-//                .ssl()  	  	//https，支持自定义ssl证书路径和密码
-//
-//                // ，ssl(String keyStorePath, String keyStorepass)
-//                .retry(5)		//重试5次
-//                ;
-//
-//        HttpClient client = hcb.build();
-////        String jsonString2 = "{\"sort\":{\"key\":\"PRIORITY\",\"value\":\"DESC\"},\"conditions\":[{\"key\":\"STATUS_TYPE\",\"customFieldId\":null,\"value\":[\"TODO\",\"PROCESSING\"],\"fixed\":true,\"userMap\":{},\"validInfo\":[]},{\"key\":\"CREATED_AT\",\"customFieldId\":null,\"value\":{\"startDate\":\"2022-02-14\",\"endDate\":\"2022-02-22\"},\"fixed\":false}]}";
-//        Map stringToMap =  JSONObject.parseObject(jsonString);
-//
-////        Map<String, Object> map = new HashMap<String, Object>();
-////        map.put("Action", "DescribeCodingProjects");
-////        map.put("PageNumber", 1);
-////        map.put("PageSize", 100);
-//        Header[] headers = HttpHeader.custom()
-//                .authorization("token 877e0180347fa8d24500d7f4e8acd2683ac958da")
-//                .build();
-//
-//
-//
-//        //插件式配置请求参数（网址、请求参数、编码、client）
-//        HttpConfig config = HttpConfig.custom()
-//                .headers(headers)
-//                .url(url)	          //设置请求的url
-//                .map(stringToMap)	          //设置请求参数，没有则无需设置
-//                .encoding("utf-8") //设置请求和返回编码，默认就是Charset.defaultCharset()
-//                .client(client)    //如果只是简单使用，无需设置，会自动获取默认的一个client对象
-//                ;
-//
-//        HttpClientUtil.post(config);    //post请求
-//        HttpResult respResult = HttpClientUtil.sendAndGetResp(config);
+
         return json_test;
     }
 
@@ -372,49 +331,76 @@ public class IssueTrendStatisticsService extends Thread{
 
 //        respResult.getResult();
         //本周新增BUG
-        String jsonString1 = String.format("{\"page\":1,\"pageSize\":100,\"content\":{\"sort\":{\"key\":\"PRIORITY\",\"value\":\"DESC\"},\"conditions\":[{\"key\":\"CREATED_AT\",\"customFieldId\":null,\"value\":{\"startDate\":\"%s\",\"endDate\":\"%s\"},\"fixed\":false},{\"key\":\"STATUS\",\"customFieldId\":null,\"value\":[],\"fixed\":false,\"userMap\":{},\"validInfo\":[]}]}}", currentTime, currentTimeNow);
-        //本周解决本周BUG
-        String jsonString2 = String.format("{\"page\":1,\"pageSize\":100,\"content\":{\"sort\":{\"key\":\"PRIORITY\",\"value\":\"DESC\"},\"conditions\":[{\"key\":\"CREATED_AT\",\"customFieldId\":null,\"value\":{\"startDate\":\"%s\",\"endDate\":\"%s\"},\"fixed\":false},{\"key\":\"STATUS\",\"customFieldId\":null,\"value\":[43257750,43257751,43257756],\"fixed\":false,\"userMap\":{\"43257750\":{\"value\":43257750},\"43257751\":{\"value\":43257751},\"43257756\":{\"value\":43257756}},\"validInfo\":[]}]}}", currentTime, currentTimeNow);
-        //本周解决历史BUG
-        String jsonString3 = String.format("{\"page\":1,\"pageSize\":100,\"content\":{\"sort\":{\"key\":\"PRIORITY\",\"value\":\"DESC\"},\"conditions\":[{\"key\":\"CREATED_AT\",\"customFieldId\":null,\"value\":{\"startDate\":\"%s\",\"endDate\":\"%s\"},\"fixed\":false},{\"key\":\"STATUS\",\"customFieldId\":null,\"value\":[43257750,43257751,43257756],\"fixed\":false,\"userMap\":{\"43257750\":{\"value\":43257750},\"43257751\":{\"value\":43257751},\"43257756\":{\"value\":43257756}},\"validInfo\":[]}]}}", currentTimelastYear, currentTime);
-        //所有未解决BUG
-        String jsonString4 = String.format("{\"page\":1,\"pageSize\":100,\"content\":{\"sort\":{\"key\":\"PRIORITY\",\"value\":\"DESC\"},\"conditions\":[{\"key\":\"CREATED_AT\",\"customFieldId\":null,\"value\":{\"startDate\":\"%s\",\"endDate\":\"%s\"},\"fixed\":false},{\"key\":\"STATUS\",\"customFieldId\":null,\"value\":[43257745,43257752,43257749],\"fixed\":false,\"userMap\":{\"43257749\":{\"value\":43257749}},\"validInfo\":[]}]}}", currentTimelastYear, currentTime);
+        String jsonString1 = String.format("{\"page\":1,\"pageSize\":10000,\"content\":{\"sort\":{\"key\":\"PRIORITY\",\"value\":\"DESC\"},\"conditions\":[{\"key\":\"CREATED_AT\",\"customFieldId\":null,\"value\":{\"startDate\":\"\",\"endDate\":\"%s\"},\"fixed\":false},{\"key\":\"STATUS\",\"customFieldId\":null,\"value\":[],\"fixed\":false,\"userMap\":{},\"validInfo\":[]}]}}",  currentTimeNow);
+//        //本周解决本周BUG
+//        String jsonString2 = String.format("{\"page\":1,\"pageSize\":100,\"content\":{\"sort\":{\"key\":\"PRIORITY\",\"value\":\"DESC\"},\"conditions\":[{\"key\":\"CREATED_AT\",\"customFieldId\":null,\"value\":{\"startDate\":\"%s\",\"endDate\":\"%s\"},\"fixed\":false},{\"key\":\"STATUS\",\"customFieldId\":null,\"value\":[43257750,43257751,43257756],\"fixed\":false,\"userMap\":{\"43257750\":{\"value\":43257750},\"43257751\":{\"value\":43257751},\"43257756\":{\"value\":43257756}},\"validInfo\":[]}]}}", currentTime, currentTimeNow);
+//        //本周解决历史BUG
+//        String jsonString3 = String.format("{\"page\":1,\"pageSize\":100,\"content\":{\"sort\":{\"key\":\"PRIORITY\",\"value\":\"DESC\"},\"conditions\":[{\"key\":\"CREATED_AT\",\"customFieldId\":null,\"value\":{\"startDate\":\"%s\",\"endDate\":\"%s\"},\"fixed\":false},{\"key\":\"STATUS\",\"customFieldId\":null,\"value\":[43257750,43257751,43257756],\"fixed\":false,\"userMap\":{\"43257750\":{\"value\":43257750},\"43257751\":{\"value\":43257751},\"43257756\":{\"value\":43257756}},\"validInfo\":[]}]}}", currentTimelastYear, currentTime);
+//        //所有未解决BUG
+//        String jsonString4 = String.format("{\"page\":1,\"pageSize\":100,\"content\":{\"sort\":{\"key\":\"PRIORITY\",\"value\":\"DESC\"},\"conditions\":[{\"key\":\"CREATED_AT\",\"customFieldId\":null,\"value\":{\"startDate\":\"%s\",\"endDate\":\"%s\"},\"fixed\":false},{\"key\":\"STATUS\",\"customFieldId\":null,\"value\":[43257745,43257752,43257749],\"fixed\":false,\"userMap\":{\"43257749\":{\"value\":43257749}},\"validInfo\":[]}]}}", currentTimelastYear, currentTime);
 
 
+        long start = System.currentTimeMillis( );
 //        JSONObject json_test = JSONObject.parseObject(respResult.getResult());
         for (Object e:respResult.getJSONArray("data")) {
+            Integer a1 = 0;
+            Integer a2 = 0;
+            Integer a3 = 0;
+            Integer a4 = 0;
             Map<String,String> testMap = new HashMap<>();
             JSONObject e1 = JSONObject.parseObject(e.toString());
-            System.out.println(e1.get("display_name").toString());
-            System.out.println(hashMap.get("projectName"));
-            System.out.println(hashMap.get("projectName") != null);
-            System.out.println(Objects.equals(e1.get("display_name").toString(), hashMap.get("projectName")));
+//            System.out.println(e1.get("display_name").toString());
+//            System.out.println(hashMap.get("projectName"));
+//            System.out.println(hashMap.get("projectName") != null);
+//            System.out.println(Objects.equals(e1.get("display_name").toString(), hashMap.get("projectName")));
             if ((hashMap.get("projectName") != null) && (hashMap.get("projectName").equals(e1.get("display_name").toString()))){
                 testMap.put("projectName",e1.get("display_name").toString());
 //                Thread t1 = new Thread();
 //                t1.start();
 
                 JSONObject respResult_AddBug = this.codingGetProjectIssueList(jsonString1,e1.get("id").toString());
+                for (Object e2 : respResult_AddBug.getJSONObject("data").getJSONArray("list")) {
+                    JSONObject e3 = JSONObject.parseObject(e2.toString());
+                if (((Long)e3.get("createdAt") < start) && ((Long)e3.get("createdAt") > start - 3600 * 24 * 7 * 1000)){
+                    a1 = a1 +1 ;
+                    if (e3.get("issueStatusId").equals(43257750) || e3.get("issueStatusId").equals(43257751)|| e3.get("issueStatusId").equals(43257756)){
+
+                        a2 = a2 +1;
+                    }
+                }
+                else {
+                    if (e3.get("issueStatusId").equals(43257750) || e3.get("issueStatusId").equals(43257751)|| e3.get("issueStatusId").equals(43257756)){
+
+                        a3 = a3 +1;
+                    }
+
+                }
+
+                if (e3.get("issueStatusId").equals(43257745) || e3.get("issueStatusId").equals(43257752)|| e3.get("issueStatusId").equals(43257749)){
+                    a4 = a4 +1;
+
+
+                }
+                }
 //                JSONObject json_AddBug = JSONObject.parseObject(respResult_AddBug.getResult());
-                testMap.put("AddBug",respResult_AddBug.getJSONObject("data").getString("totalRow"));
-
-                JSONObject respResult_RepairNewBug = this.codingGetProjectIssueList(jsonString2,e1.get("id").toString());
-//                JSONObject json_RepairNewBug = JSONObject.parseObject(respResult_RepairNewBug.getResult());
-                testMap.put("RepairNewBug",respResult_RepairNewBug.getJSONObject("data").getString("totalRow"));
-
-                JSONObject respResult_RepairHistoryBug = this.codingGetProjectIssueList(jsonString3,e1.get("id").toString());
-//                JSONObject json_RepairHistoryBug = JSONObject.parseObject(respResult_RepairHistoryBug.getResult());
-                testMap.put("RepairHistoryBug",respResult_RepairHistoryBug.getJSONObject("data").getString("totalRow"));
-
-                JSONObject respResult_noRepairBug = this.codingGetProjectIssueList(jsonString4,e1.get("id").toString());
-//                JSONObject json_noRepairBug = JSONObject.parseObject(respResult_noRepairBug.getResult());
-                testMap.put("noRepairBug",respResult_noRepairBug.getJSONObject("data").getString("totalRow"));
+                testMap.put("AddBug",a1.toString());
+//
+//                JSONObject respResult_RepairNewBug = this.codingGetProjectIssueList(jsonString2,e1.get("id").toString());
+////                JSONObject json_RepairNewBug = JSONObject.parseObject(respResult_RepairNewBug.getResult());
+                testMap.put("RepairNewBug",a2.toString());
+//
+//                JSONObject respResult_RepairHistoryBug = this.codingGetProjectIssueList(jsonString3,e1.get("id").toString());
+////                JSONObject json_RepairHistoryBug = JSONObject.parseObject(respResult_RepairHistoryBug.getResult());
+                testMap.put("RepairHistoryBug",a3.toString());
+//
+//                JSONObject respResult_noRepairBug = this.codingGetProjectIssueList(jsonString4,e1.get("id").toString());
+////                JSONObject json_noRepairBug = JSONObject.parseObject(respResult_noRepairBug.getResult());
+                testMap.put("noRepairBug",a4.toString());
 
 
 
                 Integer RepairBug;
-                RepairBug = Integer.valueOf(respResult_RepairNewBug.getJSONObject("data").getString("totalRow"))
-                        + Integer.valueOf(respResult_RepairHistoryBug.getJSONObject("data").getString("totalRow"));
+                RepairBug = a1+a2;
                 testMap.put("RepairBug",RepairBug.toString());
                 modulName.add(testMap);
                 return modulName;
@@ -422,30 +408,76 @@ public class IssueTrendStatisticsService extends Thread{
             }
             else if(hashMap.get("projectName") == null ){
                 testMap.put("projectName",e1.get("display_name").toString());
-
                 JSONObject respResult_AddBug = this.codingGetProjectIssueList(jsonString1,e1.get("id").toString());
+                for (Object e2 : respResult_AddBug.getJSONObject("data").getJSONArray("list")) {
+                    JSONObject e3 = JSONObject.parseObject(e2.toString());
+                    if (((Long)e3.get("createdAt") < start) && ((Long)e3.get("createdAt") > start - 3600 * 24 * 7 * 1000)){
+
+                        a1 = a1 +1 ;
+                        if (e3.get("issueStatusId").equals(43257750) || e3.get("issueStatusId").equals(43257751)|| e3.get("issueStatusId").equals(43257756)){
+
+                            a2 = a2 +1;
+                        }
+                    }
+                    else {
+                        if (e3.get("issueStatusId").equals(43257750) || e3.get("issueStatusId").equals(43257751)|| e3.get("issueStatusId").equals(43257756)){
+
+                            a3 = a3 +1;
+                        }
+
+                    }
+
+                    if (e3.get("issueStatusId").equals(43257745) || e3.get("issueStatusId").equals(43257752)|| e3.get("issueStatusId").equals(43257749)){
+                        a4 = a4 +1;
+
+
+                    }
+                }
 //                JSONObject json_AddBug = JSONObject.parseObject(respResult_AddBug.getResult());
-                testMap.put("AddBug",respResult_AddBug.getJSONObject("data").getString("totalRow"));
-
-                JSONObject respResult_RepairNewBug = this.codingGetProjectIssueList(jsonString2,e1.get("id").toString());
-//                JSONObject json_RepairNewBug = JSONObject.parseObject(respResult_RepairNewBug.getResult());
-                testMap.put("RepairNewBug",respResult_RepairNewBug.getJSONObject("data").getString("totalRow"));
-
-                JSONObject respResult_RepairHistoryBug = this.codingGetProjectIssueList(jsonString3,e1.get("id").toString());
-//                JSONObject json_RepairHistoryBug = JSONObject.parseObject(respResult_RepairHistoryBug.getResult());
-                testMap.put("RepairHistoryBug",respResult_RepairHistoryBug.getJSONObject("data").getString("totalRow"));
-
-                JSONObject respResult_noRepairBug = this.codingGetProjectIssueList(jsonString4,e1.get("id").toString());
-//                JSONObject json_noRepairBug = JSONObject.parseObject(respResult_noRepairBug.getResult());
-                testMap.put("noRepairBug",respResult_noRepairBug.getJSONObject("data").getString("totalRow"));
+                testMap.put("AddBug",a1.toString());
+//
+//                JSONObject respResult_RepairNewBug = this.codingGetProjectIssueList(jsonString2,e1.get("id").toString());
+////                JSONObject json_RepairNewBug = JSONObject.parseObject(respResult_RepairNewBug.getResult());
+                testMap.put("RepairNewBug",a2.toString());
+//
+//                JSONObject respResult_RepairHistoryBug = this.codingGetProjectIssueList(jsonString3,e1.get("id").toString());
+////                JSONObject json_RepairHistoryBug = JSONObject.parseObject(respResult_RepairHistoryBug.getResult());
+                testMap.put("RepairHistoryBug",a3.toString());
+//
+//                JSONObject respResult_noRepairBug = this.codingGetProjectIssueList(jsonString4,e1.get("id").toString());
+////                JSONObject json_noRepairBug = JSONObject.parseObject(respResult_noRepairBug.getResult());
+                testMap.put("noRepairBug",a4.toString());
 
 
 
                 Integer RepairBug;
-                RepairBug = Integer.valueOf(respResult_RepairNewBug.getJSONObject("data").getString("totalRow"))
-                        + Integer.valueOf(respResult_RepairHistoryBug.getJSONObject("data").getString("totalRow"));
+                RepairBug = a1+a2;
                 testMap.put("RepairBug",RepairBug.toString());
                 modulName.add(testMap);
+
+//                JSONObject respResult_AddBug = this.codingGetProjectIssueList(jsonString1,e1.get("id").toString());
+////                JSONObject json_AddBug = JSONObject.parseObject(respResult_AddBug.getResult());
+//                testMap.put("AddBug",respResult_AddBug.getJSONObject("data").getString("totalRow"));
+//
+//                JSONObject respResult_RepairNewBug = this.codingGetProjectIssueList(jsonString2,e1.get("id").toString());
+////                JSONObject json_RepairNewBug = JSONObject.parseObject(respResult_RepairNewBug.getResult());
+//                testMap.put("RepairNewBug",respResult_RepairNewBug.getJSONObject("data").getString("totalRow"));
+//
+//                JSONObject respResult_RepairHistoryBug = this.codingGetProjectIssueList(jsonString3,e1.get("id").toString());
+////                JSONObject json_RepairHistoryBug = JSONObject.parseObject(respResult_RepairHistoryBug.getResult());
+//                testMap.put("RepairHistoryBug",respResult_RepairHistoryBug.getJSONObject("data").getString("totalRow"));
+//
+//                JSONObject respResult_noRepairBug = this.codingGetProjectIssueList(jsonString4,e1.get("id").toString());
+////                JSONObject json_noRepairBug = JSONObject.parseObject(respResult_noRepairBug.getResult());
+//                testMap.put("noRepairBug",respResult_noRepairBug.getJSONObject("data").getString("totalRow"));
+//
+//
+//
+//                Integer RepairBug;
+//                RepairBug = Integer.valueOf(respResult_RepairNewBug.getJSONObject("data").getString("totalRow"))
+//                        + Integer.valueOf(respResult_RepairHistoryBug.getJSONObject("data").getString("totalRow"));
+//                testMap.put("RepairBug",RepairBug.toString());
+//                modulName.add(testMap);
 
             }
 
