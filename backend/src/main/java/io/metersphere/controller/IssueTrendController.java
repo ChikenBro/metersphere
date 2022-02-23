@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping(value = "/trend")
@@ -36,16 +37,16 @@ public class IssueTrendController {
         return issueTrendStatisticsService.getIssueTrendList();
     }
     @GetMapping("/issue/total/allproject")
-    public List<Map<String, String>> issueTrendTotal(@RequestParam HashMap<String, String> hashMap) throws HttpProcessException {
+    public List<Map<String, String>> issueTrendTotal(@RequestParam HashMap<String, String> hashMap) throws HttpProcessException, ExecutionException, InterruptedException {
 
         return issueTrendStatisticsService.getIssueTrendTotal(hashMap);
     }
     @GetMapping("/issue/total/getAllProject")
-    public List<String> getAllProject() throws HttpProcessException {
+    public List<String> getAllProject(@RequestParam HashMap<String, String> hashMap) throws HttpProcessException {
         ArrayList<String> modulName = new ArrayList<>();
 
 
-        JSONObject json_test =  issueTrendStatisticsService.codingGetProjectAll();
+        JSONObject json_test =  issueTrendStatisticsService.codingGetProjectAll(hashMap.get("yourToken"));
 //        JSONObject json_test = JSONObject.parseObject(respResult);
         for (Object e:json_test.getJSONArray("data")) {
             JSONObject e1 = JSONObject.parseObject(e.toString());
