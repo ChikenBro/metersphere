@@ -1,13 +1,35 @@
 package io.metersphere.service;
 
+import com.alibaba.fastjson.JSONObject;
+import com.arronlong.httpclientutil.HttpClientUtil;
+import com.arronlong.httpclientutil.builder.HCB;
+import com.arronlong.httpclientutil.common.HttpConfig;
+import com.arronlong.httpclientutil.common.HttpHeader;
+import com.arronlong.httpclientutil.common.HttpResult;
+import com.arronlong.httpclientutil.common.SSLs;
+import com.arronlong.httpclientutil.exception.HttpProcessException;
 import io.metersphere.base.domain.IssueTrend;
 import io.metersphere.base.domain.IssueTrendExample;
 import io.metersphere.base.mapper.IssueTrendMapper;
 import io.metersphere.commons.constants.MDTrend;
 import io.metersphere.performance.base.TrendChartsData;
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.temporal.WeekFields;
 import java.util.*;
@@ -15,12 +37,22 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
-public class IssueTrendStatisticsService {
+public class IssueTrendStatisticsService extends Thread{
 
+    private String jsonString ;
+    private String projectId ;
+    private String mapKey ;
+    private Map<String,String> testMap ;
     @Autowired
-    private IssueTrendMapper issueTrendMapper;
+    public IssueTrendMapper issueTrendMapper;
+//    public IssueTrendStatisticsService(String jsonString,String projectId,String mapKey,Map<String,String> testMap){
+//        this.jsonString = jsonString ;      // 通过构造方法配置name属性
+//        this.projectId = projectId ;      // 通过构造方法配置name属性
+//        this.mapKey = mapKey ;      // 通过构造方法配置name属性
+//        this.testMap = testMap ;      // 通过构造方法配置name属性
+//    }
 
-
+//    IssueTrendStatisticsService
     public void addProjectIssueTrend(IssueTrend issueTrend) {
         if (null == issueTrend.getIssueTotal()) {
             issueTrend.setIssueTotal(0);
@@ -141,6 +173,289 @@ public class IssueTrendStatisticsService {
         issueTrendExample.setOrderByClause("issue_week ASC");
         return issueTrendMapper.selectByExample(issueTrendExample);
     }
+
+    public JSONObject codingGetProjectAll()  {
+        JSONObject json_test = null;
+        String url = "http://mudu1.coding.net/api/project_recent_views/query?pmType=PROJECT";
+        CloseableHttpClient httpClient = null;
+        CloseableHttpResponse response = null;
+        String result = "";
+        try {
+            // 通过址默认配置创建一个httpClient实例
+            httpClient = HttpClients.createDefault();
+            // 创建httpGet远程连接实例
+            HttpGet httpGet = new HttpGet(url);
+            // 设置请求头信息，鉴权
+            httpGet.setHeader("Authorization", "token 877e0180347fa8d24500d7f4e8acd2683ac958da");
+            // 设置配置请求参数
+            RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(35000)// 连接主机服务超时时间
+                    .setConnectionRequestTimeout(35000)// 请求超时时间
+                    .setSocketTimeout(60000)// 数据读取超时时间
+                    .build();
+            // 为httpGet实例设置配置
+            httpGet.setConfig(requestConfig);
+            // 执行get请求得到返回对象
+            response = httpClient.execute(httpGet);
+            // 通过返回对象获取返回数据
+            HttpEntity entity = response.getEntity();
+            // 通过EntityUtils中的toString方法将结果转换为字符串
+            result = EntityUtils.toString(entity);
+            json_test = JSONObject.parseObject(result);
+//            System.out.println(json_test);
+//            for (Object e : json_test.getJSONArray("data")) {
+//                JSONObject e1 = JSONObject.parseObject(e.toString());
+//                System.out.println(e1.get("display_name").toString());
+//            }
+        } catch (ClientProtocolException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return json_test;
+//        String url = "http://mudu1.coding.net/api/project_recent_views/query?pmType=PROJECT";
+//        HCB hcb = HCB.custom()
+//                .timeout(1000) //超时
+//                .pool(100, 10) //启用连接池，每个路由最大创建10个链接，总连接数限制为100个
+//                .sslpv(SSLs.SSLProtocolVersion.TLSv1_2) 	//设置ssl版本号，默认SSLv3，也可以调用sslpv("TLSv1.2")
+//                .ssl()  	  	//https，支持自定义ssl证书路径和密码，ssl(String keyStorePath, String keyStorepass)
+//                .retry(5)		//重试5次
+//                ;
+//
+//        HttpClient client = hcb.build();
+//
+////        Map<String, Object> map = new HashMap<String, Object>();
+////        map.put("Action", "DescribeCodingProjects");
+////        map.put("PageNumber", 1);
+////        map.put("PageSize", 100);
+//        Header[] headers = HttpHeader.custom()
+//                .authorization("token 877e0180347fa8d24500d7f4e8acd2683ac958da")
+//                .build();
+//
+//
+//
+//        //插件式配置请求参数（网址、请求参数、编码、client）
+//        HttpConfig config = HttpConfig.custom()
+//                .headers(headers)
+//                .url(url)	          //设置请求的url
+////                .map(map)	          //设置请求参数，没有则无需设置
+//                .encoding("utf-8") //设置请求和返回编码，默认就是Charset.defaultCharset()
+//                .client(client)    //如果只是简单使用，无需设置，会自动获取默认的一个client对象
+//                ;
+//
+//        HttpClientUtil.get(config);    //post请求
+//        HttpResult respResult = HttpClientUtil.sendAndGetResp(config);
+//        return respResult;
+    }
+
+    private JSONObject codingGetProjectIssueList( String jsonString,String projectId) {
+        String url = String.format("https://mudu1.coding.net/api/project/%s/issues/DEFECT/list", projectId);
+        System.out.println(url);
+        System.out.println(jsonString);
+        JSONObject json_test = null;
+//        String url = "http://mudu1.coding.net/api/project_recent_views/query?pmType=PROJECT";
+        CloseableHttpClient httpClient = null;
+        CloseableHttpResponse response = null;
+        String result = "";
+        try {
+            // 通过址默认配置创建一个httpClient实例
+            httpClient = HttpClients.createDefault();
+            // 创建httpGet远程连接实例
+            HttpPost httpPost = new HttpPost(url);
+            // 设置请求头信息，鉴权
+            httpPost.setHeader("Authorization", "token 877e0180347fa8d24500d7f4e8acd2683ac958da");
+            StringEntity se = new StringEntity(jsonString, "UTF-8");
+            se.setContentType("application/json");
+            httpPost.setEntity(se);
+            // 设置配置请求参数
+            RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(35000)// 连接主机服务超时时间
+                    .setConnectionRequestTimeout(35000)// 请求超时时间
+                    .setSocketTimeout(60000)// 数据读取超时时间
+                    .build();
+            // 为httpGet实例设置配置
+            httpPost.setConfig(requestConfig);
+            // 执行get请求得到返回对象
+            response = httpClient.execute(httpPost);
+            // 通过返回对象获取返回数据
+            HttpEntity entity = response.getEntity();
+            // 通过EntityUtils中的toString方法将结果转换为字符串
+            result = EntityUtils.toString(entity);
+
+            json_test = JSONObject.parseObject(result);
+            return json_test;
+//            testMap.put(mapKey,json_test.getJSONObject("data").getString("totalRow"));
+//            testMap.put
+//            System.out.println(json_test);
+//            for (Object e : json_test.getJSONArray("data")) {
+//                JSONObject e1 = JSONObject.parseObject(e.toString());
+//                System.out.println(e1.get("display_name").toString());
+//            }
+        } catch (ClientProtocolException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+//        return json_test;
+//        HCB hcb = HCB.custom()
+//                .timeout(1000) //超时
+//                .pool(100, 10) //启用连接池，每个路由最大创建10个链接，总连接数限制为100个
+//                .sslpv(SSLs.SSLProtocolVersion.TLSv1_2) 	//设置ssl版本号，默认SSLv3，也可以调用sslpv("TLSv1.2")
+//                .ssl()  	  	//https，支持自定义ssl证书路径和密码
+//
+//                // ，ssl(String keyStorePath, String keyStorepass)
+//                .retry(5)		//重试5次
+//                ;
+//
+//        HttpClient client = hcb.build();
+////        String jsonString2 = "{\"sort\":{\"key\":\"PRIORITY\",\"value\":\"DESC\"},\"conditions\":[{\"key\":\"STATUS_TYPE\",\"customFieldId\":null,\"value\":[\"TODO\",\"PROCESSING\"],\"fixed\":true,\"userMap\":{},\"validInfo\":[]},{\"key\":\"CREATED_AT\",\"customFieldId\":null,\"value\":{\"startDate\":\"2022-02-14\",\"endDate\":\"2022-02-22\"},\"fixed\":false}]}";
+//        Map stringToMap =  JSONObject.parseObject(jsonString);
+//
+////        Map<String, Object> map = new HashMap<String, Object>();
+////        map.put("Action", "DescribeCodingProjects");
+////        map.put("PageNumber", 1);
+////        map.put("PageSize", 100);
+//        Header[] headers = HttpHeader.custom()
+//                .authorization("token 877e0180347fa8d24500d7f4e8acd2683ac958da")
+//                .build();
+//
+//
+//
+//        //插件式配置请求参数（网址、请求参数、编码、client）
+//        HttpConfig config = HttpConfig.custom()
+//                .headers(headers)
+//                .url(url)	          //设置请求的url
+//                .map(stringToMap)	          //设置请求参数，没有则无需设置
+//                .encoding("utf-8") //设置请求和返回编码，默认就是Charset.defaultCharset()
+//                .client(client)    //如果只是简单使用，无需设置，会自动获取默认的一个client对象
+//                ;
+//
+//        HttpClientUtil.post(config);    //post请求
+//        HttpResult respResult = HttpClientUtil.sendAndGetResp(config);
+        return json_test;
+    }
+
+    public List<Map<String, String>> getIssueTrendTotal(HashMap<String, String> hashMap) throws HttpProcessException {
+        String currentTime = null;
+        String currentTimeNow = null;
+        ArrayList<Map<String, String>> modulName = new ArrayList<>();
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        if (hashMap.get("startTime") != null){
+            currentTime = hashMap.get("startTime");
+            if (hashMap.get("endTime") != null){
+                currentTimeNow = hashMap.get("endTime");
+            }
+            else {
+                Calendar nowTime = Calendar.getInstance();
+
+                currentTimeNow = df.format(nowTime.getTime());
+            }
+
+        }
+        else {
+            Calendar nowTime2 = Calendar.getInstance();
+            nowTime2.add(Calendar.DAY_OF_WEEK, -6);//30分钟前的时间
+            currentTime = df.format(nowTime2.getTime());
+            if (hashMap.get("endTime") != null){
+                currentTimeNow = hashMap.get("endTime");
+            }
+            else {
+                Calendar nowTime = Calendar.getInstance();
+
+                currentTimeNow = df.format(nowTime.getTime());
+            }
+
+        }
+        Calendar nowTime3 = Calendar.getInstance();
+        nowTime3.add(Calendar.YEAR, -1);//30分钟前的时间
+        String currentTimelastYear = df.format(nowTime3.getTime());
+
+        JSONObject respResult = this.codingGetProjectAll();
+
+//        respResult.getResult();
+        //本周新增BUG
+        String jsonString1 = String.format("{\"page\":1,\"pageSize\":100,\"content\":{\"sort\":{\"key\":\"PRIORITY\",\"value\":\"DESC\"},\"conditions\":[{\"key\":\"CREATED_AT\",\"customFieldId\":null,\"value\":{\"startDate\":\"%s\",\"endDate\":\"%s\"},\"fixed\":false},{\"key\":\"STATUS\",\"customFieldId\":null,\"value\":[],\"fixed\":false,\"userMap\":{},\"validInfo\":[]}]}}", currentTime, currentTimeNow);
+        //本周解决本周BUG
+        String jsonString2 = String.format("{\"page\":1,\"pageSize\":100,\"content\":{\"sort\":{\"key\":\"PRIORITY\",\"value\":\"DESC\"},\"conditions\":[{\"key\":\"CREATED_AT\",\"customFieldId\":null,\"value\":{\"startDate\":\"%s\",\"endDate\":\"%s\"},\"fixed\":false},{\"key\":\"STATUS\",\"customFieldId\":null,\"value\":[43257750,43257751,43257756],\"fixed\":false,\"userMap\":{\"43257750\":{\"value\":43257750},\"43257751\":{\"value\":43257751},\"43257756\":{\"value\":43257756}},\"validInfo\":[]}]}}", currentTime, currentTimeNow);
+        //本周解决历史BUG
+        String jsonString3 = String.format("{\"page\":1,\"pageSize\":100,\"content\":{\"sort\":{\"key\":\"PRIORITY\",\"value\":\"DESC\"},\"conditions\":[{\"key\":\"CREATED_AT\",\"customFieldId\":null,\"value\":{\"startDate\":\"%s\",\"endDate\":\"%s\"},\"fixed\":false},{\"key\":\"STATUS\",\"customFieldId\":null,\"value\":[43257750,43257751,43257756],\"fixed\":false,\"userMap\":{\"43257750\":{\"value\":43257750},\"43257751\":{\"value\":43257751},\"43257756\":{\"value\":43257756}},\"validInfo\":[]}]}}", currentTimelastYear, currentTime);
+        //所有未解决BUG
+        String jsonString4 = String.format("{\"page\":1,\"pageSize\":100,\"content\":{\"sort\":{\"key\":\"PRIORITY\",\"value\":\"DESC\"},\"conditions\":[{\"key\":\"CREATED_AT\",\"customFieldId\":null,\"value\":{\"startDate\":\"%s\",\"endDate\":\"%s\"},\"fixed\":false},{\"key\":\"STATUS\",\"customFieldId\":null,\"value\":[43257745,43257752,43257749],\"fixed\":false,\"userMap\":{\"43257749\":{\"value\":43257749}},\"validInfo\":[]}]}}", currentTimelastYear, currentTime);
+
+
+//        JSONObject json_test = JSONObject.parseObject(respResult.getResult());
+        for (Object e:respResult.getJSONArray("data")) {
+            Map<String,String> testMap = new HashMap<>();
+            JSONObject e1 = JSONObject.parseObject(e.toString());
+            System.out.println(e1.get("display_name").toString());
+            System.out.println(hashMap.get("projectName"));
+            System.out.println(hashMap.get("projectName") != null);
+            System.out.println(Objects.equals(e1.get("display_name").toString(), hashMap.get("projectName")));
+            if ((hashMap.get("projectName") != null) && (hashMap.get("projectName").equals(e1.get("display_name").toString()))){
+                testMap.put("projectName",e1.get("display_name").toString());
+//                Thread t1 = new Thread();
+//                t1.start();
+
+                JSONObject respResult_AddBug = this.codingGetProjectIssueList(jsonString1,e1.get("id").toString());
+//                JSONObject json_AddBug = JSONObject.parseObject(respResult_AddBug.getResult());
+                testMap.put("AddBug",respResult_AddBug.getJSONObject("data").getString("totalRow"));
+
+                JSONObject respResult_RepairNewBug = this.codingGetProjectIssueList(jsonString2,e1.get("id").toString());
+//                JSONObject json_RepairNewBug = JSONObject.parseObject(respResult_RepairNewBug.getResult());
+                testMap.put("RepairNewBug",respResult_RepairNewBug.getJSONObject("data").getString("totalRow"));
+
+                JSONObject respResult_RepairHistoryBug = this.codingGetProjectIssueList(jsonString3,e1.get("id").toString());
+//                JSONObject json_RepairHistoryBug = JSONObject.parseObject(respResult_RepairHistoryBug.getResult());
+                testMap.put("RepairHistoryBug",respResult_RepairHistoryBug.getJSONObject("data").getString("totalRow"));
+
+                JSONObject respResult_noRepairBug = this.codingGetProjectIssueList(jsonString4,e1.get("id").toString());
+//                JSONObject json_noRepairBug = JSONObject.parseObject(respResult_noRepairBug.getResult());
+                testMap.put("noRepairBug",respResult_noRepairBug.getJSONObject("data").getString("totalRow"));
+
+
+
+                Integer RepairBug;
+                RepairBug = Integer.valueOf(respResult_RepairNewBug.getJSONObject("data").getString("totalRow"))
+                        + Integer.valueOf(respResult_RepairHistoryBug.getJSONObject("data").getString("totalRow"));
+                testMap.put("RepairBug",RepairBug.toString());
+                modulName.add(testMap);
+                return modulName;
+
+            }
+            else if(hashMap.get("projectName") == null ){
+                testMap.put("projectName",e1.get("display_name").toString());
+
+                JSONObject respResult_AddBug = this.codingGetProjectIssueList(jsonString1,e1.get("id").toString());
+//                JSONObject json_AddBug = JSONObject.parseObject(respResult_AddBug.getResult());
+                testMap.put("AddBug",respResult_AddBug.getJSONObject("data").getString("totalRow"));
+
+                JSONObject respResult_RepairNewBug = this.codingGetProjectIssueList(jsonString2,e1.get("id").toString());
+//                JSONObject json_RepairNewBug = JSONObject.parseObject(respResult_RepairNewBug.getResult());
+                testMap.put("RepairNewBug",respResult_RepairNewBug.getJSONObject("data").getString("totalRow"));
+
+                JSONObject respResult_RepairHistoryBug = this.codingGetProjectIssueList(jsonString3,e1.get("id").toString());
+//                JSONObject json_RepairHistoryBug = JSONObject.parseObject(respResult_RepairHistoryBug.getResult());
+                testMap.put("RepairHistoryBug",respResult_RepairHistoryBug.getJSONObject("data").getString("totalRow"));
+
+                JSONObject respResult_noRepairBug = this.codingGetProjectIssueList(jsonString4,e1.get("id").toString());
+//                JSONObject json_noRepairBug = JSONObject.parseObject(respResult_noRepairBug.getResult());
+                testMap.put("noRepairBug",respResult_noRepairBug.getJSONObject("data").getString("totalRow"));
+
+
+
+                Integer RepairBug;
+                RepairBug = Integer.valueOf(respResult_RepairNewBug.getJSONObject("data").getString("totalRow"))
+                        + Integer.valueOf(respResult_RepairHistoryBug.getJSONObject("data").getString("totalRow"));
+                testMap.put("RepairBug",RepairBug.toString());
+                modulName.add(testMap);
+
+            }
+
+
+
+        }
+        return modulName;
+
+    }
+
 
     private void addBugSeries(String name, List<IssueTrend> trendList, List<Map<String, List<Integer>>> addBugs) {
         if (trendList.size() == 0) {

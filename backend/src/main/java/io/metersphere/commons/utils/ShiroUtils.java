@@ -59,6 +59,8 @@ public class ShiroUtils {
         filterChainDefinitionMap.put("/mock/**", "anon");
         //devOps
         filterChainDefinitionMap.put("/devOps/api/test/case/**", "anon");
+        //Total
+        filterChainDefinitionMap.put("/trend/issue/total/**", "anon");
     }
 
     public static void ignoreCsrfFilter(Map<String, String> filterChainDefinitionMap) {
