@@ -23,7 +23,16 @@ public class ResultHolder {
         this.message = msg;
         this.data = data;
     }
-
+    private ResultHolder(Integer code, String msg, Object data,Integer total) {
+        this.code = code;
+        this.message = msg;
+        this.data = data;
+        this.total = total;
+    }
+    // 请求是否成功
+    private Integer code = 0;
+    // 请求是否成功
+    private Integer total = 0;
     // 请求是否成功
     private boolean success = false;
     // 描述信息
@@ -65,6 +74,9 @@ public class ResultHolder {
 
     public static ResultHolder error(String message, Object object) {
         return new ResultHolder(false, message, object);
+    }
+    public static ResultHolder selfInface(Integer code,String message, Object object) {
+        return new ResultHolder(code, message, object,0);
     }
 
     public String toString() {

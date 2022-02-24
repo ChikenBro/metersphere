@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.temporal.WeekFields;
@@ -293,12 +294,11 @@ public class IssueTrendStatisticsService extends Thread{
     }
 
     public List<Map<String, String>> getIssueTrendTotal(HashMap<String, String> hashMap) throws HttpProcessException {
-        String currentTime = null;
         String currentTimeNow = null;
         ArrayList<Map<String, String>> modulName = new ArrayList<>();
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         if (hashMap.get("startTime") != null){
-            currentTime = hashMap.get("startTime");
+//            currentTime = hashMap.get("startTime");
             if (hashMap.get("endTime") != null){
                 currentTimeNow = hashMap.get("endTime");
             }
@@ -311,8 +311,8 @@ public class IssueTrendStatisticsService extends Thread{
         }
         else {
             Calendar nowTime2 = Calendar.getInstance();
-            nowTime2.add(Calendar.DAY_OF_WEEK, -6);//30分钟前的时间
-            currentTime = df.format(nowTime2.getTime());
+            nowTime2.add(Calendar.DAY_OF_WEEK, -7);//30分钟前的时间
+//            Calendar nowTime = Calendar.getInstance();
             if (hashMap.get("endTime") != null){
                 currentTimeNow = hashMap.get("endTime");
             }
@@ -323,9 +323,23 @@ public class IssueTrendStatisticsService extends Thread{
             }
 
         }
-        Calendar nowTime3 = Calendar.getInstance();
-        nowTime3.add(Calendar.YEAR, -1);//30分钟前的时间
-        String currentTimelastYear = df.format(nowTime3.getTime());
+//        Date dateStart = null;
+//        Date dateEnd = null;
+//        try {
+//            dateStart = df.parse(currentTime);
+//            dateEnd = df.parse(currentTimeNow);
+//        } catch (ParseException e) {
+//            // TODO 自动生成的 catch 块
+//            e.printStackTrace();
+//        }
+////        long start = dateStart.getTime();
+//        long end = dateEnd.getTime();
+////        System.out.println(start);
+//        System.out.println(end);
+
+//        Calendar nowTime3 = Calendar.getInstance();
+//        nowTime3.add(Calendar.YEAR, -1);//30分钟前的时间
+//        String currentTimelastYear = df.format(nowTime3.getTime());
 
         JSONObject respResult = this.codingGetProjectAll(hashMap.get("yourToken"));
 
@@ -341,6 +355,7 @@ public class IssueTrendStatisticsService extends Thread{
 
 
         long start = System.currentTimeMillis( );
+//        System.out.println(start-7*24*3600*1000-10*3600*1000);
 //        JSONObject json_test = JSONObject.parseObject(respResult.getResult());
         for (Object e:respResult.getJSONArray("data")) {
             Integer a1 = 0;
@@ -359,10 +374,16 @@ public class IssueTrendStatisticsService extends Thread{
 //                t1.start();
 
                 JSONObject respResult_AddBug = this.codingGetProjectIssueList(jsonString1,e1.get("id").toString(),hashMap.get("yourToken") );
+                if (respResult_AddBug == null){
+                    testMap.put("error","token异常");
+                    modulName.add(testMap);
+                    return modulName;
+                }
                 for (Object e2 : respResult_AddBug.getJSONObject("data").getJSONArray("list")) {
                     JSONObject e3 = JSONObject.parseObject(e2.toString());
-                    if (((Long)e3.get("createdAt") < start) && ((Long)e3.get("createdAt") > start - 3600 * 24 * 7 * 1000)){
+                    if (((Long)e3.get("createdAt") < start) && ((Long)e3.get("createdAt") > start-7*24*3600*1000-10*3600*1000)){
                         a1 = a1 +1 ;
+//                        System.out.println(e3.get("code"));
                         if (e3.get("issueStatusId").equals(43257750) || e3.get("issueStatusId").equals(43257751)|| e3.get("issueStatusId").equals(43257756)){
 
                             a2 = a2 +1;
@@ -391,7 +412,7 @@ public class IssueTrendStatisticsService extends Thread{
 //
 //                JSONObject respResult_RepairHistoryBug = this.codingGetProjectIssueList(jsonString3,e1.get("id").toString());
 ////                JSONObject json_RepairHistoryBug = JSONObject.parseObject(respResult_RepairHistoryBug.getResult());
-                testMap.put("RepairHistoryBug",a3.toString());
+                testMap.put("RepairHistoryBug", String.valueOf((a3 - a1)));
 //
 //                JSONObject respResult_noRepairBug = this.codingGetProjectIssueList(jsonString4,e1.get("id").toString());
 ////                JSONObject json_noRepairBug = JSONObject.parseObject(respResult_noRepairBug.getResult());
@@ -400,7 +421,7 @@ public class IssueTrendStatisticsService extends Thread{
 
 
                 Integer RepairBug;
-                RepairBug = a1+a2;
+                RepairBug = a3;
                 testMap.put("RepairBug",RepairBug.toString());
                 modulName.add(testMap);
                 return modulName;
@@ -409,9 +430,14 @@ public class IssueTrendStatisticsService extends Thread{
             else if(hashMap.get("projectName") == null ){
                 testMap.put("projectName",e1.get("display_name").toString());
                 JSONObject respResult_AddBug = this.codingGetProjectIssueList(jsonString1,e1.get("id").toString(),hashMap.get("yourToken"));
+                if (respResult_AddBug == null){
+                    testMap.put("error","token异常");
+                    modulName.add(testMap);
+                    return modulName;
+                }
                 for (Object e2 : respResult_AddBug.getJSONObject("data").getJSONArray("list")) {
                     JSONObject e3 = JSONObject.parseObject(e2.toString());
-                    if (((Long)e3.get("createdAt") < start) && ((Long)e3.get("createdAt") > start - 3600 * 24 * 7 * 1000)){
+                    if (((Long)e3.get("createdAt") < start) && ((Long)e3.get("createdAt") > start - 3600 * 24 * 7 * 1000-10*3600*1000)){
 
                         a1 = a1 +1 ;
                         if (e3.get("issueStatusId").equals(43257750) || e3.get("issueStatusId").equals(43257751)|| e3.get("issueStatusId").equals(43257756)){
@@ -442,7 +468,7 @@ public class IssueTrendStatisticsService extends Thread{
 //
 //                JSONObject respResult_RepairHistoryBug = this.codingGetProjectIssueList(jsonString3,e1.get("id").toString());
 ////                JSONObject json_RepairHistoryBug = JSONObject.parseObject(respResult_RepairHistoryBug.getResult());
-                testMap.put("RepairHistoryBug",a3.toString());
+                testMap.put("RepairHistoryBug",String.valueOf((a3 - a1)));
 //
 //                JSONObject respResult_noRepairBug = this.codingGetProjectIssueList(jsonString4,e1.get("id").toString());
 ////                JSONObject json_noRepairBug = JSONObject.parseObject(respResult_noRepairBug.getResult());
@@ -451,7 +477,7 @@ public class IssueTrendStatisticsService extends Thread{
 
 
                 Integer RepairBug;
-                RepairBug = a1+a2;
+                RepairBug = a3;
                 testMap.put("RepairBug",RepairBug.toString());
                 modulName.add(testMap);
 
