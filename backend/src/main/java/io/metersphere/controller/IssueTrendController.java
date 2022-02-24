@@ -9,6 +9,7 @@ import io.metersphere.service.IssueTrendStatisticsService;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,7 +37,7 @@ public class IssueTrendController {
         return issueTrendStatisticsService.getIssueTrendList();
     }
     @GetMapping("/issue/total/allproject")
-    public ResultHolder issueTrendTotal(@RequestParam HashMap<String, String> hashMap) throws HttpProcessException, ExecutionException, InterruptedException {
+    public ResultHolder issueTrendTotal(@RequestParam HashMap<String, String> hashMap) throws HttpProcessException, ExecutionException, InterruptedException, ParseException {
 
         return ResultHolder.selfInface(100000,"成功",issueTrendStatisticsService.getIssueTrendTotal(hashMap));
     }
