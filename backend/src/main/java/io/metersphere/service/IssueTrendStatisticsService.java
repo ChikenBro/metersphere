@@ -86,6 +86,22 @@ public class IssueTrendStatisticsService extends Thread{
         int update = issueTrendMapper.updateByPrimaryKey(issueTrend);
         return update > 0;
     }
+    public static Date getThisWeekMonday(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        // 获得当前日期是一个星期的第几天
+        int dayWeek = cal.get(Calendar.DAY_OF_WEEK);
+        if (1 == dayWeek) {
+            cal.add(Calendar.DAY_OF_MONTH, -1);
+        }
+        // 设置一个星期的第一天，按中国的习惯一个星期的第一天是星期一
+        cal.setFirstDayOfWeek(Calendar.MONDAY);
+        // 获得当前日期是一个星期的第几天
+        int day = cal.get(Calendar.DAY_OF_WEEK);
+        // 根据日历的规则，给当前日期减去星期几与一个星期第一天的差值
+        cal.add(Calendar.DATE, cal.getFirstDayOfWeek() - day);
+        return cal.getTime();
+    }
 
     public List<IssueTrend> getIssueTrendByCurrentWeek() {
         LocalDate now = LocalDate.now();
@@ -218,47 +234,12 @@ public class IssueTrendStatisticsService extends Thread{
             e.printStackTrace();
         }
         return json_test;
-//        String url = "http://mudu1.coding.net/api/project_recent_views/query?pmType=PROJECT";
-//        HCB hcb = HCB.custom()
-//                .timeout(1000) //超时
-//                .pool(100, 10) //启用连接池，每个路由最大创建10个链接，总连接数限制为100个
-//                .sslpv(SSLs.SSLProtocolVersion.TLSv1_2) 	//设置ssl版本号，默认SSLv3，也可以调用sslpv("TLSv1.2")
-//                .ssl()  	  	//https，支持自定义ssl证书路径和密码，ssl(String keyStorePath, String keyStorepass)
-//                .retry(5)		//重试5次
-//                ;
-//
-//        HttpClient client = hcb.build();
-//
-////        Map<String, Object> map = new HashMap<String, Object>();
-////        map.put("Action", "DescribeCodingProjects");
-////        map.put("PageNumber", 1);
-////        map.put("PageSize", 100);
-//        Header[] headers = HttpHeader.custom()
-//                .authorization("token 877e0180347fa8d24500d7f4e8acd2683ac958da")
-//                .build();
-//
-//
-//
-//        //插件式配置请求参数（网址、请求参数、编码、client）
-//        HttpConfig config = HttpConfig.custom()
-//                .headers(headers)
-//                .url(url)	          //设置请求的url
-////                .map(map)	          //设置请求参数，没有则无需设置
-//                .encoding("utf-8") //设置请求和返回编码，默认就是Charset.defaultCharset()
-//                .client(client)    //如果只是简单使用，无需设置，会自动获取默认的一个client对象
-//                ;
-//
-//        HttpClientUtil.get(config);    //post请求
-//        HttpResult respResult = HttpClientUtil.sendAndGetResp(config);
-//        return respResult;
     }
 
     private JSONObject codingGetProjectIssueList( String jsonString,String projectId,String youToken) {
         String url = String.format("https://mudu1.coding.net/api/project/%s/issues/DEFECT/list", projectId);
-//        #System.out.println(url);
-//        #System.out.println(jsonString);
         JSONObject json_test = null;
-//        String url = "http://mudu1.coding.net/api/project_recent_views/query?pmType=PROJECT";
+
         CloseableHttpClient httpClient = null;
         CloseableHttpResponse response = null;
         String result = "";
@@ -298,9 +279,9 @@ public class IssueTrendStatisticsService extends Thread{
         return json_test;
     }
     @Async
-    public Future<Map<String,String>> AsytGetIssueTotal(String token,  Object e,String currentTimeNow){
+    public Future<Map<String,String>> AsytGetIssueTotal(String token,  Object e,String currentTimeNow,long start ,long end){
 
-        long start = System.currentTimeMillis( );
+//        long start = System.currentTimeMillis( );
         Future<Map<String,String>> returnmsg;
         String jsonString1 = String.format("{\"page\":1,\"pageSize\":10000,\"content\":{\"sort\":{\"key\":\"PRIORITY\",\"value\":\"DESC\"},\"conditions\":[{\"key\":\"CREATED_AT\",\"customFieldId\":null,\"value\":{\"startDate\":\"\",\"endDate\":\"%s\"},\"fixed\":false},{\"key\":\"STATUS\",\"customFieldId\":null,\"value\":[],\"fixed\":false,\"userMap\":{},\"validInfo\":[]}]}}",  currentTimeNow);
 
@@ -321,7 +302,7 @@ public class IssueTrendStatisticsService extends Thread{
         else {
         for (Object e2 : respResult_AddBug.getJSONObject("data").getJSONArray("list")) {
             JSONObject e3 = JSONObject.parseObject(e2.toString());
-            if (((Long)e3.get("createdAt") < start) && ((Long)e3.get("createdAt") > start - 3600 * 24 * 7 * 1000-10*3600*1000)){
+            if (((Long)e3.get("createdAt") < start) && ((Long)e3.get("createdAt") > end)){
 
                 a1 = a1 +1 ;
                 if (e3.get("issueStatusId").equals(43257750) || e3.get("issueStatusId").equals(43257751)|| e3.get("issueStatusId").equals(43257756)){
@@ -367,31 +348,18 @@ public class IssueTrendStatisticsService extends Thread{
         returnmsg=new AsyncResult(testMap);
         return returnmsg;
     }
-    public static Map<String,String> getStringToMap(String str){
-        //根据逗号截取字符串数组
-        String[] str1 = str.split(",");
-        //创建Map对象
-        Map<String,String> map = new HashMap<>();
-        //循环加入map集合
-        for (int i = 0; i < str1.length; i++) {
-            //根据":"截取字符串数组
-            String[] str2 = str1[i].split("=");
-            //str2[0]为KEY,str2[1]为值
-            //map.put(str2[0],str2[1]);
-            if (str2.length == 2){
-                map.put(str2[0].trim(),str2[1]);
-            }else{
-                map.put(str2[0].trim(),"");
-            }
-        }
-        return map;
-    }
-    public List<Map<String,String>> getIssueTrendTotal(HashMap<String, String> hashMap) throws HttpProcessException, ExecutionException, InterruptedException {
+
+    public List<Map<String,String>> getIssueTrendTotal(HashMap<String, String> hashMap) throws HttpProcessException, ExecutionException, InterruptedException, ParseException {
         String currentTimeNow = null;
+        String currentTime = null;
+        long start = 0 ;
+        long end = 0;
         ArrayList<Map<String,String>> modulName = new ArrayList<>();
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         if (hashMap.get("startTime") != null){
-//            currentTime = hashMap.get("startTime");
+            currentTime = hashMap.get("startTime");
+            Date date = df.parse(currentTime);
+            start = date.getTime();
             if (hashMap.get("endTime") != null){
                 currentTimeNow = hashMap.get("endTime");
             }
@@ -403,16 +371,17 @@ public class IssueTrendStatisticsService extends Thread{
 
         }
         else {
-            Calendar nowTime2 = Calendar.getInstance();
-            nowTime2.add(Calendar.DAY_OF_WEEK, -7);//30分钟前的时间
-//            Calendar nowTime = Calendar.getInstance();
+
             if (hashMap.get("endTime") != null){
                 currentTimeNow = hashMap.get("endTime");
+                Date date = df.parse(currentTimeNow);
+                end = df.parse(df.format(getThisWeekMonday(date))).getTime();
             }
             else {
                 Calendar nowTime = Calendar.getInstance();
 
                 currentTimeNow = df.format(nowTime.getTime());
+                end = System.currentTimeMillis( );
             }
 
         }
@@ -431,7 +400,10 @@ public class IssueTrendStatisticsService extends Thread{
 //        String jsonString4 = String.format("{\"page\":1,\"pageSize\":100,\"content\":{\"sort\":{\"key\":\"PRIORITY\",\"value\":\"DESC\"},\"conditions\":[{\"key\":\"CREATED_AT\",\"customFieldId\":null,\"value\":{\"startDate\":\"%s\",\"endDate\":\"%s\"},\"fixed\":false},{\"key\":\"STATUS\",\"customFieldId\":null,\"value\":[43257745,43257752,43257749],\"fixed\":false,\"userMap\":{\"43257749\":{\"value\":43257749}},\"validInfo\":[]}]}}", currentTimelastYear, currentTime);
 
 
-        long start = System.currentTimeMillis( );
+
+//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+//        System.out.println(start);
 //        System.out.println(start-7*24*3600*1000-10*3600*1000);
 //        JSONObject json_test = JSONObject.parseObject(respResult.getResult());
         for (Object e:respResult.getJSONArray("data")) {
@@ -453,7 +425,7 @@ public class IssueTrendStatisticsService extends Thread{
                 }
                 for (Object e2 : respResult_AddBug.getJSONObject("data").getJSONArray("list")) {
                     JSONObject e3 = JSONObject.parseObject(e2.toString());
-                    if (((Long)e3.get("createdAt") < start) && ((Long)e3.get("createdAt") > start-7*24*3600*1000-10*3600*1000)){
+                    if (((Long)e3.get("createdAt") < end) && ((Long)e3.get("createdAt") > start)){
                         a1 = a1 +1 ;
 //                        System.out.println(e3.get("code"));
                         if (e3.get("issueStatusId").equals(43257750) || e3.get("issueStatusId").equals(43257751)|| e3.get("issueStatusId").equals(43257756)){
@@ -501,90 +473,14 @@ public class IssueTrendStatisticsService extends Thread{
             }
             else if(hashMap.get("projectName") == null ){
 
-                Future<Map<String,String>> future=this.AsytGetIssueTotal(hashMap.get("yourToken"),e,currentTimeNow);
-                long end = System.currentTimeMillis( );
-                System.out.println(future.get());
+                Future<Map<String,String>> future=this.AsytGetIssueTotal(hashMap.get("yourToken"),e,currentTimeNow,end,start);
+                long end1 = System.currentTimeMillis( );
+//                System.out.println(future.get());
 //                Map<String,String> hashMapNew = JSON.parseObject(future.get().replace("=",":"), HashMap.class);
 //                Map<String, String> hashMapNew = this.getStringToMap(future.get());
                 modulName.add(future.get());
-                System.out.println(end-start);
+//                System.out.println(end1-start);
 
-//                testMap.put("projectName",e1.get("display_name").toString());
-//                JSONObject respResult_AddBug = this.codingGetProjectIssueList(jsonString1,e1.get("id").toString(),hashMap.get("yourToken"));
-//                if (respResult_AddBug == null){
-//                    testMap.put("error","token异常");
-//                    modulName.add(testMap);
-//                    return modulName;
-//                }
-//                for (Object e2 : respResult_AddBug.getJSONObject("data").getJSONArray("list")) {
-//                    JSONObject e3 = JSONObject.parseObject(e2.toString());
-//                    if (((Long)e3.get("createdAt") < start) && ((Long)e3.get("createdAt") > start - 3600 * 24 * 7 * 1000-10*3600*1000)){
-//
-//                        a1 = a1 +1 ;
-//                        if (e3.get("issueStatusId").equals(43257750) || e3.get("issueStatusId").equals(43257751)|| e3.get("issueStatusId").equals(43257756)){
-//
-//                            a2 = a2 +1;
-//                        }
-//                    }
-//                    else {
-//                        if (e3.get("issueStatusId").equals(43257750) || e3.get("issueStatusId").equals(43257751)|| e3.get("issueStatusId").equals(43257756)){
-//
-//                            a3 = a3 +1;
-//                        }
-//
-//                    }
-//
-//                    if (e3.get("issueStatusId").equals(43257745) || e3.get("issueStatusId").equals(43257752)|| e3.get("issueStatusId").equals(43257749)){
-//                        a4 = a4 +1;
-//
-//
-//                    }
-//                }
-////                JSONObject json_AddBug = JSONObject.parseObject(respResult_AddBug.getResult());
-//                testMap.put("AddBug",a1.toString());
-////
-////                JSONObject respResult_RepairNewBug = this.codingGetProjectIssueList(jsonString2,e1.get("id").toString());
-//////                JSONObject json_RepairNewBug = JSONObject.parseObject(respResult_RepairNewBug.getResult());
-//                testMap.put("RepairNewBug",a2.toString());
-////
-////                JSONObject respResult_RepairHistoryBug = this.codingGetProjectIssueList(jsonString3,e1.get("id").toString());
-//////                JSONObject json_RepairHistoryBug = JSONObject.parseObject(respResult_RepairHistoryBug.getResult());
-//                testMap.put("RepairHistoryBug",String.valueOf((a3 - a1)));
-////
-////                JSONObject respResult_noRepairBug = this.codingGetProjectIssueList(jsonString4,e1.get("id").toString());
-//////                JSONObject json_noRepairBug = JSONObject.parseObject(respResult_noRepairBug.getResult());
-//                testMap.put("noRepairBug",a4.toString());
-//
-//
-//
-//                Integer RepairBug;
-//                RepairBug = a3;
-//                testMap.put("RepairBug",RepairBug.toString());
-//                modulName.add(testMap);
-
-//                JSONObject respResult_AddBug = this.codingGetProjectIssueList(jsonString1,e1.get("id").toString());
-////                JSONObject json_AddBug = JSONObject.parseObject(respResult_AddBug.getResult());
-//                testMap.put("AddBug",respResult_AddBug.getJSONObject("data").getString("totalRow"));
-//
-//                JSONObject respResult_RepairNewBug = this.codingGetProjectIssueList(jsonString2,e1.get("id").toString());
-////                JSONObject json_RepairNewBug = JSONObject.parseObject(respResult_RepairNewBug.getResult());
-//                testMap.put("RepairNewBug",respResult_RepairNewBug.getJSONObject("data").getString("totalRow"));
-//
-//                JSONObject respResult_RepairHistoryBug = this.codingGetProjectIssueList(jsonString3,e1.get("id").toString());
-////                JSONObject json_RepairHistoryBug = JSONObject.parseObject(respResult_RepairHistoryBug.getResult());
-//                testMap.put("RepairHistoryBug",respResult_RepairHistoryBug.getJSONObject("data").getString("totalRow"));
-//
-//                JSONObject respResult_noRepairBug = this.codingGetProjectIssueList(jsonString4,e1.get("id").toString());
-////                JSONObject json_noRepairBug = JSONObject.parseObject(respResult_noRepairBug.getResult());
-//                testMap.put("noRepairBug",respResult_noRepairBug.getJSONObject("data").getString("totalRow"));
-//
-//
-//
-//                Integer RepairBug;
-//                RepairBug = Integer.valueOf(respResult_RepairNewBug.getJSONObject("data").getString("totalRow"))
-//                        + Integer.valueOf(respResult_RepairHistoryBug.getJSONObject("data").getString("totalRow"));
-//                testMap.put("RepairBug",RepairBug.toString());
-//                modulName.add(testMap);
 
             }
 
