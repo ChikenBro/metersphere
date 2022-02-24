@@ -38,14 +38,6 @@ public class IssueTrendController {
     @GetMapping("/issue/total/allproject")
     public ResultHolder issueTrendTotal(@RequestParam HashMap<String, String> hashMap) throws HttpProcessException, ExecutionException, InterruptedException {
 
-        for (Map<String, String> e:issueTrendStatisticsService.getIssueTrendTotal(hashMap)){
-            if (e.get("error") != null){
-                return  ResultHolder.selfInface(100001,e.get("error"),null);
-            }
-
-        }
-//            if issueTrendStatisticsService.getIssueTrendTotal(hashMap)
-//        return ResultHolder.selfInface();
         return ResultHolder.selfInface(100000,"成功",issueTrendStatisticsService.getIssueTrendTotal(hashMap));
     }
     @GetMapping("/issue/total/getAllProject")
