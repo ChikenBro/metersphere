@@ -302,7 +302,7 @@ public class IssueTrendStatisticsService extends Thread{
         else {
         for (Object e2 : respResult_AddBug.getJSONObject("data").getJSONArray("list")) {
             JSONObject e3 = JSONObject.parseObject(e2.toString());
-            if (((Long)e3.get("createdAt") < start) && ((Long)e3.get("createdAt") > end)){
+            if (((Long)e3.get("createdAt") < start+24*3600*1000-600) && ((Long)e3.get("createdAt") > end)){
 
                 a1 = a1 +1 ;
                 if (e3.get("issueStatusId").equals(43257750) || e3.get("issueStatusId").equals(43257751)|| e3.get("issueStatusId").equals(43257756)){
@@ -354,28 +354,46 @@ public class IssueTrendStatisticsService extends Thread{
         String currentTime = null;
         long start = 0 ;
         long end = 0;
+        Date date ;
         ArrayList<Map<String,String>> modulName = new ArrayList<>();
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         if (hashMap.get("startTime") != null){
             currentTime = hashMap.get("startTime");
-            Date date = df.parse(currentTime);
+            date = df.parse(currentTime);
             start = date.getTime();
             if (hashMap.get("endTime") != null){
                 currentTimeNow = hashMap.get("endTime");
+//                Calendar nowTimeNow = Calendar.getInstance();
+
+//                currentTimeNow = df.format(nowTimeNow.getTime());
+                date = df.parse(currentTimeNow);
+                end = date.getTime();
             }
             else {
                 Calendar nowTime = Calendar.getInstance();
 
                 currentTimeNow = df.format(nowTime.getTime());
+                end = System.currentTimeMillis( );
             }
 
         }
         else {
+            Calendar nowTimeNow = Calendar.getInstance();
+
+            currentTimeNow = df.format(nowTimeNow.getTime());
+            date = df.parse(currentTimeNow);
+            start = df.parse(df.format(getThisWeekMonday(date))).getTime();
 
             if (hashMap.get("endTime") != null){
                 currentTimeNow = hashMap.get("endTime");
-                Date date = df.parse(currentTimeNow);
-                end = df.parse(df.format(getThisWeekMonday(date))).getTime();
+//                Calendar nowTimeNow = Calendar.getInstance();
+
+//                currentTimeNow = df.format(nowTimeNow.getTime());
+                date = df.parse(currentTimeNow);
+                end = date.getTime();
+//                currentTimeNow = hashMap.get("endTime");
+//                date = df.parse(currentTimeNow);
+//                start = df.parse(df.format(getThisWeekMonday(date))).getTime();
             }
             else {
                 Calendar nowTime = Calendar.getInstance();
@@ -423,9 +441,11 @@ public class IssueTrendStatisticsService extends Thread{
                     modulName.add(testMap);
                     return modulName;
                 }
+                System.out.println(end);
+                System.out.println(start);
                 for (Object e2 : respResult_AddBug.getJSONObject("data").getJSONArray("list")) {
                     JSONObject e3 = JSONObject.parseObject(e2.toString());
-                    if (((Long)e3.get("createdAt") < end) && ((Long)e3.get("createdAt") > start)){
+                    if (((Long)e3.get("createdAt") < end+24*3600*1000-600) && ((Long)e3.get("createdAt") > start)){
                         a1 = a1 +1 ;
 //                        System.out.println(e3.get("code"));
                         if (e3.get("issueStatusId").equals(43257750) || e3.get("issueStatusId").equals(43257751)|| e3.get("issueStatusId").equals(43257756)){
