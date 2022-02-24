@@ -289,6 +289,7 @@ public class IssueTrendStatisticsService extends Thread{
         Integer a2 = 0;
         Integer a3 = 0;
         Integer a4 = 0;
+        Integer a5 = 0;
         Map<String,String> testMap = new HashMap<>();
         JSONObject e1 = JSONObject.parseObject(e.toString());
         testMap.put("projectName",e1.get("display_name").toString());
@@ -317,6 +318,13 @@ public class IssueTrendStatisticsService extends Thread{
                 }
 
             }
+//            if(((Long)e3.get("createdAt") < end){
+//
+//            }
+            if (e3.get("issueStatusId").equals(43257750) || e3.get("issueStatusId").equals(43257751)|| e3.get("issueStatusId").equals(43257756)){
+
+                a5 = a5 +1;
+            }
 
             if (e3.get("issueStatusId").equals(43257745) || e3.get("issueStatusId").equals(43257752)|| e3.get("issueStatusId").equals(43257749)){
                 a4 = a4 +1;
@@ -333,7 +341,7 @@ public class IssueTrendStatisticsService extends Thread{
 //
 //                JSONObject respResult_RepairHistoryBug = this.codingGetProjectIssueList(jsonString3,e1.get("id").toString());
 ////                JSONObject json_RepairHistoryBug = JSONObject.parseObject(respResult_RepairHistoryBug.getResult());
-        testMap.put("RepairHistoryBug",String.valueOf((a3 - a1)));
+        testMap.put("RepairHistoryBug",a3.toString());
 //
 //                JSONObject respResult_noRepairBug = this.codingGetProjectIssueList(jsonString4,e1.get("id").toString());
 ////                JSONObject json_noRepairBug = JSONObject.parseObject(respResult_noRepairBug.getResult());
@@ -341,9 +349,9 @@ public class IssueTrendStatisticsService extends Thread{
 
 
 
-        Integer RepairBug;
-        RepairBug = a3;
-        testMap.put("RepairBug",RepairBug.toString());
+//        Integer RepairBug;
+//        RepairBug = a3;
+        testMap.put("RepairBug",a5.toString());
         }
         returnmsg=new AsyncResult(testMap);
         return returnmsg;
@@ -429,6 +437,7 @@ public class IssueTrendStatisticsService extends Thread{
             Integer a2 = 0;
             Integer a3 = 0;
             Integer a4 = 0;
+            Integer a5 = 0;
             Map<String,String> testMap = new HashMap<>();
             JSONObject e1 = JSONObject.parseObject(e.toString());
 
@@ -460,6 +469,10 @@ public class IssueTrendStatisticsService extends Thread{
                         }
 
                     }
+                    if (e3.get("issueStatusId").equals(43257750) || e3.get("issueStatusId").equals(43257751)|| e3.get("issueStatusId").equals(43257756)){
+
+                        a5 = a5 +1;
+                    }
 
                     if (e3.get("issueStatusId").equals(43257745) || e3.get("issueStatusId").equals(43257752)|| e3.get("issueStatusId").equals(43257749)){
                         a4 = a4 +1;
@@ -476,7 +489,7 @@ public class IssueTrendStatisticsService extends Thread{
 //
 //                JSONObject respResult_RepairHistoryBug = this.codingGetProjectIssueList(jsonString3,e1.get("id").toString());
 ////                JSONObject json_RepairHistoryBug = JSONObject.parseObject(respResult_RepairHistoryBug.getResult());
-                testMap.put("RepairHistoryBug", String.valueOf((a3 - a1)));
+                testMap.put("RepairHistoryBug", a3 .toString());
 //
 //                JSONObject respResult_noRepairBug = this.codingGetProjectIssueList(jsonString4,e1.get("id").toString());
 ////                JSONObject json_noRepairBug = JSONObject.parseObject(respResult_noRepairBug.getResult());
@@ -484,9 +497,9 @@ public class IssueTrendStatisticsService extends Thread{
 
 
 
-                Integer RepairBug;
-                RepairBug = a3;
-                testMap.put("RepairBug",RepairBug.toString());
+//                Integer RepairBug;
+//                RepairBug = a3;
+                testMap.put("RepairBug",a5.toString());
                 modulName.add(testMap);
                 return modulName;
 
