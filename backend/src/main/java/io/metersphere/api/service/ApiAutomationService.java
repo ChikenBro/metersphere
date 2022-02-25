@@ -130,6 +130,8 @@ public class ApiAutomationService {
     private ApiScenarioReferenceIdService apiScenarioReferenceIdService;
     @Resource
     private ApiDefinitionMapper apiDefinitionMapper;
+    @Resource
+    private ApiScenarioRelevanceService apiScenarioRelevanceService;
 
     public ApiScenarioWithBLOBs getDto(String id) {
         return apiScenarioMapper.selectByPrimaryKey(id);
@@ -2008,7 +2010,7 @@ public class ApiAutomationService {
      * @param allEffectiveApiList 接口集合（id / path 必须有数据）
      * @return
      */
-    public float countInterfaceCoverage(List<ApiScenarioWithBLOBs> allScenarioInfoList, List<ApiDefinition> allEffectiveApiList) {
+    public float countInterfaceCoverage(List<ApiScenarioWithBLOBs> allScenarioInfoList, List<ApiDefinition> allEffectiveApiList, String projectId) {
         float intetfaceCoverage = 0;
         if (allEffectiveApiList == null || allEffectiveApiList.isEmpty()) {
             return 100;
@@ -2044,10 +2046,12 @@ public class ApiAutomationService {
                 String baseUrl = use.url.replace("$", "");
                 if (baseUrl.contains("?")) {
                     String spiltBaseUrl = baseUrl.split("[?]")[0];
-                    ApiMethodUrlDTO apiMethodUrlDTO = new ApiMethodUrlDTO(spiltBaseUrl,use.method);
+                    ApiMethodUrlDTO apiMethodUrlDTO = new ApiMethodUrlDTO(spiltBaseUrl, use.method);
+                    apiMethodUrlDTO.setScenarioId(model.getId());
                     baseUseUrl.add(apiMethodUrlDTO);
-                }else {
-                    ApiMethodUrlDTO apiMethodUrlDTO = new ApiMethodUrlDTO(baseUrl,use.method);
+                } else {
+                    ApiMethodUrlDTO apiMethodUrlDTO = new ApiMethodUrlDTO(baseUrl, use.method);
+                    apiMethodUrlDTO.setScenarioId(model.getId());
                     baseUseUrl.add(apiMethodUrlDTO);
                 }
             }
@@ -2074,6 +2078,12 @@ public class ApiAutomationService {
         }
         //设置当前场景为已完成-Prepare
         apiDefinitionMapper.updateById(containsApiIdList);
+        List<String> allScenarioList = new ArrayList<>();
+        for (ApiScenarioWithBLOBs allScenarioInfo : allScenarioInfoList) {
+            allScenarioList.add(allScenarioInfo.getId());
+        }
+        //场景与api的关系入库
+        apiScenarioRelevanceService.apiScenarioRelevance(urlList, projectId);
         int allApiIdCount = 0;
         for (List<String> allApiIdList : urlMap.values()) {
             if (CollectionUtils.isNotEmpty(allApiIdList)) {

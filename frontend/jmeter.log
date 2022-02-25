@@ -1,0 +1,21 @@
+2022-01-04 14:31:48,244 INFO o.a.j.u.JMeterUtils: Setting Locale to en_EN
+2022-01-04 14:31:48,269 INFO o.a.j.JMeter: Loading user properties from: /Users/hepengchong/Documents/jmeter/apache-jmeter-5.4/bin/user.properties
+2022-01-04 14:31:48,270 INFO o.a.j.JMeter: Loading system properties from: /Users/hepengchong/Documents/jmeter/apache-jmeter-5.4/bin/system.properties
+2022-01-04 14:31:48,280 INFO o.a.j.JMeter: Copyright (c) 1998-2020 The Apache Software Foundation
+2022-01-04 14:31:48,280 INFO o.a.j.JMeter: Version 5.4
+2022-01-04 14:31:48,280 INFO o.a.j.JMeter: java.version=1.8.0_221
+2022-01-04 14:31:48,280 INFO o.a.j.JMeter: java.vm.name=Java HotSpot(TM) 64-Bit Server VM
+2022-01-04 14:31:48,280 INFO o.a.j.JMeter: os.name=Mac OS X
+2022-01-04 14:31:48,281 INFO o.a.j.JMeter: os.arch=x86_64
+2022-01-04 14:31:48,281 INFO o.a.j.JMeter: os.version=10.16
+2022-01-04 14:31:48,281 INFO o.a.j.JMeter: file.encoding=UTF-8
+2022-01-04 14:31:48,281 INFO o.a.j.JMeter: java.awt.headless=null
+2022-01-04 14:31:48,281 INFO o.a.j.JMeter: Max memory     =4294967296
+2022-01-04 14:31:48,281 INFO o.a.j.JMeter: Available Processors =8
+2022-01-04 14:31:48,285 INFO o.a.j.JMeter: Default Locale=English (EN)
+2022-01-04 14:31:48,286 INFO o.a.j.JMeter: JMeter  Locale=English (EN)
+2022-01-04 14:31:48,286 INFO o.a.j.JMeter: JMeterHome=/Users/hepengchong/Documents/jmeter/apache-jmeter-5.4
+2022-01-04 14:31:48,286 INFO o.a.j.JMeter: user.dir  =/Users/hepengchong/Documents/code/java/MeterSphere/frontend
+2022-01-04 14:31:48,286 INFO o.a.j.JMeter: PWD       =/Users/hepengchong/Documents/code/java/MeterSphere/frontend
+2022-01-04 14:31:48,289 INFO o.a.j.JMeter: IP: 127.0.0.1 Name: hepengchongdeMacBook-Pro-2.local FullName: localhost
+2022-01-04 14:31:48,883 INFO o.a.j.JMeter: Setting LAF to: com.github.weisj.darklaf.DarkLaf:com.github.weisj.darklaf.theme.DarculaTheme
