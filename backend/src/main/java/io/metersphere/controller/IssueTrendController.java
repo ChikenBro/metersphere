@@ -40,9 +40,9 @@ public class IssueTrendController {
     @GetMapping("/issue/total/projectquality/list")
     public ResultHolder issueTrendTotal(@RequestParam HashMap<String, String> hashMap) throws HttpProcessException, ExecutionException, InterruptedException, ParseException {
         List<Map<String,Object>> result = issueTrendStatisticsService.getIssueTrendTotal(hashMap);
-        //        if (issueTrendStatisticsService.getIssueTrendTotal(hashMap).size()==0){
-//            return ResultHolder.selfInface(1,"fail","请检查环境或者个人令牌权限",issueTrendStatisticsService.getIssueTrendTotal(hashMap).size());
-//        }
+        if (result.size()==0){
+            return ResultHolder.selfInface(1,"fail","请检查环境或者个人令牌权限",0);
+        }
         return ResultHolder.selfInface(0,"success",result,result.size());
     }
 //    @RequestMapping(value = "/queryStmp", method = RequestMethod.GET)
