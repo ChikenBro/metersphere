@@ -4,7 +4,6 @@ package io.metersphere.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.arronlong.httpclientutil.exception.HttpProcessException;
 import io.metersphere.base.domain.IssueTrend;
-import io.metersphere.commons.common.CommonResult;
 import io.metersphere.performance.base.TrendChartsData;
 import io.metersphere.service.IssueTrendStatisticsService;
 import org.springframework.web.bind.annotation.*;
