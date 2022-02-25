@@ -37,7 +37,7 @@ public class IssueTrendController {
 
         return issueTrendStatisticsService.getIssueTrendList();
     }
-    @GetMapping("/issue/total/allproject")
+    @GetMapping("/issue/total/projectquality/list")
     public ResultHolder issueTrendTotal(@RequestParam HashMap<String, String> hashMap) throws HttpProcessException, ExecutionException, InterruptedException, ParseException {
         List<Map<String,Object>> result = issueTrendStatisticsService.getIssueTrendTotal(hashMap);
         if (result.size()==0){
