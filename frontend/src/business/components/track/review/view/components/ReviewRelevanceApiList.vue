@@ -28,8 +28,6 @@
                     :content="$t('test_track.plan.plan_status_running')"/>
             <ms-tag v-if="scope.row.status == 'Completed'" type="success" effect="plain"
                     :content="$t('test_track.plan.plan_status_completed')"/>
-            <ms-tag v-if="scope.row.status == 'Interior'" type="success" effect="plain"
-                    :content="$t('test_track.plan.plan_status_interior')"/>
             <ms-tag v-if="scope.row.status == 'Trash'" type="danger" effect="plain"
                     :content="$t('test_track.plan.plan_status_trash')"/>
           </template>
