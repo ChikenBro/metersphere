@@ -37,6 +37,7 @@ public class ResultResponseBodyAdvice implements ResponseBodyAdvice<Object> {
 
         if (!(o instanceof ResultHolder)) {
             if (o instanceof String) {
+
                 return JSON.toJSONString(ResultHolder.success(o));
             }
             return ResultHolder.success(o);
