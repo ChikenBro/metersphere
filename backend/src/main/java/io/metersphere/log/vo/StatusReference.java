@@ -11,7 +11,6 @@ public class StatusReference {
         statusMap.put("Prepare", "未开始");
         statusMap.put("Underway", "进行中");
         statusMap.put("Completed", "已完成");
-        statusMap.put("Interior", "内部接口");
         statusMap.put("Finished", "已结束");
         statusMap.put("Saved", "已保存");
         statusMap.put("Starting", "已开始");

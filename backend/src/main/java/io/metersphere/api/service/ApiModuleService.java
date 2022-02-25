@@ -71,7 +71,6 @@ public class ApiModuleService extends NodeTreeService<ApiModuleDTO> {
         list.add("Prepare");
         list.add("Underway");
         list.add("Completed");
-        list.add("Interior");
         Map<String, List<String>> filters = new LinkedHashMap<>();
         filters.put("status", list);
         request.setFilters(filters);

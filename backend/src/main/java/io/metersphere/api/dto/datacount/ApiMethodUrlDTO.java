@@ -1,19 +1,14 @@
 package io.metersphere.api.dto.datacount;
 
-import lombok.Data;
-
 import java.util.Objects;
 
 /**
  * @author song.tianyang
  * @Date 2021/6/21 4:15 下午
  */
-@Data
 public class ApiMethodUrlDTO {
     public String url;
     public String method;
-    public String scenarioId;
-
 
     public ApiMethodUrlDTO(String url, String method) {
         this.url = url == null ? "" : url;
