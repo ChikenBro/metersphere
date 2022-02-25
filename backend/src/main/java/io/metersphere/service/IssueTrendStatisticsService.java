@@ -361,12 +361,12 @@ public class IssueTrendStatisticsService extends Thread{
         Date date ;
         ArrayList<Map<String, Object>> modulName = new ArrayList<>();
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-        if (hashMap.get("startTime") != null){
-            currentTime = hashMap.get("startTime");
+        if (hashMap.get("startDate") != null){
+            currentTime = hashMap.get("startDate");
             date = df.parse(currentTime);
             start = date.getTime();
-            if (hashMap.get("endTime") != null){
-                currentTimeNow = hashMap.get("endTime");
+            if (hashMap.get("endDate") != null){
+                currentTimeNow = hashMap.get("endDate");
 //                Calendar nowTimeNow = Calendar.getInstance();
 
 //                currentTimeNow = df.format(nowTimeNow.getTime());
@@ -388,14 +388,14 @@ public class IssueTrendStatisticsService extends Thread{
             date = df.parse(currentTimeNow);
             start = df.parse(df.format(getThisWeekMonday(date))).getTime();
 
-            if (hashMap.get("endTime") != null){
-                currentTimeNow = hashMap.get("endTime");
+            if (hashMap.get("endDate") != null){
+                currentTimeNow = hashMap.get("endDate");
 //                Calendar nowTimeNow = Calendar.getInstance();
 
 //                currentTimeNow = df.format(nowTimeNow.getTime());
                 date = df.parse(currentTimeNow);
                 end = date.getTime();
-//                currentTimeNow = hashMap.get("endTime");
+//                currentTimeNow = hashMap.get("endDate");
 //                date = df.parse(currentTimeNow);
 //                start = df.parse(df.format(getThisWeekMonday(date))).getTime();
             }
@@ -409,7 +409,7 @@ public class IssueTrendStatisticsService extends Thread{
         }
 
 
-        JSONObject respResult = this.codingGetProjectAll(hashMap.get("yourToken"));
+        JSONObject respResult = this.codingGetProjectAll(hashMap.get("personalToken"));
 
 //        respResult.getResult();
         //本周新增BUG
@@ -440,7 +440,7 @@ public class IssueTrendStatisticsService extends Thread{
             if ((hashMap.get("projectName") != null) && (hashMap.get("projectName").equals(e1.get("display_name").toString()))){
                 testMap.put("project",e1.get("display_name").toString());
 
-                JSONObject respResult_AddBug = this.codingGetProjectIssueList(jsonString1,e1.get("id").toString(),hashMap.get("yourToken") );
+                JSONObject respResult_AddBug = this.codingGetProjectIssueList(jsonString1,e1.get("id").toString(),hashMap.get("personalToken") );
                 if (respResult_AddBug == null){
                     modulName.add(testMap);
                     return modulName;
@@ -478,9 +478,7 @@ public class IssueTrendStatisticsService extends Thread{
                 }
 //                JSONObject json_AddBug = JSONObject.parseObject(respResult_AddBug.getResult());
                 testMap2.put("new_create_issue",a1.toString());
-//
-//                JSONObject respResult_RepairNewBug = this.codingGetProjectIssueList(jsonString2,e1.get("id").toString());
-////                JSONObject json_RepairNewBug = JSONObject.parseObject(respResult_RepairNewBug.getResult());
+
                 testMap2.put("week_resolved_week_issue",a2.toString());
 //
 //                JSONObject respResult_RepairHistoryBug = this.codingGetProjectIssueList(jsonString3,e1.get("id").toString());
@@ -502,14 +500,16 @@ public class IssueTrendStatisticsService extends Thread{
 
             }
             else if(hashMap.get("projectName") == null ){
+                long start1 = System.currentTimeMillis( );
 
-                Future<Map<String,Object>> future=this.AsytGetIssueTotal(hashMap.get("yourToken"),e,currentTimeNow,end,start);
-                long end1 = System.currentTimeMillis( );
+                Future<Map<String,Object>> future=this.AsytGetIssueTotal(hashMap.get("personalToken"),e,currentTimeNow,end,start);
+
 //                System.out.println(future.get());
 //                Map<String,String> hashMapNew = JSON.parseObject(future.get().replace("=",":"), HashMap.class);
 //                Map<String, String> hashMapNew = this.getStringToMap(future.get());
                 modulName.add(future.get());
-//                System.out.println(end1-start);
+                long end1 = System.currentTimeMillis( );
+                System.out.println(end1-start1);
 
 
             }

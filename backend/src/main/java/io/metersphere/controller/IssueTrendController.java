@@ -37,7 +37,7 @@ public class IssueTrendController {
 
         return issueTrendStatisticsService.getIssueTrendList();
     }
-    @GetMapping("/issue/total/projectquality/list")
+    @GetMapping("/issue/total/allproject")
     public ResultHolder issueTrendTotal(@RequestParam HashMap<String, String> hashMap) throws HttpProcessException, ExecutionException, InterruptedException, ParseException {
         List<Map<String,Object>> result = issueTrendStatisticsService.getIssueTrendTotal(hashMap);
         if (result.size()==0){
@@ -52,7 +52,7 @@ public class IssueTrendController {
         ArrayList<String> modulName = new ArrayList<>();
 
 
-        JSONObject json_test =  issueTrendStatisticsService.codingGetProjectAll(hashMap.get("yourToken"));
+        JSONObject json_test =  issueTrendStatisticsService.codingGetProjectAll(hashMap.get("personalToken"));
 //        JSONObject json_test = JSONObject.parseObject(respResult);
         for (Object e:json_test.getJSONArray("data")) {
             JSONObject e1 = JSONObject.parseObject(e.toString());
