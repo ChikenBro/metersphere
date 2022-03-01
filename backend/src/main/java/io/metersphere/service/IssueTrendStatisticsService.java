@@ -236,7 +236,7 @@ public class IssueTrendStatisticsService extends Thread{
 //        modulName.put("all_issue",respResult_AddBug.getJSONObject("data").get("totalRow"));
 
 
-        for (Object e2 : respResult_AddBug.getJSONObject("data").getJSONArray("list")) {
+        for (Object e2 : respResult_AddBug.getJSONObject("Response").getJSONObject("Data").getJSONArray("List")) {
             Map<String, Object> modulName1 = new HashMap<>();
             JSONObject e3 = JSONObject.parseObject(e2.toString());
 //            JSONObject e4 = JSONObject.parseObject(e3.get("assignee") .toString());
