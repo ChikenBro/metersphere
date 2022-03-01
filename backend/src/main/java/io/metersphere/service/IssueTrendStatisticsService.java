@@ -186,6 +186,179 @@ public class IssueTrendStatisticsService extends Thread{
         issueTrendExample.setOrderByClause("issue_week ASC");
         return issueTrendMapper.selectByExample(issueTrendExample);
     }
+    public Map<String, Object> fromProjectUnresolved(String youToken,String projectId){
+        Map<String, Object> modulName = new HashMap<>();
+        String jsonString1 = String.format("{\"page\":1,\"pageSize\":10000,\"content\":{\"sort\":{\"key\":\"PRIORITY\",\"value\":\"DESC\"},\"conditions\":[{\"key\":\"CREATED_AT\",\"customFieldId\":null,\"value\":{\"startDate\":\"\",\"endDate\":\"%s\"},\"fixed\":false},{\"key\":\"STATUS\",\"customFieldId\":null,\"value\":[],\"fixed\":false,\"userMap\":{},\"validInfo\":[]}]}}",  "");
+
+        JSONObject respResult_AddBug = this.codingGetProjectIssueList(jsonString1,projectId,youToken );
+//        JSONObject respResult_AddBug = this.codingGetProjectIssueList(jsonString1,e1.get("id").toString(),hashMap.get("token") );
+        if (respResult_AddBug == null){
+//            modulName.add(testMap);
+            return modulName;
+        }
+//        System.out.println(end);
+//        System.out.println(start);
+        Map<String,Object> testMap2 = new HashMap<>();
+        Integer a4 = 0;
+        modulName.put("all_issue",respResult_AddBug.getJSONObject("data").get("totalRow"));
+        for (Object e2 : respResult_AddBug.getJSONObject("data").getJSONArray("list")) {
+            JSONObject e3 = JSONObject.parseObject(e2.toString());
+        if (e3.get("issueStatusId").equals(43257745) || e3.get("issueStatusId").equals(43257752)|| e3.get("issueStatusId").equals(43257749)){
+            a4 = a4 +1;
+
+        }
+            modulName.put("all_unresolved_issue",a4);
+
+
+        }
+        return modulName;
+        
+
+
+    }
+    public  ArrayList<Object> fromProjectBugCheckNull(String youToken,String projectId){
+//        Map<String, Object> modulName = new HashMap<>();
+        ArrayList<Object> testName = new ArrayList<>();
+        String jsonString1 = String.format("{\"page\":1,\"pageSize\":10000,\"content\":{\"sort\":{\"key\":\"PRIORITY\",\"value\":\"DESC\"},\"conditions\":[{\"key\":\"STATUS_TYPE\",\"customFieldId\":null,\"value\":[],\"fixed\":true,\"constValue\":[],\"userMap\":{\"COMPLETED\":{\"value\":\"COMPLETED\"},\"PROCESSING\":{\"value\":\"PROCESSING\"},\"TODO\":{\"value\":\"TODO\"}},\"validInfo\":[]},{\"key\":\"KEYWORD\",\"customFieldId\":null,\"value\":null,\"fixed\":true},{\"key\":\"STATUS\",\"customFieldId\":null,\"value\":[43257745,43257752,43257749,43257750],\"fixed\":false,\"userMap\":{\"43257745\":{\"value\":43257745},\"43257749\":{\"value\":43257749},\"43257750\":{\"value\":43257750},\"43257752\":{\"value\":43257752}},\"validInfo\":[]}]}}",  "");
+
+        JSONObject respResult_AddBug = this.codingGetProjectIssueList(jsonString1,projectId,youToken );
+
+        if (respResult_AddBug == null){
+//            modulName.add(testMap);
+            return testName;
+        }
+//        System.out.println(end);
+//        System.out.println(start);
+//        Map<String,Object> testMap2 = new HashMap<>();
+        Integer a4 = 0;
+//        modulName.put("all_issue",respResult_AddBug.getJSONObject("data").get("totalRow"));
+
+
+        for (Object e2 : respResult_AddBug.getJSONObject("data").getJSONArray("list")) {
+            Map<String, Object> modulName1 = new HashMap<>();
+            JSONObject e3 = JSONObject.parseObject(e2.toString());
+            JSONObject e4 = JSONObject.parseObject(e3.get("assignee") .toString());
+            JSONObject e5 = JSONObject.parseObject(e3.get("issueStatus") .toString());
+            if (e3.get("startDate") == null || e3.get("dueDate") == null) {
+                a4 = a4 +1;
+                modulName1.put("name",e3.get("name"));
+                modulName1.put("startDate",e3.get("startDate"));
+                modulName1.put("dueDate",e3.get("dueDate"));
+                modulName1.put("assignee",e4.get("name"));
+                modulName1.put("issueStatus",e5.get("name"));
+                testName.add(modulName1);
+//
+//            }
+//                modulName.put("dueDateNullList",testName);
+//                modulName.put("dueDateNull", a4.toString());
+
+
+            }
+
+        }
+        return testName;
+
+
+    }
+    public ArrayList<Object> fromProjectBugCheck(String youToken,String projectId,String duation){
+//        Map<String, Object> modulName = new HashMap<>();
+        ArrayList<Object> testName = new ArrayList<>();
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd ");
+        String jsonString1 = String.format("{\"page\":1,\"pageSize\":10000,\"content\":{\"sort\":{\"key\":\"PRIORITY\",\"value\":\"DESC\"},\"conditions\":[{\"key\":\"CREATED_AT\",\"customFieldId\":null,\"value\":{\"startDate\":\"\",\"endDate\":\"%s\"},\"fixed\":false},{\"key\":\"STATUS\",\"customFieldId\":null,\"value\":[],\"fixed\":false,\"userMap\":{},\"validInfo\":[]}]}}",  "");
+
+        JSONObject respResult_AddBug = this.codingGetProjectIssueList(jsonString1,projectId,youToken );
+
+        if (respResult_AddBug == null){
+//            modulName.add(testMap);
+            return testName;
+        }
+//        System.out.println(end);
+//        System.out.println(start);
+//        Map<String,Object> testMap2 = new HashMap<>();
+        Integer a4 = 0;
+//        modulName.put("all_issue",respResult_AddBug.getJSONObject("data").get("totalRow"));
+        System.out.println(respResult_AddBug);
+
+
+        for (Object e2 : respResult_AddBug.getJSONObject("data").getJSONArray("list")) {
+            Map<String, Object> modulName1 = new HashMap<>();
+            JSONObject e3 = JSONObject.parseObject(e2.toString());
+            JSONObject e4 = JSONObject.parseObject(e3.get("assignee") .toString());
+            JSONObject e5 = JSONObject.parseObject(e3.get("issueStatus") .toString());
+            if ( e3.get("dueDate") != null) {
+                if ( (Long)e3.get("updatedAt") -(Long)e3.get("dueDate")  > Integer.parseInt(duation)*24*3600*1000){
+                a4 = a4 +1;
+                modulName1.put("name",e3.get("name"));
+                modulName1.put("startDate",df.format(e3.get("startDate")));
+                modulName1.put("dueDate",df.format(e3.get("dueDate")));
+                modulName1.put("assignee",e4.get("name"));
+                modulName1.put("updatedAt",df.format(e3.get("updatedAt")));
+                    modulName1.put("issueStatus",e5.get("name"));
+                testName.add(modulName1);
+                }
+//
+//            }
+//                modulName.put("dueDateList",testName);
+//                modulName.put("count", a4.toString());
+
+
+            }
+
+        }
+        return testName;
+
+
+    }
+    public ArrayList<Object> fromProjectBugCheckOvertime(String youToken,String projectId,String duation){
+//        Map<String, Object> modulName = new HashMap<>();
+        ArrayList<Object> testName = new ArrayList<>();
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd ");
+        String jsonString1 = String.format("{\"page\":1,\"pageSize\":10000,\"content\":{\"sort\":{\"key\":\"PRIORITY\",\"value\":\"DESC\"},\"conditions\":[{\"key\":\"STATUS_TYPE\",\"customFieldId\":null,\"value\":[],\"fixed\":true,\"constValue\":[],\"userMap\":{\"COMPLETED\":{\"value\":\"COMPLETED\"},\"PROCESSING\":{\"value\":\"PROCESSING\"},\"TODO\":{\"value\":\"TODO\"}},\"validInfo\":[]},{\"key\":\"KEYWORD\",\"customFieldId\":null,\"value\":null,\"fixed\":true},{\"key\":\"STATUS\",\"customFieldId\":null,\"value\":[43257750],\"fixed\":false,\"userMap\":{\"43257750\":{\"value\":43257750}},\"validInfo\":[]}]}}",  "");
+
+        JSONObject respResult_AddBug = this.codingGetProjectIssueList(jsonString1,projectId,youToken );
+
+        if (respResult_AddBug == null){
+//            modulName.add(testMap);
+            return testName;
+        }
+//        System.out.println(end);
+//        System.out.println(start);
+//        Map<String,Object> testMap2 = new HashMap<>();
+        Integer a4 = 0;
+//        modulName.put("all_issue",respResult_AddBug.getJSONObject("data").get("totalRow"));
+
+        System.out.println(respResult_AddBug);
+
+        for (Object e2 : respResult_AddBug.getJSONObject("data").getJSONArray("list")) {
+            Map<String, Object> modulName1 = new HashMap<>();
+            JSONObject e3 = JSONObject.parseObject(e2.toString());
+            JSONObject e4 = JSONObject.parseObject(e3.get("assignee") .toString());
+            JSONObject e5 = JSONObject.parseObject(e3.get("issueStatus") .toString());
+            JSONObject e6 = JSONObject.parseObject(e3.get("creator") .toString());
+//            if ( e3.get("dueDate") != null) {
+                if (System.currentTimeMillis( )- (long)e3.get("updatedAt") > (long) Integer.parseInt(duation) * 3600*24){
+                    a4 = a4 +1;
+                    modulName1.put("name",e3.get("name"));
+                    modulName1.put("creator",e6.get("name"));
+
+                    modulName1.put("assignee",e4.get("name"));
+                    modulName1.put("updatedAt",df.format(e3.get("updatedAt")));
+                    modulName1.put("issueStatus",e5.get("name"));
+                    testName.add(modulName1);
+                }
+//
+//            }
+//                modulName.put("dueDateList",testName);
+//                modulName.put("bug_check_overtime", a4.toString());
+
+
+            }
+
+//        }
+        return testName;
+
+
+    }
 
     public JSONObject codingGetProjectAll(String youToken)  {
         JSONObject json_test = null;
@@ -284,7 +457,7 @@ public class IssueTrendStatisticsService extends Thread{
         Map<String,Object> testMap = new HashMap<>();
         Map<String,String> testMap2 = new HashMap<>();
         JSONObject e1 = JSONObject.parseObject(e.toString());
-        testMap.put("project",e1.get("display_name").toString());
+//        testMap.put("project",e1.get("display_name").toString());
 
         JSONObject respResult_AddBug = this.codingGetProjectIssueList(jsonString1,e1.get("id").toString(),token);
         if (respResult_AddBug == null){
@@ -347,7 +520,7 @@ public class IssueTrendStatisticsService extends Thread{
 //                Integer RepairBug;
 //                RepairBug = a3;
             testMap2.put("week_resolved_issue",a5.toString());
-            testMap.put("data",testMap2);
+            testMap.put(e1.get("id").toString(),testMap2);
         }
         returnmsg=new AsyncResult(testMap);
         return returnmsg;
@@ -409,7 +582,7 @@ public class IssueTrendStatisticsService extends Thread{
         }
 
 
-        JSONObject respResult = this.codingGetProjectAll(hashMap.get("personalToken"));
+        JSONObject respResult = this.codingGetProjectAll(hashMap.get("token"));
 
 //        respResult.getResult();
         //本周新增BUG
@@ -435,12 +608,12 @@ public class IssueTrendStatisticsService extends Thread{
             Integer a4 = 0;
             Integer a5 = 0;
             Map<String,Object> testMap = new HashMap<>();
-            JSONObject e1 = JSONObject.parseObject(e.toString());
+//            JSONObject e1 = JSONObject.parseObject(e.toString());
 
-            if ((hashMap.get("projectName") != null) && (hashMap.get("projectName").equals(e1.get("display_name").toString()))){
-                testMap.put("project",e1.get("display_name").toString());
+            if ((hashMap.get("projectId") != null) ){
+//                testMap.put("project",e1.get("display_name").toString());
 
-                JSONObject respResult_AddBug = this.codingGetProjectIssueList(jsonString1,e1.get("id").toString(),hashMap.get("personalToken") );
+                JSONObject respResult_AddBug = this.codingGetProjectIssueList(jsonString1,hashMap.get("projectId") ,hashMap.get("token") );
                 if (respResult_AddBug == null){
                     modulName.add(testMap);
                     return modulName;
@@ -494,15 +667,15 @@ public class IssueTrendStatisticsService extends Thread{
 //                Integer RepairBug;
 //                RepairBug = a3;
                 testMap2.put("week_resolved_issue",a5.toString());
-                testMap.put("data",testMap2);
+                testMap.put(hashMap.get("projectId"),testMap2);
                 modulName.add(testMap);
                 return modulName;
 
             }
-            else if(hashMap.get("projectName") == null ){
+            else if(hashMap.get("projectId") == null ){
                 long start1 = System.currentTimeMillis( );
 
-                Future<Map<String,Object>> future=this.AsytGetIssueTotal(hashMap.get("personalToken"),e,currentTimeNow,end,start);
+                Future<Map<String,Object>> future=this.AsytGetIssueTotal(hashMap.get("token"),e,currentTimeNow,end,start);
 
 //                System.out.println(future.get());
 //                Map<String,String> hashMapNew = JSON.parseObject(future.get().replace("=",":"), HashMap.class);
