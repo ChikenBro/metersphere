@@ -242,7 +242,7 @@ public class IssueTrendStatisticsService extends Thread{
 //            JSONObject e4 = JSONObject.parseObject(e3.get("assignee") .toString());
 //            JSONObject e5 = JSONObject.parseObject(e3.get("issueStatus") .toString());
             if ((Integer)e3.get("IssueStatusId")== 43257745 ||(Integer)e3.get("IssueStatusId")== 43257752 ||(Integer)e3.get("IssueStatusId")== 43257749||(Integer)e3.get("IssueStatusId")== 43257750){
-            if ((long)e3.get("StartDate") == 0 || (Integer)e3.get("DueDate") == 0) {
+            if (e3.get("StartDate").equals(0) || e3.get("DueDate").equals(0)) {
                 a4 = a4 + 1;
                 modulName1.put("name", e3.get("Name"));
                 modulName1.put("startDate", e3.get("StartDate"));
