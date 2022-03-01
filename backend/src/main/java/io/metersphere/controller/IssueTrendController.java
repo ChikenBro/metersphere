@@ -39,7 +39,9 @@ public class IssueTrendController {
     }
     @GetMapping("/issue/total/projectquality/resolved/list")
     public ResultHolder issueTrendTotal(@RequestParam HashMap<String, String> hashMap) throws HttpProcessException, ExecutionException, InterruptedException, ParseException {
+        System.out.println(hashMap.get("token"));
         JSONObject resultToken = issueTrendStatisticsService.checkToken(hashMap.get("token"));
+        System.out.println(resultToken);
         if(resultToken.get("team") == null ){
             return ResultHolder.selfInface(1,"fail","请检查环境或者个人令牌权限",0);
         }
@@ -53,6 +55,8 @@ public class IssueTrendController {
     @GetMapping("/issue/total/getAllProject")
     public ResultHolder getAllProject(@RequestParam HashMap<String, String> hashMap) throws HttpProcessException {
         JSONObject resultToken = issueTrendStatisticsService.checkToken(hashMap.get("token"));
+//        System.out.println(String.format("code1:%s,", hashMap.get("token")));
+//        System.out.println(resultToken);
         if(resultToken.get("team") == null ){
             return ResultHolder.selfInface(1,"fail","请检查环境或者个人令牌权限",0);
         }
@@ -61,14 +65,15 @@ public class IssueTrendController {
 
 
         JSONObject json_test =  issueTrendStatisticsService.codingGetProjectAll(hashMap.get("token"));
-//        JSONObject json_test = JSONObject.parseObject(respResult);
-        for (Object e:json_test.getJSONArray("data")) {
-            Map<String,String> modulName = new HashMap<>();
+        System.out.println(json_test);
+//        JSONObject json_test1 = JSONObject.parseObject(json_test.get("Response"));
+        for (Object e:json_test.getJSONObject("Response").getJSONObject("Data").getJSONArray("ProjectList")) {
+            Map<String,Object> modulName = new HashMap<>();
             JSONObject e1 = JSONObject.parseObject(e.toString());
             System.out.println(e1);
-            modulName.put("display_name", (String) e1.get("display_name"));
-            modulName.put("name", (String)e1.get("name"));
-            testMap.put( e1.get("id").toString(),modulName);
+            modulName.put("display_name",  e1.get("DisplayName"));
+            modulName.put("id", e1.get("Id"));
+            testMap.put( e1.get("Name").toString(),modulName);
         }
 //        testMap.put("code",0);
 //        testMap.put("msg","sueccess");
@@ -83,7 +88,7 @@ public class IssueTrendController {
         if(resultToken.get("team") == null ){
             return ResultHolder.selfInface(1,"fail","请检查环境或者个人令牌权限",0);
         }
-        Map<String,Object> result = issueTrendStatisticsService.fromProjectUnresolved(hashMap.get("token"),hashMap.get("projectId"));
+        Map<String,Object> result = issueTrendStatisticsService.fromProjectUnresolved(hashMap.get("token"),hashMap.get("projectName"));
         if (result.size()==0){
             return ResultHolder.selfInface(1,"fail","请检查环境或者个人令牌权限",0);
         }
@@ -95,7 +100,7 @@ public class IssueTrendController {
         if(resultToken.get("team") == null ){
             return ResultHolder.selfInface(1,"fail","请检查环境或者个人令牌权限",0);
         }
-        ArrayList<Object> result = issueTrendStatisticsService.fromProjectBugCheckNull(hashMap.get("token"),hashMap.get("projectId"));
+        ArrayList<Object> result = issueTrendStatisticsService.fromProjectBugCheckNull(hashMap.get("token"),hashMap.get("projectName"));
         if (result.size()==0){
             return ResultHolder.selfInface(1,"fail","请检查环境或者个人令牌权限",0);
         }
@@ -107,7 +112,7 @@ public class IssueTrendController {
         if(resultToken.get("team") == null ){
             return ResultHolder.selfInface(1,"fail","请检查环境或者个人令牌权限",0);
         }
-        ArrayList<Object> result = issueTrendStatisticsService.fromProjectBugCheck(hashMap.get("token"),hashMap.get("projectId"),hashMap.get("duation"));
+        ArrayList<Object> result = issueTrendStatisticsService.fromProjectBugCheck(hashMap.get("token"),hashMap.get("projectName"),hashMap.get("duation"));
         if (result.size()==0){
             return ResultHolder.selfInface(1,"fail","请检查环境或者个人令牌权限",0);
         }
@@ -119,7 +124,7 @@ public class IssueTrendController {
         if(resultToken.get("team") == null ){
             return ResultHolder.selfInface(1,"fail","请检查环境或者个人令牌权限",0);
         }
-        ArrayList<Object> result = issueTrendStatisticsService.fromProjectBugCheckOvertime(hashMap.get("token"),hashMap.get("projectId"),hashMap.get("duation"));
+        ArrayList<Object> result = issueTrendStatisticsService.fromProjectBugCheckOvertime(hashMap.get("token"),hashMap.get("projectName"),hashMap.get("duation"));
         if (result.size()==0){
             return ResultHolder.selfInface(1,"fail","请检查环境或者个人令牌权限",0);
         }
