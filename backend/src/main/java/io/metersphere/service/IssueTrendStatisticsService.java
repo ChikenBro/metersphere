@@ -349,7 +349,7 @@ public class IssueTrendStatisticsService extends Thread{
 //            JSONObject e6 = JSONObject.parseObject(e3.get("creator") .toString());
 //            if ( e3.get("dueDate") != null) {
             if ((Integer)e3.get("IssueStatusId") == 43257750) {
-                if (System.currentTimeMillis() - (long) e3.get("CompletedAt") > (long) Integer.parseInt(duation) * 3600 * 24) {
+                if (System.currentTimeMillis() - (long) e3.get("CompletedAt") > (long) Integer.parseInt(duation) * 3600 * 24*1000) {
                     a4 = a4 + 1;
                     modulName1.put("name", e3.get("Name"));
                     modulName1.put("creator", member.get(e3.get("CreatorId")));
