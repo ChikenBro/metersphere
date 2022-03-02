@@ -80,7 +80,7 @@ public class IssueTrendController {
 //        testMap.put("data",modulName);
 //        return CommonResult.success(modulName);
 
-        return ResultHolder.selfInfaceNew(0,"success",testMap);
+        return ResultHolder.selfInfaceNew(0,"success",testMap,testMap.size());
     }
     @GetMapping("/issue/total/projectquality/unresolved/list")
     public ResultHolder fromProjectUnresolved(@RequestParam HashMap<String, String> hashMap) throws HttpProcessException {
