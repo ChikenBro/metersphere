@@ -220,6 +220,7 @@ public class IssueTrendStatisticsService extends Thread{
     public  ArrayList<Object> fromProjectBugCheckNull(String youToken,String projectName){
         Map<Object, Object> member = this.getAllprojectMember(  youToken);
 //        Map<String, Object> modulName = new HashMap<>();
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd ");
         ArrayList<Object> testName = new ArrayList<>();
         String jsonString1 = String.format("{\"Action\": \"DescribeIssueListWithPage\", 	\"ProjectName\": \"%s\", 	\"IssueType\": \"DEFECT\", 	\"PageNumber\": 1, 	\"PageSize\": 500  }",  projectName);
 
@@ -245,7 +246,7 @@ public class IssueTrendStatisticsService extends Thread{
                 if (e3.get("StartDate").equals(0) || e3.get("DueDate").equals(0)) {
                     a4 = a4 + 1;
                     modulName1.put("name", e3.get("Name"));
-                    modulName1.put("startDate", e3.get("StartDate"));
+                    modulName1.put("startDate", df.format(e3.get("StartDate")));
                     modulName1.put("dueDate", e3.get("DueDate"));
                     modulName1.put("assignee", member.get(e3.get("AssigneeId")));
                     modulName1.put("issueStatus", e3.get("IssueStatusName"));
@@ -349,14 +350,14 @@ public class IssueTrendStatisticsService extends Thread{
 //            JSONObject e6 = JSONObject.parseObject(e3.get("creator") .toString());
 //            if ( e3.get("dueDate") != null) {
             if ((Integer)e3.get("IssueStatusId") == 43257750) {
-                if (System.currentTimeMillis() - (long) e3.get("CompletedAt") > (long) Integer.parseInt(duation) * 3600 * 24*1000) {
+                if (System.currentTimeMillis() - (long) e3.get("UpdatedAt") > (long) Integer.parseInt(duation) * 3600 * 24*1000) {
                     a4 = a4 + 1;
                     modulName1.put("name", e3.get("Name"));
                     modulName1.put("creator", member.get(e3.get("CreatorId")));
 
 //                    modulName1.put("assignee", e4.get("name"));
                     modulName1.put("assignee",member.get(e3.get("AssigneeId")));
-                    modulName1.put("CompletedAt", df.format(e3.get("CompletedAt")));
+                    modulName1.put("UpdatedAt", df.format(e3.get("UpdatedAt")));
                     modulName1.put("issueStatus", e3.get("IssueStatusName"));
                     testName.add(modulName1);
                 }
