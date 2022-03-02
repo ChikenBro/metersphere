@@ -80,7 +80,7 @@ public class IssueTrendController {
 //        testMap.put("data",modulName);
 //        return CommonResult.success(modulName);
 
-        return ResultHolder.selfInfaceNew(0,"success",testMap,testMap.size());
+        return ResultHolder.selfInfaceNew(0,"success",testMap);
     }
     @GetMapping("/issue/total/projectquality/unresolved/list")
     public ResultHolder fromProjectUnresolved(@RequestParam HashMap<String, String> hashMap) throws HttpProcessException {
@@ -126,7 +126,7 @@ public class IssueTrendController {
         }
         ArrayList<Object> result = issueTrendStatisticsService.fromProjectBugCheckOvertime(hashMap.get("token"),hashMap.get("projectName"),hashMap.get("duation"));
         if (result.size()==0){
-            return ResultHolder.selfInface(1,"fail","请检查环境或者个人令牌权限",0);
+            return ResultHolder.selfInface(0,"success",result,result.size());
         }
         return ResultHolder.selfInface(0,"success",result,result.size());
     }
