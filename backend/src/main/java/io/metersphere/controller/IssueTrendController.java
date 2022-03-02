@@ -125,9 +125,7 @@ public class IssueTrendController {
             return ResultHolder.selfInface(1,"fail","请检查环境或者个人令牌权限",0);
         }
         ArrayList<Object> result = issueTrendStatisticsService.fromProjectBugCheckOvertime(hashMap.get("token"),hashMap.get("projectName"),hashMap.get("duation"));
-        if (result.size()==0){
-            return ResultHolder.selfInface(1,"fail",result,0);
-        }
+
         return ResultHolder.selfInface(0,"success",result,result.size());
     }
 }
