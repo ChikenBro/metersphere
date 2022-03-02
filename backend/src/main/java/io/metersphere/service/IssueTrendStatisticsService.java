@@ -293,13 +293,13 @@ public class IssueTrendStatisticsService extends Thread{
 //            JSONObject e5 = JSONObject.parseObject(e3.get("issueStatus") .toString());
             if ( !e3.get("DueDate").equals(0) ) {
                 //System.out.println(e3.get("DueDate") );
-                if ( (long)e3.get("UpdatedAt") -(long)e3.get("DueDate")  > Integer.parseInt(duation)*24*3600*1000){
+                if ( (long)e3.get("CompletedAt") -(long)e3.get("DueDate")  > Integer.parseInt(duation)*24*3600*1000){
                     a4 = a4 +1;
                     modulName1.put("name",e3.get("Name"));
                     modulName1.put("startDate",df.format(e3.get("StartDate")));
                     modulName1.put("dueDate",df.format(e3.get("DueDate")));
                     modulName1.put("assignee",member.get(e3.get("AssigneeId")));
-                    modulName1.put("updatedAt",df.format(e3.get("UpdatedAt")));
+                    modulName1.put("CompletedAt",df.format(e3.get("CompletedAt")));
                     modulName1.put("issueStatus",e3.get("IssueStatusName"));
                     testName.add(modulName1);
                 }
@@ -349,14 +349,14 @@ public class IssueTrendStatisticsService extends Thread{
 //            JSONObject e6 = JSONObject.parseObject(e3.get("creator") .toString());
 //            if ( e3.get("dueDate") != null) {
             if ((Integer)e3.get("IssueStatusId") == 43257750) {
-                if (System.currentTimeMillis() - (long) e3.get("UpdatedAt") > (long) Integer.parseInt(duation) * 3600 * 24) {
+                if (System.currentTimeMillis() - (long) e3.get("CompletedAt") > (long) Integer.parseInt(duation) * 3600 * 24) {
                     a4 = a4 + 1;
                     modulName1.put("name", e3.get("Name"));
                     modulName1.put("creator", member.get(e3.get("CreatorId")));
 
 //                    modulName1.put("assignee", e4.get("name"));
                     modulName1.put("assignee",member.get(e3.get("AssigneeId")));
-                    modulName1.put("updatedAt", df.format(e3.get("UpdatedAt")));
+                    modulName1.put("CompletedAt", df.format(e3.get("CompletedAt")));
                     modulName1.put("issueStatus", e3.get("IssueStatusName"));
                     testName.add(modulName1);
                 }
@@ -610,28 +610,31 @@ public class IssueTrendStatisticsService extends Thread{
         else {
             for (Object e2 : respResult_AddBug.getJSONObject("Response").getJSONObject("Data").getJSONArray("List")) {
                 JSONObject e3 = JSONObject.parseObject(e2.toString());
-                if (((Long)e3.get("CreatedAt") < start+24*3600*1000-600) && ((Long)e3.get("CreatedAt") > end)){
-
+                if (((long)e3.get("CreatedAt") < end+24*3600*1000-600) && ((long)e3.get("CreatedAt") > start)){
                     a1 = a1 +1 ;
-                    if (e3.get("IssueStatusId").equals(43257750) || e3.get("IssueStatusId").equals(43257751)|| e3.get("IssueStatusId").equals(43257756)){
+//                        //System.out.println(e3.get("code"));
+                    if ( e3.get("IssueStatusId").equals(43257756)){
 
                         a2 = a2 +1;
                     }
                 }
                 else {
-                    if (e3.get("IssueStatusId").equals(43257750) || e3.get("IssueStatusId").equals(43257751)|| e3.get("IssueStatusId").equals(43257756)){
 
-                        a3 = a3 +1;
+                    if (e3.get("IssueStatusId").equals(43257756) ){
+                        if(((long)e3.get("CompletedAt") < end+24*3600*1000-600) && ((long)e3.get("CompletedAt") > start-+24*3600*1000)){
+
+                            a3 = a3 +1;
+                        }
                     }
 
                 }
-//            if(((Long)e3.get("createdAt") < end){
-//
-//            }
-                if ((Long)e3.get("CreatedAt") < start+24*3600*1000-600){
-                    if (e3.get("IssueStatusId").equals(43257750) || e3.get("IssueStatusId").equals(43257751)|| e3.get("IssueStatusId").equals(43257756)){
+                if ((long)e3.get("CreatedAt") < end+24*3600*1000-600){
 
-                        a5 = a5 +1;
+                    if (e3.get("IssueStatusId").equals(43257756) ){
+                        if(((long)e3.get("CompletedAt") < end+24*3600*1000-600) && ((long)e3.get("CompletedAt") > start-24*3600*1000)){
+
+                            a5 = a5 +1;
+                        }
                     }
 
                     if (e3.get("IssueStatusId").equals(43257745) || e3.get("IssueStatusId").equals(43257752)|| e3.get("IssueStatusId").equals(43257749)){
@@ -643,9 +646,7 @@ public class IssueTrendStatisticsService extends Thread{
             }
 //                JSONObject json_AddBug = JSONObject.parseObject(respResult_AddBug.getResult());
             testMap2.put("new_create_issue",a1.toString());
-//
-//                JSONObject respResult_RepairNewBug = this.codingGetProjectIssueList(jsonString2,e1.get("id").toString());
-////                JSONObject json_RepairNewBug = JSONObject.parseObject(respResult_RepairNewBug.getResult());
+
             testMap2.put("week_resolved_week_issue",a2.toString());
 //
 //                JSONObject respResult_RepairHistoryBug = this.codingGetProjectIssueList(jsonString3,e1.get("id").toString());
@@ -765,25 +766,32 @@ public class IssueTrendStatisticsService extends Thread{
             Map<String,Object> testMap2 = new HashMap<>();
             for (Object e2 : respResult_AddBug.getJSONObject("Response").getJSONObject("Data").getJSONArray("List")) {
                 JSONObject e3 = JSONObject.parseObject(e2.toString());
-                if (((Long)e3.get("CreatedAt") < end+24*3600*1000-600) && ((Long)e3.get("CreatedAt") > start)){
+                if (((long)e3.get("CreatedAt") < end+24*3600*1000-600) && ((long)e3.get("CreatedAt") > start)){
                     a1 = a1 +1 ;
 //                        //System.out.println(e3.get("code"));
-                    if (e3.get("IssueStatusId").equals(43257750) || e3.get("IssueStatusId").equals(43257751)|| e3.get("IssueStatusId").equals(43257756)){
+                    if ( e3.get("IssueStatusId").equals(43257756)){
 
                         a2 = a2 +1;
                     }
                 }
                 else {
-                    if (e3.get("IssueStatusId").equals(43257750) || e3.get("IssueStatusId").equals(43257751)|| e3.get("IssueStatusId").equals(43257756)){
+
+                    if (e3.get("IssueStatusId").equals(43257756) ){
+                        if(((long)e3.get("CompletedAt") < end+24*3600*1000-600) && ((long)e3.get("CompletedAt") > start-+24*3600*1000)){
 
                         a3 = a3 +1;
                     }
+                    }
 
                 }
-                if ((Long)e3.get("CreatedAt") < end+24*3600*1000-600){
-                    if (e3.get("IssueStatusId").equals(43257750) || e3.get("IssueStatusId").equals(43257751)|| e3.get("IssueStatusId").equals(43257756)){
+                if ((long)e3.get("CreatedAt") < end+24*3600*1000-600){
+
+                    if (e3.get("IssueStatusId").equals(43257756) ){
+                        if(((long)e3.get("CompletedAt") < end+24*3600*1000-600) && ((long)e3.get("CompletedAt") > start-24*3600*1000)){
+                            System.out.println(e3);
 
                         a5 = a5 +1;
+                    }
                     }
 
                     if (e3.get("IssueStatusId").equals(43257745) || e3.get("IssueStatusId").equals(43257752)|| e3.get("IssueStatusId").equals(43257749)){
@@ -822,7 +830,7 @@ public class IssueTrendStatisticsService extends Thread{
             JSONObject respResult = this.codingGetProjectAll(hashMap.get("token"));
             for (Object e:respResult.getJSONObject("Response").getJSONObject("Data").getJSONArray("ProjectList")) {
 //
-                future=this.AsytGetIssueTotal(hashMap.get("token"),e,end,start);
+                future=this.AsytGetIssueTotal(hashMap.get("token"),e,start,end);
                 modulName.add(future.get());
             }
 //
