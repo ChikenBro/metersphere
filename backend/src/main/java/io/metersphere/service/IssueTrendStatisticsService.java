@@ -220,7 +220,7 @@ public class IssueTrendStatisticsService extends Thread{
     public  ArrayList<Object> fromProjectBugCheckNull(String youToken,String projectName){
         Map<Object, Object> member = this.getAllprojectMember(  youToken);
 //        Map<String, Object> modulName = new HashMap<>();
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd ");
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         ArrayList<Object> testName = new ArrayList<>();
         String jsonString1 = String.format("{\"Action\": \"DescribeIssueListWithPage\", 	\"ProjectName\": \"%s\", 	\"IssueType\": \"DEFECT\", 	\"PageNumber\": 1, 	\"PageSize\": 500  }",  projectName);
 
@@ -245,9 +245,10 @@ public class IssueTrendStatisticsService extends Thread{
             if ((Integer)e3.get("IssueStatusId")== 43257745 ||(Integer)e3.get("IssueStatusId")== 43257752 ||(Integer)e3.get("IssueStatusId")== 43257749||(Integer)e3.get("IssueStatusId")== 43257750){
                 if (e3.get("StartDate").equals(0) || e3.get("DueDate").equals(0)) {
                     a4 = a4 + 1;
+//                    System.out.println(df.format(e3.get("DueDate")));
                     modulName1.put("name", e3.get("Name"));
                     modulName1.put("startDate", df.format(e3.get("StartDate")));
-                    modulName1.put("dueDate", e3.get("DueDate"));
+                    modulName1.put("dueDate", df.format(e3.get("DueDate")));
                     modulName1.put("assignee", member.get(e3.get("AssigneeId")));
                     modulName1.put("issueStatus", e3.get("IssueStatusName"));
                     testName.add(modulName1);
@@ -270,7 +271,7 @@ public class IssueTrendStatisticsService extends Thread{
         Map<Object, Object> member = this.getAllprojectMember(youToken);
 //        Map<String, Object> modulName = new HashMap<>();
         ArrayList<Object> testName = new ArrayList<>();
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd ");
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         String jsonString1 = String.format("{\"Action\": \"DescribeIssueListWithPage\", 	\"ProjectName\": \"%s\", 	\"IssueType\": \"DEFECT\", 	\"PageNumber\": 1, 	\"PageSize\": 500  }",  projectName);
 
         JSONObject respResult_AddBug = this.codingGetProjectIssueList(jsonString1,youToken );
@@ -294,13 +295,13 @@ public class IssueTrendStatisticsService extends Thread{
 //            JSONObject e5 = JSONObject.parseObject(e3.get("issueStatus") .toString());
             if ( !e3.get("DueDate").equals(0) ) {
                 //System.out.println(e3.get("DueDate") );
-                if ( (long)e3.get("CompletedAt") -(long)e3.get("DueDate")  > Integer.parseInt(duation)*24*3600*1000){
+                if ( (long)e3.get("UpdatedAt") -(long)e3.get("DueDate")  > Integer.parseInt(duation)*24*3600*1000){
                     a4 = a4 +1;
                     modulName1.put("name",e3.get("Name"));
                     modulName1.put("startDate",df.format(e3.get("StartDate")));
                     modulName1.put("dueDate",df.format(e3.get("DueDate")));
                     modulName1.put("assignee",member.get(e3.get("AssigneeId")));
-                    modulName1.put("CompletedAt",df.format(e3.get("CompletedAt")));
+                    modulName1.put("UpdatedAt",df.format(e3.get("UpdatedAt")));
                     modulName1.put("issueStatus",e3.get("IssueStatusName"));
                     testName.add(modulName1);
                 }
@@ -321,7 +322,7 @@ public class IssueTrendStatisticsService extends Thread{
         Map<Object, Object> member = this.getAllprojectMember(  youToken);
 //        Map<String, Object> modulName = new HashMap<>();
         ArrayList<Object> testName = new ArrayList<>();
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd ");
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         String jsonString1 = String.format("{\"Action\": \"DescribeIssueListWithPage\", 	\"ProjectName\": \"%s\", 	\"IssueType\": \"DEFECT\", 	\"PageNumber\": 1, 	\"PageSize\": 500  }",  projectName);
 
 //        String jsonString1 = String.format("{\"page\":1,\"pageSize\":10000,\"content\":{\"sort\":{\"key\":\"PRIORITY\",\"value\":\"DESC\"},\"conditions\":[{\"key\":\"STATUS_TYPE\",\"customFieldId\":null,\"value\":[],\"fixed\":true,\"constValue\":[],\"userMap\":{\"COMPLETED\":{\"value\":\"COMPLETED\"},\"PROCESSING\":{\"value\":\"PROCESSING\"},\"TODO\":{\"value\":\"TODO\"}},\"validInfo\":[]},{\"key\":\"KEYWORD\",\"customFieldId\":null,\"value\":null,\"fixed\":true},{\"key\":\"STATUS\",\"customFieldId\":null,\"value\":[43257750],\"fixed\":false,\"userMap\":{\"43257750\":{\"value\":43257750}},\"validInfo\":[]}]}}",  "");

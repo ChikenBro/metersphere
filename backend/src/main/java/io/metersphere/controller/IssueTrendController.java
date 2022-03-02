@@ -52,13 +52,13 @@ public class IssueTrendController {
 //        }
             return ResultHolder.selfInface(0,"success",result,result.size());
         } catch (HttpProcessException e) {
-            return ResultHolder.selfInface(1,"fail","请检查环境或者个人令牌权限",0);
+            return ResultHolder.selfInface(1,"fail","请检查请求消息体",0);
         } catch (ExecutionException e) {
-            return ResultHolder.selfInface(1,"fail","请检查环境或者个人令牌权限",0);
+            return ResultHolder.selfInface(1,"fail","请检查请求消息体",0);
         } catch (InterruptedException e) {
-            return ResultHolder.selfInface(1,"fail","请检查环境或者个人令牌权限",0);
+            return ResultHolder.selfInface(1,"fail","请检查请求消息体",0);
         } catch (ParseException e) {
-            return ResultHolder.selfInface(1,"fail","请检查环境或者个人令牌权限",0);
+            return ResultHolder.selfInface(1,"fail","请检查请求消息体",0);
         }
     }
 //    @RequestMapping(value = "/queryStmp", method = RequestMethod.GET)
@@ -92,7 +92,7 @@ public class IssueTrendController {
 
             return ResultHolder.selfInface(0,"success",testMap,testMap.size());
         } catch (Exception e) {
-            return ResultHolder.selfInface(1,"fail","请检查环境或者个人令牌权限",0);
+            return ResultHolder.selfInface(1,"fail","请检查请求消息体",0);
         }
     }
     @GetMapping("/issue/total/projectquality/unresolved/list")
@@ -108,7 +108,7 @@ public class IssueTrendController {
 //        }
             return ResultHolder.selfInface(0,"success",result,0);
         } catch (Exception e) {
-            return ResultHolder.selfInface(1,"fail","请检查环境或者个人令牌权限",0);
+            return ResultHolder.selfInface(1,"fail","请检查请求消息体",0);
         }
     }
     @GetMapping("/issue/total/projectquality/duedate/null/list")
@@ -124,7 +124,7 @@ public class IssueTrendController {
 //        }
             return ResultHolder.selfInface(0,"success",result,result.size());
         } catch (Exception e) {
-            return ResultHolder.selfInface(1,"fail","请检查环境或者个人令牌权限",0);
+            return ResultHolder.selfInface(1,"fail","请检查请求消息体",0);
         }
     }
     @GetMapping("/issue/total/projectquality/lastday/list")
@@ -140,7 +140,7 @@ public class IssueTrendController {
 //        }
             return ResultHolder.selfInface(0,"success",result,result.size());
         } catch (Exception e) {
-            return ResultHolder.selfInface(1,"fail","请检查环境或者个人令牌权限",0);
+            return ResultHolder.selfInface(1,"fail","请检查请求消息体",0);
         }
     }
     @GetMapping("/issue/total/projectquality/duedate/overtime/list")
@@ -156,7 +156,7 @@ public class IssueTrendController {
 //        }
             return ResultHolder.selfInface(0,"success",result,result.size());
         } catch (Exception e) {
-            return ResultHolder.selfInface(1,"fail","请检查环境或者个人令牌权限",0);
+            return ResultHolder.selfInface(1,"fail","请检查请求消息体",0);
         }
     }
 }
