@@ -188,6 +188,7 @@ public class IssueTrendStatisticsService extends Thread{
     }
     public Map<String, Object> fromProjectUnresolved(String youToken,String projectName){
         Map<String, Object> modulName = new HashMap<>();
+
         String jsonString1 = String.format("{\"Action\": \"DescribeIssueListWithPage\", \t\"ProjectName\": \"%s\", \t\"IssueType\": \"DEFECT\", \t\"PageNumber\": 1, \t\"PageSize\": 500  }", projectName);
 
         JSONObject respResult_AddBug = this.codingGetProjectIssueList(jsonString1,youToken );
@@ -324,7 +325,7 @@ public class IssueTrendStatisticsService extends Thread{
         ArrayList<Object> testName = new ArrayList<>();
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         String jsonString1 = String.format("{\"Action\": \"DescribeIssueListWithPage\", 	\"ProjectName\": \"%s\", 	\"IssueType\": \"DEFECT\", 	\"PageNumber\": 1, 	\"PageSize\": 500  }",  projectName);
-
+        System.out.println(jsonString1);
 //        String jsonString1 = String.format("{\"page\":1,\"pageSize\":10000,\"content\":{\"sort\":{\"key\":\"PRIORITY\",\"value\":\"DESC\"},\"conditions\":[{\"key\":\"STATUS_TYPE\",\"customFieldId\":null,\"value\":[],\"fixed\":true,\"constValue\":[],\"userMap\":{\"COMPLETED\":{\"value\":\"COMPLETED\"},\"PROCESSING\":{\"value\":\"PROCESSING\"},\"TODO\":{\"value\":\"TODO\"}},\"validInfo\":[]},{\"key\":\"KEYWORD\",\"customFieldId\":null,\"value\":null,\"fixed\":true},{\"key\":\"STATUS\",\"customFieldId\":null,\"value\":[43257750],\"fixed\":false,\"userMap\":{\"43257750\":{\"value\":43257750}},\"validInfo\":[]}]}}",  "");
 
         JSONObject respResult_AddBug = this.codingGetProjectIssueList(jsonString1,youToken );
@@ -664,7 +665,10 @@ public class IssueTrendStatisticsService extends Thread{
 //                Integer RepairBug;
 //                RepairBug = a3;
             testMap2.put("week_resolved_issue",a5.toString());
-            testMap.put(e1.get("Name").toString(),testMap2);
+//            testMap.put(e1.get("Name").toString(),testMap2);
+            testMap.put("data",testMap2);
+            testMap.put("pojectName",e1.get("Name"));
+//            modulName.add(testMap);
         }
         returnmsg=new AsyncResult(testMap);
         return returnmsg;
@@ -821,7 +825,8 @@ public class IssueTrendStatisticsService extends Thread{
 //                Integer RepairBug;
 //                RepairBug = a3;
             testMap2.put("week_resolved_issue",a5.toString());
-            testMap.put(hashMap.get("projectName"),testMap2);
+            testMap.put("data",testMap2);
+            testMap.put("pojectName",hashMap.get("projectName"));
             modulName.add(testMap);
             return modulName;
 
