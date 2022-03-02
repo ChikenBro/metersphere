@@ -602,7 +602,8 @@ public class IssueTrendStatisticsService extends Thread{
 //                Integer RepairBug;
 //                RepairBug = a3;
             testMap2.put("week_resolved_issue",a5.toString());
-            testMap.put(e1.get("Name").toString(),testMap2);
+            testMap.put("data",testMap2);
+            testMap.put("pojectName",e1.get("Name"));
             returnmsg=new AsyncResult(testMap);
             return returnmsg;
 
