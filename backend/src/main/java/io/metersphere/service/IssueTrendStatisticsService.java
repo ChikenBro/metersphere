@@ -204,7 +204,7 @@ public class IssueTrendStatisticsService extends Thread{
         Map<String,Object> testMap2 = new HashMap<>();
         Integer a4 = 0;
         //System.out.println(respResult_AddBug.getJSONObject("Response").getJSONObject("Data"));
-        Integer totalCount=  (Integer)respResult_AddBug.getJSONObject("Response").getJSONObject("Data").get("TotalCount");
+        Integer totalCount = (Integer)respResult_AddBug.getJSONObject("Response").getJSONObject("Data").get("TotalCount");
         modulName.put("allIssue",totalCount);
         for (Object e2 : respResult_AddBug.getJSONObject("Response").getJSONObject("Data").getJSONArray("List")) {
             JSONObject e3 = JSONObject.parseObject(e2.toString());
@@ -212,10 +212,11 @@ public class IssueTrendStatisticsService extends Thread{
                 a4 = a4 +1;
 
             }
+                    modulName.put("allUnresolvedIssue",a4);
+        modulName.put("unresolvedIssuePercent",String.format("%.2f", a4/totalCount*100));
 
         }
-        modulName.put("allUnresolvedIssue",a4);
-        modulName.put("unresolvedIssuePercent",String.format("%.2f", a4/totalCount*100));
+
         return modulName;
 
 
