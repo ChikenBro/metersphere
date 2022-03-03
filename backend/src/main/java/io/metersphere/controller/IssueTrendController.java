@@ -115,6 +115,9 @@ public class IssueTrendController {
                     try {
                         result = issueTrendStatisticsService.fromProjectUnresolved(hashMap.get("token"),e1.get("Name").toString());
                     } catch (Exception e) {
+            result.put("allIssue",0);
+            result.put("allUnresolvedIssue",0);
+            result.put("unresolvedIssuePercent",0);
                         e.printStackTrace();
                     }
                     newMap.put("data",result);
