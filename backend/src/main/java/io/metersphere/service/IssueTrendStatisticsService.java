@@ -215,7 +215,7 @@ public class IssueTrendStatisticsService extends Thread{
 
         }
         modulName.put("allUnresolvedIssue",a4);
-        modulName.put("unresolvedIssuePercent",String.format("%.2f", a4/totalCount*100))
+        modulName.put("unresolvedIssuePercent",String.format("%.2f", a4/totalCount*100));
         return modulName;
 
 
