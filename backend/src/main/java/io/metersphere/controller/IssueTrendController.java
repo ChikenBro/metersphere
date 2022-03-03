@@ -40,7 +40,7 @@ public class IssueTrendController {
     @GetMapping("/issue/total/projectquality/resolved/list")
     public ResultHolder issueTrendTotal(@RequestParam HashMap<String, String> hashMap) throws HttpProcessException, ExecutionException, InterruptedException, ParseException {
         try {
-            System.out.println(hashMap.get("token"));
+//            System.out.println(hashMap.get("token"));
             JSONObject resultToken = issueTrendStatisticsService.checkToken(hashMap.get("token"));
             System.out.println(resultToken);
             if(resultToken.get("team") == null ){
@@ -81,7 +81,7 @@ public class IssueTrendController {
                 Map<String,Object> modulName = new HashMap<>();
                 JSONObject e1 = JSONObject.parseObject(e.toString());
                 System.out.println(e1);
-                modulName.put("display_name",  e1.get("DisplayName"));
+                modulName.put("displayName",  e1.get("DisplayName"));
                 modulName.put("id", e1.get("Id"));
                 modulName.put("projectName",e1.get("Name").toString());
                 testMap.add( modulName);
