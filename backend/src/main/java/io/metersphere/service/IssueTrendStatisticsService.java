@@ -23,6 +23,8 @@ import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+//import java.text.NumberFormat;
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -204,7 +206,7 @@ public class IssueTrendStatisticsService extends Thread{
         Map<String,Object> testMap2 = new HashMap<>();
         Integer a4 = 0;
         //System.out.println(respResult_AddBug.getJSONObject("Response").getJSONObject("Data"));
-        Integer totalCount = (Integer)respResult_AddBug.getJSONObject("Response").getJSONObject("Data").get("TotalCount");
+        Integer totalCount = (Integer) respResult_AddBug.getJSONObject("Response").getJSONObject("Data").get("TotalCount");
         modulName.put("allIssue",totalCount);
         for (Object e2 : respResult_AddBug.getJSONObject("Response").getJSONObject("Data").getJSONArray("List")) {
             JSONObject e3 = JSONObject.parseObject(e2.toString());
@@ -212,10 +214,20 @@ public class IssueTrendStatisticsService extends Thread{
                 a4 = a4 +1;
 
             }
-                    modulName.put("allUnresolvedIssue",a4);
-        modulName.put("unresolvedIssuePercent",String.format("%.2f", a4/totalCount*100));
+
 
         }
+        modulName.put("allUnresolvedIssue",a4);
+//            NumberFormat numberFormat = NumberFormat.getInstance();
+//
+//            // 设置精确到小数点后2位
+//
+//            numberFormat.setMaximumFractionDigits(2);
+        float totalPrice=(float)a4/(float)totalCount;
+        BigDecimal   b  =   new BigDecimal(totalPrice*100);
+//        System.out.println( );
+//            System.out.println(totalPrice);
+        modulName.put("unresolvedIssuePercent",b.setScale(2,  BigDecimal.ROUND_HALF_UP).floatValue());
 
         return modulName;
 
@@ -707,7 +719,7 @@ public class IssueTrendStatisticsService extends Thread{
 
             currentTimeNow = df.format(nowTimeNow.getTime());
             date = df.parse(currentTimeNow);
-            
+
             start = System.currentTimeMillis( )-24*1000*7*3600-12*1000*3600;
 //            start = df.parse(df.format(getThisWeekMonday(date))).getTime();
 
@@ -787,8 +799,8 @@ public class IssueTrendStatisticsService extends Thread{
                     if (e3.get("IssueStatusId").equals(43257756) ){
                         if(((long)e3.get("CompletedAt") < end+24*3600*1000-600) && ((long)e3.get("CompletedAt") > start-+24*3600*1000)){
 
-                        a3 = a3 +1;
-                    }
+                            a3 = a3 +1;
+                        }
                     }
 
                 }
@@ -798,8 +810,8 @@ public class IssueTrendStatisticsService extends Thread{
                         if(((long)e3.get("CompletedAt") < end+24*3600*1000-600) && ((long)e3.get("CompletedAt") > start-24*3600*1000)){
                             System.out.println(e3);
 
-                        a5 = a5 +1;
-                    }
+                            a5 = a5 +1;
+                        }
                     }
 
                     if (e3.get("IssueStatusId").equals(43257745) || e3.get("IssueStatusId").equals(43257752)|| e3.get("IssueStatusId").equals(43257749)){
