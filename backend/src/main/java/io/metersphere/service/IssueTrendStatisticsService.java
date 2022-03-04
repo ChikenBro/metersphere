@@ -206,7 +206,12 @@ public class IssueTrendStatisticsService extends Thread{
         Map<String,Object> testMap2 = new HashMap<>();
         Integer a4 = 0;
         //System.out.println(respResult_AddBug.getJSONObject("Response").getJSONObject("Data"));
-        Integer totalCount = (Integer) respResult_AddBug.getJSONObject("Response").getJSONObject("Data").get("TotalCount");
+        Integer totalCount = 0;
+        try {
+            totalCount = (Integer) respResult_AddBug.getJSONObject("Response").getJSONObject("Data").get("TotalCount");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         modulName.put("allIssue",totalCount);
         for (Object e2 : respResult_AddBug.getJSONObject("Response").getJSONObject("Data").getJSONArray("List")) {
             JSONObject e3 = JSONObject.parseObject(e2.toString());
@@ -224,7 +229,12 @@ public class IssueTrendStatisticsService extends Thread{
 //
 //            numberFormat.setMaximumFractionDigits(2);
         float totalPrice=(float)a4/(float)totalCount;
-        BigDecimal   b  =   new BigDecimal(totalPrice*100);
+        BigDecimal   b  = null;
+        try {
+            b = new BigDecimal(totalPrice*100);
+        } catch (Exception e) {
+            b = new BigDecimal(0);
+        }
 //        System.out.println( );
 //            System.out.println(totalPrice);
         modulName.put("unresolvedIssuePercent",b.setScale(2,  BigDecimal.ROUND_HALF_UP).floatValue());
