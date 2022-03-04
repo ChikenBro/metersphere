@@ -646,7 +646,7 @@ public class IssueTrendStatisticsService extends Thread{
                 else {
 
                     if (e3.get("IssueStatusId").equals(43257756) ){
-                        if(((long)e3.get("CompletedAt") < end+24*3600*1000-600) && ((long)e3.get("CompletedAt") > start-+24*3600*1000)){
+                        if(((long)e3.get("CompletedAt") < end+24*3600*1000-600) && ((long)e3.get("CompletedAt") > start)){
 
                             a3 = a3 +1;
                         }
@@ -656,7 +656,7 @@ public class IssueTrendStatisticsService extends Thread{
                 if ((long)e3.get("CreatedAt") < end+24*3600*1000-600){
 
                     if (e3.get("IssueStatusId").equals(43257756) ){
-                        if(((long)e3.get("CompletedAt") < end+24*3600*1000-600) && ((long)e3.get("CompletedAt") > start-24*3600*1000)){
+                        if(((long)e3.get("CompletedAt") < end+24*3600*1000-600) && ((long)e3.get("CompletedAt") > start)){
 
                             a5 = a5 +1;
                         }
@@ -807,7 +807,7 @@ public class IssueTrendStatisticsService extends Thread{
                 else {
 
                     if (e3.get("IssueStatusId").equals(43257756) ){
-                        if(((long)e3.get("CompletedAt") < end+24*3600*1000-600) && ((long)e3.get("CompletedAt") > start-+24*3600*1000)){
+                        if(((long)e3.get("CompletedAt") < end+24*3600*1000-600) && ((long)e3.get("CompletedAt") > start)){
 
                             a3 = a3 +1;
                         }
@@ -817,7 +817,7 @@ public class IssueTrendStatisticsService extends Thread{
                 if ((long)e3.get("CreatedAt") < end+24*3600*1000-600){
 
                     if (e3.get("IssueStatusId").equals(43257756) ){
-                        if(((long)e3.get("CompletedAt") < end+24*3600*1000-600) && ((long)e3.get("CompletedAt") > start-24*3600*1000)){
+                        if(((long)e3.get("CompletedAt") < end+24*3600*1000-600) && ((long)e3.get("CompletedAt") > start)){
                             System.out.println(e3);
 
                             a5 = a5 +1;
