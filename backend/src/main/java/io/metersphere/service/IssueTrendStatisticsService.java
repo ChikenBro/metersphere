@@ -191,9 +191,9 @@ public class IssueTrendStatisticsService extends Thread{
     public Map<String, Object> fromProjectUnresolved(String youToken,String projectName){
         Map<String, Object> modulName = new HashMap<>();
 
-        String jsonString1 = String.format("{\"Action\": \"DescribeIssueListWithPage\", \t\"ProjectName\": \"%s\", \t\"IssueType\": \"DEFECT\", \t\"PageNumber\": 1, \t\"PageSize\": 500  }", projectName);
+        String jsonString1 = String.format("{\"Action\": \"DescribeIssueListWithPage\", \t\"ProjectName\": \"%s\", \t\"IssueType\": \"DEFECT\", \t\"PageNumber\": 1, \t\"PageSize\": 20  }", projectName);
 
-        JSONObject respResult_AddBug = this.codingGetProjectIssueList(jsonString1,youToken );
+        JSONObject respResult_AddBug = this.codingGetProjectIssueList(projectName,youToken );
 //        JSONObject respResult_AddBug = this.codingGetProjectIssueList(jsonString1,e1.get("id").toString(),hashMap.get("token") );
         if (respResult_AddBug == null){
             modulName.put("allIssue",0);
@@ -249,9 +249,9 @@ public class IssueTrendStatisticsService extends Thread{
 //        Map<String, Object> modulName = new HashMap<>();
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         ArrayList<Object> testName = new ArrayList<>();
-        String jsonString1 = String.format("{\"Action\": \"DescribeIssueListWithPage\", 	\"ProjectName\": \"%s\", 	\"IssueType\": \"DEFECT\", 	\"PageNumber\": 1, 	\"PageSize\": 500  }",  projectName);
+//        String jsonString1 = String.format("{\"Action\": \"DescribeIssueListWithPage\", 	\"ProjectName\": \"%s\", 	\"IssueType\": \"DEFECT\", 	\"PageNumber\": 1, 	\"PageSize\": 500  }",  projectName);
 
-        JSONObject respResult_AddBug = this.codingGetProjectIssueList(jsonString1,youToken );
+        JSONObject respResult_AddBug = this.codingGetProjectIssueList(projectName,youToken );
 
         if (respResult_AddBug == null){
 //            modulName.add(testMap);
@@ -297,7 +297,7 @@ public class IssueTrendStatisticsService extends Thread{
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         String jsonString1 = String.format("{\"Action\": \"DescribeIssueListWithPage\", 	\"ProjectName\": \"%s\", 	\"IssueType\": \"DEFECT\", 	\"PageNumber\": 1, 	\"PageSize\": 500  }",  projectName);
 
-        JSONObject respResult_AddBug = this.codingGetProjectIssueList(jsonString1,youToken );
+        JSONObject respResult_AddBug = this.codingGetProjectIssueList(projectName,youToken );
 
         if (respResult_AddBug == null){
 //            modulName.add(testMap);
@@ -347,10 +347,10 @@ public class IssueTrendStatisticsService extends Thread{
         ArrayList<Object> testName = new ArrayList<>();
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         String jsonString1 = String.format("{\"Action\": \"DescribeIssueListWithPage\", 	\"ProjectName\": \"%s\", 	\"IssueType\": \"DEFECT\", 	\"PageNumber\": 1, 	\"PageSize\": 500  }",  projectName);
-        System.out.println(jsonString1);
+//        System.out.println(jsonString1);
 //        String jsonString1 = String.format("{\"page\":1,\"pageSize\":10000,\"content\":{\"sort\":{\"key\":\"PRIORITY\",\"value\":\"DESC\"},\"conditions\":[{\"key\":\"STATUS_TYPE\",\"customFieldId\":null,\"value\":[],\"fixed\":true,\"constValue\":[],\"userMap\":{\"COMPLETED\":{\"value\":\"COMPLETED\"},\"PROCESSING\":{\"value\":\"PROCESSING\"},\"TODO\":{\"value\":\"TODO\"}},\"validInfo\":[]},{\"key\":\"KEYWORD\",\"customFieldId\":null,\"value\":null,\"fixed\":true},{\"key\":\"STATUS\",\"customFieldId\":null,\"value\":[43257750],\"fixed\":false,\"userMap\":{\"43257750\":{\"value\":43257750}},\"validInfo\":[]}]}}",  "");
 
-        JSONObject respResult_AddBug = this.codingGetProjectIssueList(jsonString1,youToken );
+        JSONObject respResult_AddBug = this.codingGetProjectIssueList(projectName,youToken );
 
         if (respResult_AddBug == null){
 //            modulName.add(testMap);
@@ -541,8 +541,12 @@ public class IssueTrendStatisticsService extends Thread{
 
         return member;
     }
-
-    private JSONObject codingGetProjectIssueList( String jsonString,String youToken) {
+    @Async
+    public Future<List<JSONObject>> codingGetProjectIssueListAsync( String projectName,String youToken,Integer pageNumber) {
+        Future<List<JSONObject>> returnmsg = null;
+//        List<JSONObject> resultNew = new ArrayList<>();
+        String jsonString = String.format("{\"Action\": \"DescribeIssueListWithPage\", 	\"ProjectName\": \"%s\", 	\"IssueType\": \"DEFECT\", 	\"PageNumber\": %d, 	\"PageSize\": 20  }",  projectName,pageNumber);
+//        System.out.println(jsonString);
         String url = "https://mudu1.coding.net/open-api";
         JSONObject json_test = null;
 
@@ -575,8 +579,105 @@ public class IssueTrendStatisticsService extends Thread{
             result = EntityUtils.toString(entity);
 
             json_test = JSONObject.parseObject(result);
+//            System.out.println(json_test);
+            List<JSONObject> resultNew = (List<JSONObject>) json_test.getJSONObject("Response").getJSONObject("Data").get("List");
+            returnmsg=new AsyncResult(resultNew);
+//            if (PageNumber == 1){
+//                return PageNumber;
+//            }
+//            else {
+            return returnmsg;
+//            }
 
-            return json_test;
+
+        } catch (ClientProtocolException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return returnmsg;
+    }
+
+
+    private JSONObject codingGetProjectIssueList( String projectName,String youToken) {
+        String jsonString = String.format("{\"Action\": \"DescribeIssueListWithPage\", 	\"ProjectName\": \"%s\", 	\"IssueType\": \"DEFECT\", 	\"PageNumber\": 1, 	\"PageSize\": 20  }",  projectName);
+
+        String url = "https://mudu1.coding.net/open-api";
+        JSONObject json_test = null;
+
+
+        CloseableHttpClient httpClient = null;
+        CloseableHttpResponse response = null;
+        String result = "";
+        try {
+            // 通过址默认配置创建一个httpClient实例
+            httpClient = HttpClients.createDefault();
+            // 创建httpGet远程连接实例
+            HttpPost httpPost = new HttpPost(url);
+            // 设置请求头信息，鉴权
+            httpPost.setHeader("Authorization", "token "+youToken);
+            StringEntity se = new StringEntity(jsonString, "UTF-8");
+            se.setContentType("application/json");
+            httpPost.setEntity(se);
+            // 设置配置请求参数
+            RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(35000)// 连接主机服务超时时间
+                    .setConnectionRequestTimeout(35000)// 请求超时时间
+                    .setSocketTimeout(60000)// 数据读取超时时间
+                    .build();
+            // 为httpGet实例设置配置
+            httpPost.setConfig(requestConfig);
+            // 执行get请求得到返回对象
+            response = httpClient.execute(httpPost);
+            // 通过返回对象获取返回数据
+            HttpEntity entity = response.getEntity();
+            // 通过EntityUtils中的toString方法将结果转换为字符串
+            result = EntityUtils.toString(entity);
+
+            json_test = JSONObject.parseObject(result);
+            List<JSONObject> resultNew = new ArrayList<>();
+//            System.out.println(json_test);
+            Integer PageNumber = null;
+            try {
+                PageNumber = (Integer) json_test.getJSONObject("Response").getJSONObject("Data").get("TotalPage");
+                resultNew = (List<JSONObject>) json_test.getJSONObject("Response").getJSONObject("Data").get("List");
+            } catch (Exception e) {
+                return json_test;
+            }
+
+            if (PageNumber == 1){
+                return json_test;
+//                return PageNumber;
+            }
+            else {
+                List<Future<List<JSONObject>>> tmpResult = new ArrayList<>();
+                for (int i = 2; i < PageNumber+1; i++) {
+                    Future<List<JSONObject>> future=this.codingGetProjectIssueListAsync( projectName, youToken,i);
+
+//                ss=future.get();
+                    tmpResult.add( future);
+//                    resultNew.add();
+                }
+                for (Future<List<JSONObject>> s2:tmpResult) {
+                    try {
+
+                        resultNew = Stream.of(s2.get(),resultNew)
+                                .flatMap(Collection::stream).distinct().collect(Collectors.toList());
+//                        System.out.println(resultNew);
+//                        System.out.println(s2.get());
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (ExecutionException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+//                System.out.println(resultNew);
+                JSONObject json_data_test = json_test.getJSONObject("Response").getJSONObject("Data");
+                json_data_test.put("List",resultNew);
+                json_test.put("Data",json_data_test);
+                return json_test;
+            }
+
 
         } catch (ClientProtocolException e) {
             e.printStackTrace();
@@ -600,10 +701,10 @@ public class IssueTrendStatisticsService extends Thread{
         Map<String,String> testMap2 = new HashMap<>();
         JSONObject e1 = JSONObject.parseObject(e.toString());
 //        testMap.put("project",e1.get("display_name").toString());
-        String jsonString1 = String.format("{\"Action\": \"DescribeIssueListWithPage\", 	\"ProjectName\": \"%s\", 	\"IssueType\": \"DEFECT\", 	\"PageNumber\": 1, 	\"PageSize\": 500  }",  e1.get("Name"));
+//        String jsonString1 = String.format("{\"Action\": \"DescribeIssueListWithPage\", 	\"ProjectName\": \"%s\", 	\"IssueType\": \"DEFECT\", 	\"PageNumber\": 1, 	\"PageSize\": 10  }",  e1.get("Name"));
 
 //        System.out.println(jsonString1);
-        JSONObject respResult_AddBug = this.codingGetProjectIssueList(jsonString1,token);
+        JSONObject respResult_AddBug = this.codingGetProjectIssueList((String) e1.get("Name"),token);
         if (respResult_AddBug.getJSONObject("Response").getJSONObject("Data") == null){
             //                JSONObject json_AddBug = JSONObject.parseObject(respResult_AddBug.getResult());
 //                JSONObject json_AddBug = JSONObject.parseObject(respResult_AddBug.getResult());
@@ -646,7 +747,7 @@ public class IssueTrendStatisticsService extends Thread{
                 else {
 
                     if (e3.get("IssueStatusId").equals(43257756) ){
-                        if(((long)e3.get("CompletedAt") < end+24*3600*1000-600) && ((long)e3.get("CompletedAt") > start)){
+                        if(((long)e3.get("CompletedAt") < end+24*3600*1000-600) && ((long)e3.get("CompletedAt") > start-+24*3600*1000)){
 
                             a3 = a3 +1;
                         }
@@ -656,7 +757,7 @@ public class IssueTrendStatisticsService extends Thread{
                 if ((long)e3.get("CreatedAt") < end+24*3600*1000-600){
 
                     if (e3.get("IssueStatusId").equals(43257756) ){
-                        if(((long)e3.get("CompletedAt") < end+24*3600*1000-600) && ((long)e3.get("CompletedAt") > start)){
+                        if(((long)e3.get("CompletedAt") < end+24*3600*1000-600) && ((long)e3.get("CompletedAt") > start-24*3600*1000)){
 
                             a5 = a5 +1;
                         }
@@ -731,18 +832,10 @@ public class IssueTrendStatisticsService extends Thread{
             date = df.parse(currentTimeNow);
 
             start = System.currentTimeMillis( )-24*1000*7*3600-12*1000*3600;
-//            start = df.parse(df.format(getThisWeekMonday(date))).getTime();
-
             if (hashMap.get("endDate") != null){
                 currentTimeNow = hashMap.get("endDate");
-//                Calendar nowTimeNow = Calendar.getInstance();
-
-//                currentTimeNow = df.format(nowTimeNow.getTime());
                 date = df.parse(currentTimeNow);
                 end = date.getTime();
-//                currentTimeNow = hashMap.get("endDate");
-//                date = df.parse(currentTimeNow);
-//                start = df.parse(df.format(getThisWeekMonday(date))).getTime();
             }
             else {
                 Calendar nowTime = Calendar.getInstance();
@@ -753,40 +846,17 @@ public class IssueTrendStatisticsService extends Thread{
 
         }
 
-
-//        JSONObject respResult = this.codingGetProjectAll(hashMap.get("token"));
-
-//        respResult.getResult();
-        //本周新增BUG
-        //        //本周解决本周BUG
-//        String jsonString2 = String.format("{\"page\":1,\"pageSize\":100,\"content\":{\"sort\":{\"key\":\"PRIORITY\",\"value\":\"DESC\"},\"conditions\":[{\"key\":\"CREATED_AT\",\"customFieldId\":null,\"value\":{\"startDate\":\"%s\",\"endDate\":\"%s\"},\"fixed\":false},{\"key\":\"STATUS\",\"customFieldId\":null,\"value\":[43257750,43257751,43257756],\"fixed\":false,\"userMap\":{\"43257750\":{\"value\":43257750},\"43257751\":{\"value\":43257751},\"43257756\":{\"value\":43257756}},\"validInfo\":[]}]}}", currentTime, currentTimeNow);
-//        //本周解决历史BUG
-//        String jsonString3 = String.format("{\"page\":1,\"pageSize\":100,\"content\":{\"sort\":{\"key\":\"PRIORITY\",\"value\":\"DESC\"},\"conditions\":[{\"key\":\"CREATED_AT\",\"customFieldId\":null,\"value\":{\"startDate\":\"%s\",\"endDate\":\"%s\"},\"fixed\":false},{\"key\":\"STATUS\",\"customFieldId\":null,\"value\":[43257750,43257751,43257756],\"fixed\":false,\"userMap\":{\"43257750\":{\"value\":43257750},\"43257751\":{\"value\":43257751},\"43257756\":{\"value\":43257756}},\"validInfo\":[]}]}}", currentTimelastYear, currentTime);
-//        //所有未解决BUG
-//        String jsonString4 = String.format("{\"page\":1,\"pageSize\":100,\"content\":{\"sort\":{\"key\":\"PRIORITY\",\"value\":\"DESC\"},\"conditions\":[{\"key\":\"CREATED_AT\",\"customFieldId\":null,\"value\":{\"startDate\":\"%s\",\"endDate\":\"%s\"},\"fixed\":false},{\"key\":\"STATUS\",\"customFieldId\":null,\"value\":[43257745,43257752,43257749],\"fixed\":false,\"userMap\":{\"43257749\":{\"value\":43257749}},\"validInfo\":[]}]}}", currentTimelastYear, currentTime);
-
-
-
-//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-
-//        //System.out.println(start);
-//        //System.out.println(start-7*24*3600*1000-10*3600*1000);
-//        JSONObject json_test = JSONObject.parseObject(respResult.getResult());
-//        for (Object e:respResult.getJSONArray("Data")) {
         Integer a1 = 0;
         Integer a2 = 0;
         Integer a3 = 0;
         Integer a4 = 0;
         Integer a5 = 0;
         Map<String,Object> testMap = new HashMap<>();
-//            JSONObject e1 = JSONObject.parseObject(e.toString());
 
         if ((hashMap.get("projectName") != null) ){
-//                testMap.put("project",e1.get("display_name").toString());
-            String jsonString1 = String.format("{\"Action\": \"DescribeIssueListWithPage\", 	\"ProjectName\": \"%s\", 	\"IssueType\": \"DEFECT\", 	\"PageNumber\": 1, 	\"PageSize\": 500  }",  hashMap.get("projectName"));
 
 
-            JSONObject respResult_AddBug = this.codingGetProjectIssueList(jsonString1 ,hashMap.get("token") );
+            JSONObject respResult_AddBug = this.codingGetProjectIssueList(hashMap.get("projectName") ,hashMap.get("token") );
             if (respResult_AddBug == null){
                 modulName.add(testMap);
                 return modulName;
@@ -794,8 +864,10 @@ public class IssueTrendStatisticsService extends Thread{
             //System.out.println(end);
             //System.out.println(start);
             Map<String,Object> testMap2 = new HashMap<>();
+//            System.out.println(String.format("respResult_AddBug:%s", respResult_AddBug));
             for (Object e2 : respResult_AddBug.getJSONObject("Response").getJSONObject("Data").getJSONArray("List")) {
                 JSONObject e3 = JSONObject.parseObject(e2.toString());
+//                System.out.println(String.format("%s,%s", e3.get("IssueStatusId"),e3.get("Name")));
                 if (((long)e3.get("CreatedAt") < end+24*3600*1000-600) && ((long)e3.get("CreatedAt") > start)){
                     a1 = a1 +1 ;
 //                        //System.out.println(e3.get("code"));
@@ -808,6 +880,8 @@ public class IssueTrendStatisticsService extends Thread{
 
                     if (e3.get("IssueStatusId").equals(43257756) ){
                         if(((long)e3.get("CompletedAt") < end+24*3600*1000-600) && ((long)e3.get("CompletedAt") > start)){
+//                            System.out.println(start-24*3600*1000);
+//                            System.out.println(end+24*3600*1000-600*1000);
 
                             a3 = a3 +1;
                         }
@@ -818,7 +892,8 @@ public class IssueTrendStatisticsService extends Thread{
 
                     if (e3.get("IssueStatusId").equals(43257756) ){
                         if(((long)e3.get("CompletedAt") < end+24*3600*1000-600) && ((long)e3.get("CompletedAt") > start)){
-                            System.out.println(e3);
+
+//                            System.out.println(e3);
 
                             a5 = a5 +1;
                         }
@@ -856,28 +931,20 @@ public class IssueTrendStatisticsService extends Thread{
 
         }
         else if(hashMap.get("projectName") == null ){
-            Future<Map<String,Object>> future = null;
+            List<Future<Map<String,Object>>> s1 = new ArrayList<>();
 //                long start1 = System.currentTimeMillis( );
             JSONObject respResult = this.codingGetProjectAll(hashMap.get("token"));
             for (Object e:respResult.getJSONObject("Response").getJSONObject("Data").getJSONArray("ProjectList")) {
 //
-                future=this.AsytGetIssueTotal(hashMap.get("token"),e,start,end);
-                modulName.add(future.get());
+                Future<Map<String,Object>>   future=this.AsytGetIssueTotal(hashMap.get("token"),e,start,end);
+                s1.add(future);
             }
-//
-////                //System.out.println(future.get());
-////                Map<String,String> hashMapNew = JSON.parseObject(future.get().replace("=",":"), HashMap.class);
-////                Map<String, String> hashMapNew = this.getStringToMap(future.get());
+            for (Future<Map<String,Object>> s2:s1) {
+                modulName.add(s2.get());
+            }
 
-//                long end1 = System.currentTimeMillis( );
-//                //System.out.println(end1-start1);
-//
-//
+
         }
-
-
-
-//        }
         return modulName;
 
     }
