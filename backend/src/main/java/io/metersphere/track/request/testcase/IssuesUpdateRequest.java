@@ -12,7 +12,10 @@ public class IssuesUpdateRequest extends IssuesWithBLOBs {
     private String content;
     private String testCaseId;
     private String organizationId;
-
+    /**
+     * coding 处理字段
+     */
+    private FieldsRequest fields;
     private List<String> tapdUsers;
     /**
      * zentao bug 处理人
@@ -24,4 +27,13 @@ public class IssuesUpdateRequest extends IssuesWithBLOBs {
      */
     private List<String> zentaoBuilds;
     private List<String> testCaseIds;
+    /**
+     * 缺陷 Code
+     */
+    private Integer IssueCode;
+    /**
+     * 	缺陷状态 Id
+     */
+    private Integer StatusId;
+
 }

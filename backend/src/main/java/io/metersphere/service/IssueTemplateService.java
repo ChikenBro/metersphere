@@ -1,7 +1,6 @@
 package io.metersphere.service;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import io.metersphere.base.domain.*;
 import io.metersphere.base.mapper.IssueTemplateMapper;
@@ -14,6 +13,7 @@ import io.metersphere.commons.utils.ServiceUtils;
 import io.metersphere.commons.utils.SessionUtils;
 import io.metersphere.controller.request.BaseQueryRequest;
 import io.metersphere.controller.request.UpdateIssueTemplateRequest;
+import io.metersphere.dto.CodingCustomFieldListDTO;
 import io.metersphere.dto.CustomFieldDao;
 import io.metersphere.dto.IssueTemplateDao;
 import io.metersphere.i18n.Translator;
@@ -142,7 +142,7 @@ public class IssueTemplateService extends TemplateBaseService {
 
         defaultCustomFieldTemplateList.forEach(f -> {
             if (TemplateConstants.FieldTemplateScene.ISSUE.name().equals(f.getScene())) {
-                CustomField defaultCustomField =  customFieldService.getFieldById(f.getFieldId());
+                CustomField defaultCustomField = customFieldService.getFieldById(f.getFieldId());
                 // 添加自定义字段
                 CustomField customField = new CustomField();
                 customField.setWorkspaceId(request.getWorkspaceId());
@@ -150,31 +150,31 @@ public class IssueTemplateService extends TemplateBaseService {
                 customField.setType(defaultCustomField.getType());
                 if (f.getCustomData().equals("fixVersions")) {
                     // 获取versions
-                   List<JSONObject> fixVersions = jsonObject.getJSONArray("versions")
-                           .stream()
-                           .map(e -> {
-                               JSONObject version = (JSONObject) e;
-                               JSONObject object = new JSONObject();
-                               object.put("text",version.getString("name"));
-                               object.put("value",version.getString("name"));
-                               return object;
-                           }).collect(Collectors.toList());
-                   defaultCustomField.setOptions(JSON.toJSONString(fixVersions));
+                    List<JSONObject> fixVersions = jsonObject.getJSONArray("versions")
+                            .stream()
+                            .map(e -> {
+                                JSONObject version = (JSONObject) e;
+                                JSONObject object = new JSONObject();
+                                object.put("text", version.getString("name"));
+                                object.put("value", version.getString("name"));
+                                return object;
+                            }).collect(Collectors.toList());
+                    defaultCustomField.setOptions(JSON.toJSONString(fixVersions));
                 }
                 if (f.getCustomData().equals("components")) {
                     // 获取components
                     List<JSONObject> components = jsonObject.getJSONArray("components").stream().map(e -> {
-                        JSONObject component = (JSONObject)e;
+                        JSONObject component = (JSONObject) e;
                         JSONObject object = new JSONObject();
-                        object.put("text",component.getString("name"));
-                        object.put("value",component.getString("id"));
+                        object.put("text", component.getString("name"));
+                        object.put("value", component.getString("id"));
                         return object;
                     }).collect(Collectors.toList());
                     defaultCustomField.setOptions(JSON.toJSONString(components));
                 }
                 customField.setOptions(defaultCustomField.getOptions());
                 customField.setScene(TemplateConstants.FieldTemplateScene.ISSUE.name());
-                String newCustomFieldId =  customFieldService.add(customField);
+                String newCustomFieldId = customFieldService.add(customField);
                 // issue模板
                 CustomFieldTemplate customFieldTemplate = new CustomFieldTemplate();
                 customFieldTemplate.setFieldId(newCustomFieldId);
@@ -195,6 +195,7 @@ public class IssueTemplateService extends TemplateBaseService {
      * 获取该工作空间的系统模板
      * - 如果没有，则创建该工作空间模板，并关联默认的字段
      * - 如果有，则更新原来关联的 fieldId
+     *
      * @param customField
      */
     public void handleSystemFieldCreate(CustomField customField) {
@@ -262,7 +263,7 @@ public class IssueTemplateService extends TemplateBaseService {
         Iterator<IssueTemplate> iterator = issueTemplates.iterator();
         while (iterator.hasNext()) {
             IssueTemplate next = iterator.next();
-            for (IssueTemplate item: issueTemplates) {
+            for (IssueTemplate item : issueTemplates) {
                 if (next.getGlobal() && !item.getGlobal() && StringUtils.equals(item.getName(), next.getName())) {
                     // 如果有工作空间的模板则过滤掉全局模板
                     iterator.remove();
@@ -299,7 +300,7 @@ public class IssueTemplateService extends TemplateBaseService {
         return issueTemplates;
     }
 
-    public IssueTemplateDao getTemplate(String projectId) {
+    public IssueTemplate getIssueTemplateParam(String projectId) {
         Project project = projectService.getProjectById(projectId);
         String issueTemplateId = project.getIssueTemplateId();
         IssueTemplate issueTemplate = null;
@@ -312,9 +313,31 @@ public class IssueTemplateService extends TemplateBaseService {
         } else {
             issueTemplate = getDefaultTemplate(project.getWorkspaceId());
         }
+        return issueTemplate;
+    }
+
+    public IssueTemplateDao getTemplate(String projectId) {
+        IssueTemplateDao issueTemplateDao = new IssueTemplateDao();
+        IssueTemplate issueTemplate = getIssueTemplateParam(projectId);
         BeanUtils.copyBean(issueTemplateDao, issueTemplate);
+
         List<CustomFieldDao> result = customFieldService.getCustomFieldByTemplateId(issueTemplate.getId());
         issueTemplateDao.setCustomFields(result);
+        return issueTemplateDao;
+    }
+
+    /**
+     * 获取coding issue template
+     *
+     * @param projectId
+     * @return
+     */
+    public IssueTemplateDao getCodingIssueTemplate(String projectId) {
+        IssueTemplateDao issueTemplateDao = new IssueTemplateDao();
+        IssueTemplate issueTemplate = getIssueTemplateParam(projectId);
+        BeanUtils.copyBean(issueTemplateDao, issueTemplate);
+        CodingCustomFieldListDTO result = customFieldService.getCodingCustomFieldByTemplateId(projectId);
+        issueTemplateDao.setCustomFieldListList(result.getItems());
         return issueTemplateDao;
     }
 

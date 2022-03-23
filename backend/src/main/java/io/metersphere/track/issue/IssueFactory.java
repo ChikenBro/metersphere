@@ -19,6 +19,8 @@ public class IssueFactory {
             return new ZentaoPlatform(addIssueRequest);
         } else if (StringUtils.equalsIgnoreCase(IssuesManagePlatform.Local.toString(), platform)) {
             return new LocalPlatform(addIssueRequest);
+        } else if (StringUtils.equalsIgnoreCase(IssuesManagePlatform.Coding.toString(), platform)) {
+            return new CodingPaltform(addIssueRequest);
         }
         return null;
     }

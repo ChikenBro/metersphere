@@ -20,7 +20,7 @@ import java.util.Arrays;
 
 public abstract class BaseClient {
 
-    protected  RestTemplate restTemplate;
+    public   RestTemplate restTemplate;
 
      {
         try {
