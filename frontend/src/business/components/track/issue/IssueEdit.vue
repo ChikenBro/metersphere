@@ -10,7 +10,8 @@
     ref="drawer"
     >
     <template v-slot:default="scope">
-      <template-component-edit-header :show-edit="false" :template="{}" prop="title" @cancel="handleClose" @save="save"/>
+      <template-component-edit-header :show-edit="false" :template="{}" prop="title" @cancel="handleClose" @create="save"  @createNext="handleCreateNext"
+      :title="$t('test_track.issue.create_issue')"/>
       <issue-edit-detail @refresh="$emit('refresh')" @close="handleClose" ref="issueEditDetail"/>
     </template>
   </el-drawer>
@@ -40,6 +41,11 @@ export default {
     },
     save() {
       this.$refs.issueEditDetail.save();
+    },
+    // 保存并清空
+    handleCreateNext() {
+      this.$refs.issueEditDetail.save('reCreate');
+      this.open()
     }
   }
 };

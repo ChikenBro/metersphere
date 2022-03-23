@@ -7,10 +7,14 @@
         <span v-if="template[prop]" class="title">{{template[prop]}}</span>
         <span class="name-tip" v-else>{{$t('test_track.plan_view.input_template_name')}}</span>
       </div>
+      <div v-else-if="title">
+        <span>&emsp;&emsp;{{title}}</span>
+      </div>
     </el-col>
     <el-col :span="12" class="head-right">
-      <el-button plain size="mini" @click="handleCancel">{{$t('test_track.return')}}</el-button>
-      <el-button type="primary" size="mini" @click="handleSave">{{$t('test_track.save')}}</el-button>
+      <el-button plain size="mini" @click="handleCancel">{{$t('test_track.cancel')}}</el-button>
+      <el-button type="primary" size="mini" @click="handleCreate">{{$t('test_track.create')}}</el-button>
+      <el-button type="primary" size="mini" @click="handleCreateNext">{{$t('test_track.create_next')}}</el-button>
     </el-col>
 
   </el-row>
@@ -44,6 +48,12 @@
             return true;
           }
         },
+        title: {
+          type: String,
+          default() {
+            return '';
+          }          
+        }
       },
       methods: {
         handleCancel() {
@@ -51,6 +61,12 @@
         },
         handleSave() {
           this.$emit('save');
+        },
+        handleCreate() {
+          this.$emit('create');
+        },
+        handleCreateNext() {
+          this.$emit('createNext');
         }
       }
     }

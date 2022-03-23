@@ -212,7 +212,7 @@ export default {
       this.isFormAlive = false;
       this.$nextTick(() => (this.isFormAlive = true));
     },
-    save() {
+    save(type) {
       let isValidate = true;
       this.$refs['form'].validate((valid) => {
         if (!valid) {
@@ -227,7 +227,7 @@ export default {
         }
       });
       if (isValidate) {
-        this._save();
+        this._save(type);
       }
     },
     buildPram() {
@@ -246,11 +246,11 @@ export default {
       }
       return param;
     },
-    _save() {
+    _save(type) {
       let param = this.buildPram();
       this.parseOldFields(param);
       this.result = this.$post(this.url, param, () => {
-        this.$emit('close');
+        if(type !== 'reCreate') this.$emit('close');
         this.$success(this.$t('commons.save_success'));
         this.$emit('refresh');
       });

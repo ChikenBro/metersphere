@@ -1349,6 +1349,8 @@ export default {
     planning_execution: "规划&执行",
     confirm: "确 定",
     cancel: "取 消",
+    create: "创 建",
+    create_next: "创建下一个",
     project: "项目",
     save: "保 存",
     return: "返 回",

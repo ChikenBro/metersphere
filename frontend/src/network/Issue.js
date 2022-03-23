@@ -65,7 +65,7 @@ export function getRelateIssues(page) {
 }
 
 export function syncIssues(success) {
-  return get('issues/sync/' + getCurrentProjectID(), (response) => {
+  return get('/trend/issue/sync/coding?projectId=' + getCurrentProjectID(), (response) => {
     if (success) {
       success(response);
     }
