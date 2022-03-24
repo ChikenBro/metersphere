@@ -4,16 +4,14 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import io.metersphere.base.domain.IssueTemplate;
 import io.metersphere.commons.constants.OperLogConstants;
-import io.metersphere.commons.constants.RoleConstants;
 import io.metersphere.commons.utils.PageUtils;
 import io.metersphere.commons.utils.Pager;
 import io.metersphere.controller.request.BaseQueryRequest;
 import io.metersphere.controller.request.UpdateIssueTemplateRequest;
-import io.metersphere.dto.IssueTemplateDao;
+import io.metersphere.dto.CodingCustomFieldListRequest;
+import io.metersphere.dto.CustomFieldList;
 import io.metersphere.log.annotation.MsAuditLog;
 import io.metersphere.service.IssueTemplateService;
-import org.apache.shiro.authz.annotation.Logical;
-import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -55,8 +53,13 @@ public class IssueTemplateController {
         return issueTemplateService.getOption(workspaceId);
     }
 
-    @GetMapping("/get/relate/{projectId}")
-    public IssueTemplateDao getTemplate(@PathVariable String projectId) {
-        return issueTemplateService.getCodingIssueTemplate(projectId);
+//    @GetMapping("/get/relate/{projectId}")
+//    public IssueTemplateDao getTemplate(@PathVariable String projectId) {
+//        return issueTemplateService.getCodingIssueTemplate(projectId);
+//    }
+
+    @PostMapping("/templates/list/{goPage}/{pageSize}")
+    public CustomFieldList getIssueTemplate(@PathVariable Integer goPage, @PathVariable Integer pageSize, @RequestBody CodingCustomFieldListRequest codingCustomFieldListRequest) {
+        return issueTemplateService.getCodingIssueTemplate(goPage, pageSize, codingCustomFieldListRequest);
     }
 }

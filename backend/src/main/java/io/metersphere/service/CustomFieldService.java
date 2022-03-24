@@ -13,9 +13,7 @@ import io.metersphere.commons.exception.CodingException;
 import io.metersphere.commons.exception.MSException;
 import io.metersphere.commons.utils.*;
 import io.metersphere.controller.request.QueryCustomFieldRequest;
-import io.metersphere.dto.CodingCustomFieldListDTO;
-import io.metersphere.dto.CustomFieldDao;
-import io.metersphere.dto.IssueTemplateDao;
+import io.metersphere.dto.*;
 import io.metersphere.i18n.Translator;
 import io.metersphere.log.utils.ReflexObjectUtil;
 import io.metersphere.log.vo.DetailColumn;
@@ -146,17 +144,17 @@ public class CustomFieldService {
 
     /**
      * coding customField
-     *
-     * @param projectId
+     * @param goPage 当前页数
+     * @param pageSize 1页多少数量
+     * @param customFieldListRequest
      * @return
      */
-    public CodingCustomFieldListDTO getCodingCustomFieldByTemplateId(String projectId) {
+    public CustomFieldList getCodingCustomFieldByTemplateId(Integer goPage, Integer pageSize, CodingCustomFieldListRequest customFieldListRequest) {
 
-        String url = String.format("http://10.20.11.185:8088/field/template/issue/get/relate/%s", projectId);
-        LogUtil.info("add issue: " + projectId);
-        String result = CodingException.checkCodingException(url, projectId);
-        CodingCustomFieldListDTO jsonObject = JSON.parseObject(result, CodingCustomFieldListDTO.class);
-        return jsonObject;
+        String url = String.format("http://10.20.11.185:8088/field/template/issue//requirement/list/%s/%s", goPage, pageSize);
+        LogUtil.info("get coding customField: " + customFieldListRequest);
+        String result = CodingException.checkCodingException(url, customFieldListRequest);
+        return JSON.parseObject(result, CustomFieldList.class);
     }
 
     public List<CustomField> getFieldByIds(List<String> ids) {

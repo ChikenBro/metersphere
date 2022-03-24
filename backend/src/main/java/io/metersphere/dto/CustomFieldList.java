@@ -6,7 +6,7 @@ import java.util.List;
 
 @Data
 public class CustomFieldList {
-    private String type;
+    private Integer type;
+    private String name;
     private List<Options> options;
-
 }
