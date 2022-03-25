@@ -10,8 +10,8 @@
     ref="drawer"
     >
     <template v-slot:default="scope">
-      <template-component-edit-header :show-edit="false" :template="{}" prop="title" @cancel="handleClose" @create="save"  @createNext="handleCreateNext"
-      :title="$t('test_track.issue.create_issue')"/>
+      <template-component-edit-header :show-edit="false" :template="{}" prop="title" :showCreateNext="showCreateNext" @cancel="handleClose" @save="save"  @createNext="handleCreateNext" 
+      :title="$t('test_track.issue.create_issue')" :isSaveTitle="isSaveTitle"/>
       <issue-edit-detail @refresh="$emit('refresh')" @close="handleClose" ref="issueEditDetail"/>
     </template>
   </el-drawer>
@@ -26,12 +26,16 @@ export default {
   components: {IssueEditDetail, TemplateComponentEditHeader},
   data() {
     return {
-      visible: false
+      visible: false,
+      showCreateNext: true,
+      isSaveTitle: false,
     }
   },
   methods: {
     open(data) {
       this.visible = true;
+      this.showCreateNext = data === undefined
+      this.isSaveTitle = data !== undefined
       this.$nextTick(() => {
         this.$refs.issueEditDetail.open(data);
       })

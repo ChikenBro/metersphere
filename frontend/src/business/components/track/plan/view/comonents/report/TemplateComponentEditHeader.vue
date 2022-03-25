@@ -13,8 +13,8 @@
     </el-col>
     <el-col :span="12" class="head-right">
       <el-button plain size="mini" @click="handleCancel">{{$t('test_track.cancel')}}</el-button>
-      <el-button type="primary" size="mini" @click="handleCreate">{{$t('test_track.create')}}</el-button>
-      <el-button type="primary" size="mini" @click="handleCreateNext">{{$t('test_track.create_next')}}</el-button>
+      <el-button type="primary" size="mini" @click="handleSave">{{$t(isSaveTitle ? 'test_track.save' : 'test_track.create')}}</el-button>
+      <el-button type="primary" size="mini" @click="handleCreateNext" v-if="showCreateNext">{{$t('test_track.create_next')}}</el-button>
     </el-col>
 
   </el-row>
@@ -53,6 +53,18 @@
           default() {
             return '';
           }          
+        },
+        showCreateNext: {
+          type: Boolean,
+          default() {
+            return false;
+          }
+        },
+        isSaveTitle: {
+          type: Boolean,
+          default() {
+            return false;
+          }
         }
       },
       methods: {
@@ -61,9 +73,6 @@
         },
         handleSave() {
           this.$emit('save');
-        },
-        handleCreate() {
-          this.$emit('create');
         },
         handleCreateNext() {
           this.$emit('createNext');

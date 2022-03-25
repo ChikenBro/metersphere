@@ -1,7 +1,7 @@
 <template>
-  <el-form-item :disable="true" :label="title" :prop="prop" :label-width="labelWidth">
-    <mavon-editor v-if="active" :editable="!disabled" @imgAdd="imgAdd" :default-open="disabled ? 'preview' : null" class="mavon-editor"
-                  :subfield="disabled ? false : true" :toolbars="toolbars" :toolbarsFlag="disabled ? false : true" @imgDel="imgDel" v-model="data[prop]"  ref="md"/>
+  <el-form-item :disable="true" :label="title" :prop="prefix ? prefix + prop : prop" :label-width="labelWidth">
+    <mavon-editor v-if="active" :editable="!disabled" @imgAdd="imgAdd" :default-open="disabled ? 'preview' : 'edit' " class="mavon-editor"
+                  :subfield="disabled ? true : false" :toolbars="toolbars" :toolbarsFlag="disabled ? false : true" @imgDel="imgDel" v-model="data[prop]"  ref="md"/>
   </el-form-item>
 </template>
 
@@ -10,7 +10,7 @@ import {getUUID} from "@/common/js/utils";
 export default {
   name: "FormRichTextItem",
   components: {},
-  props: ['data', 'title', 'prop', 'disabled', 'labelWidth'],
+  props: ['data', 'title', 'prop', 'disabled', 'labelWidth', 'prefix'],
   data() {
     return {
       toolbars: {
@@ -52,6 +52,9 @@ export default {
   },
   computed: {
     active() {
+      if(this.prop.indexOf('.') !== -1 && this.data[this.prop.split('.')[this.prop.split('.').lenght-1]] !== undefined) {
+        return true
+      }
       if (this.data[this.prop] !== undefined) {
         return true;
       }

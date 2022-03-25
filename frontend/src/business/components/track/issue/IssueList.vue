@@ -148,7 +148,27 @@
 
         </span>
         </ms-table>
-
+        
+        <!-- 删除确认框 -->
+        <ms-edit-dialog
+          :visible.sync="dialogVisible"
+          width="40%"
+          :title="$t('test_track.issue.delete')"
+          :with-footer="true"
+          :close-on-click-modal="true"
+          @confirm="handleDeLeteConfirm"
+          >
+          <el-form>
+            <el-row>
+              <el-col :span="24">
+                <el-form-item :label="`请输入删除缺陷的原因, 缺陷ID: ${deleteIssueInfo.ids[0]}`">
+                  <el-input size="small" v-model="deleteIssueInfo.remark" placeholder="请输入删除原因"/>
+                </el-form-item>
+              </el-col>
+            </el-row>
+          </el-form>
+        </ms-edit-dialog>
+        
         <ms-table-pagination :change="getIssues" :current-page.sync="page.currentPage" :page-size.sync="page.pageSize"
                              :total="page.total"/>
 
@@ -165,6 +185,7 @@ import MsTableColumn from "@/business/components/common/components/table/MsTable
 import MsTableOperators from "@/business/components/common/components/MsTableOperators";
 import MsTableButton from "@/business/components/common/components/MsTableButton";
 import MsTablePagination from "@/business/components/common/pagination/TablePagination";
+import MsEditDialog from "@/business/components/common/components/MsEditDialog";
 import {
   CUSTOM_FIELD_SCENE_OPTION,
   CUSTOM_FIELD_TYPE_OPTION,
@@ -195,7 +216,8 @@ export default {
     IssueEdit,
     IssueDescriptionTableItem,
     MsTableHeader,
-    MsTablePagination, MsTableButton, MsTableOperators, MsTableColumn, MsTable
+    MsTablePagination, MsTableButton, MsTableOperators, MsTableColumn, MsTable,
+    MsEditDialog
   },
   data() {
     return {
@@ -224,7 +246,13 @@ export default {
       ],
       issueTemplate: {},
       members: [],
-      isThirdPart: false
+      isThirdPart: false,
+      dialogVisible: false,
+      deleteIssueInfo: {
+        ids: [],
+        projectId: '',
+        remark:''
+      },
     };
   },
   activated() {
@@ -299,12 +327,12 @@ export default {
       copyData.id = null;
       copyData.name = data.name + '_copy';
       this.$refs.issueEdit.open(copyData);
-    },
+    },   
+    // 显示删除确认框
     handleDelete(data) {
-      this.page.result = this.$get('issues/delete/' + data.id, () => {
-        this.$success(this.$t('commons.delete_success'));
-        this.getIssues();
-      });
+      this.deleteIssueInfo.ids = [data.id]
+      this.deleteIssueInfo.projectId = data.projectId
+      this.openDialog()
     },
     btnDisable(row) {
       if (row.platform === 'Local') {
@@ -331,6 +359,20 @@ export default {
         }
       }
       return returnObj;
+    },
+    // 打开缺陷删除对话框
+    openDialog() {
+      this.dialogVisible = true;
+      this.deleteIssueInfo.remark = ''
+    },
+    // 确认提交
+    handleDeLeteConfirm() {
+      this.page.result = this.$post('issue/delete/', this.deleteIssueInfo, () => {
+        this.$success(this.$t('commons.delete_success'));
+        this.getIssues();
+      });
+      this.dialogVisible = false;
+      this.deleteIssueInfo.remark = ''
     }
   }
 };
