@@ -36,9 +36,10 @@ export default {
   methods: {
     open(data) {
       this.visible = true;
-      this.isCreateTitle = this.showCreateNext = data === undefined
+      this.showCreateNext = data === undefined
+      this.isCreateTitle = data === undefined || data?.isCreateTitle
       this.title = data?.drawerTitle || this.$t('test_track.issue.create_issue')
-      this.isDisabled = !!(data?.isCopy)
+      this.isDisabled = !!(data?.isOnlyRead)
       this.$nextTick(() => {
         this.$refs.issueEditDetail.open(data);
       })

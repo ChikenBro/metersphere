@@ -33,7 +33,7 @@
           :custom-fields="issueTemplate.customFields"
           ref="table"
         >
-    <span v-for="(item) in fields" :key="item.key">
+        <span v-for="(item) in fields" :key="item.key">
 <!--          <ms-table-column
            :label="$t('test_track.issue.id')"
            prop="id"
@@ -380,11 +380,10 @@ export default {
       let copyData = {};
       Object.assign(copyData, data);
       copyData.id = null;
-      copyData.name = data.name + '_copy';
-      copyData.isCopy = true
+      copyData.isCreateTitle = true
       copyData.drawerTitle = '复制缺陷'
       this.$refs.issueEdit.open(copyData);
-    },   
+    },    
     // 显示删除确认框
     handleDelete(data) {
       this.deleteIssueInfo.num = data.num
