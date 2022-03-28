@@ -152,7 +152,7 @@
         <!-- 删除确认框 -->
         <ms-edit-dialog
           :visible.sync="dialogVisible"
-          width="40%"
+          width="30%"
           :title="$t('test_track.issue.delete')"
           :with-footer="true"
           :close-on-click-modal="true"
@@ -161,7 +161,7 @@
           <el-form>
             <el-row>
               <el-col :span="24">
-                <el-form-item :label="`请输入删除缺陷的原因, 缺陷ID: ${deleteIssueInfo.ids[0]}`">
+                <el-form-item :label="`请输入删除缺陷的原因, 缺陷ID: ${deleteIssueInfo.num}`">
                   <el-input size="small" v-model="deleteIssueInfo.remark" placeholder="请输入删除原因"/>
                 </el-form-item>
               </el-col>
@@ -251,7 +251,8 @@ export default {
       deleteIssueInfo: {
         ids: [],
         projectId: '',
-        remark:''
+        remark:'',
+        num: '',
       },
     };
   },
@@ -316,20 +317,77 @@ export default {
       this.page.result = getIssues(this.page);
     },
     handleEdit(data) {
+      // 传了row(data)和index 只用到了data
+      data = {
+          "title": "默认",
+          "descriptions": {
+              "preconditions": "缺陷内容",
+              "operatingSteps": "操作步骤",
+              "expectedResult": "预期结果",
+              "actualResult": "实际结果"
+          },
+          "creator": "0852",
+          "fields": {
+              "defectTypeId": 30801759,
+              "priority": 1,
+              "workingHours": "12",
+              "iterationCode": 91,
+              "assigneeName": "0852",
+              "requirementCode": 190,
+              "moduleId": "",
+              "startDate": "2022-02-28T16:00:00.000Z",
+              "dueDate": "2022-03-01T16:00:00.000Z"
+          },
+          "environment": "dev",
+          "repetitionFrequency": "must",
+          "projectId": "648d74c1-4973-4d1c-8c22-a68a0357d6c4",
+          "organizationId": "d1ab2464-0a3d-11ec-b53d-0c42a1eda428",
+          "testCaseIds": []
+      }
+      data.drawerTitle = '编辑缺陷'
       this.$refs.issueEdit.open(data);
     },
     handleCreate() {
       this.$refs.issueEdit.open();
     },
     handleCopy(data) {
+      data = {
+          "title": "默认",
+          "descriptions": {
+              "preconditions": "缺陷内容",
+              "operatingSteps": "操作步骤",
+              "expectedResult": "预期结果",
+              "actualResult": "实际结果"
+          },
+          "creator": "0852",
+          "fields": {
+              "defectTypeId": 30801759,
+              "priority": 1,
+              "workingHours": "12",
+              "iterationCode": 91,
+              "assigneeName": "0852",
+              "requirementCode": 190,
+              "moduleId": "",
+              "startDate": "2022-02-28T16:00:00.000Z",
+              "dueDate": "2022-03-01T16:00:00.000Z"
+          },
+          "environment": "dev",
+          "repetitionFrequency": "must",
+          "projectId": "648d74c1-4973-4d1c-8c22-a68a0357d6c4",
+          "organizationId": "d1ab2464-0a3d-11ec-b53d-0c42a1eda428",
+          "testCaseIds": []
+      }      
       let copyData = {};
       Object.assign(copyData, data);
       copyData.id = null;
       copyData.name = data.name + '_copy';
+      copyData.isCopy = true
+      copyData.drawerTitle = '复制缺陷'
       this.$refs.issueEdit.open(copyData);
     },   
     // 显示删除确认框
     handleDelete(data) {
+      this.deleteIssueInfo.num = data.num
       this.deleteIssueInfo.ids = [data.id]
       this.deleteIssueInfo.projectId = data.projectId
       this.openDialog()

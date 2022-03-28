@@ -1,7 +1,7 @@
 <template>
   <el-main v-loading="result.loading" class="container" :style="isPlan ? '' : 'height: calc(100vh - 62px)'">
     <el-scrollbar style="paddingTop: 20px">
-      <el-form :model="form" :rules="rules" label-position="right" label-width="80px" ref="form">
+      <el-form :model="form" :rules="rules" label-position="right" label-width="80px" ref="form" :disabled="isDisabled">
         <el-row class="custom-field-row">
           <el-col :span="14">
             <el-form-item :label="$t('commons.title')" prop="title">
@@ -162,10 +162,10 @@
           </el-row>
         </el-form> -->
 
-        <form-rich-text-item :title="$t('custom_field.issue_content')" :data="form.descriptions" prop="preconditions" key="preconditions" prefix="descriptions."/>
-        <form-rich-text-item title="操作步骤" :data="form.descriptions" prop="operatingSteps" key="operatingSteps" prefix="descriptions."/>
-        <form-rich-text-item title="预期结果" :data="form.descriptions" prop="expectedResult" key="expectedResult" prefix="descriptions."/>
-        <form-rich-text-item title="实际结果" :data="form.descriptions" prop="actualResult" key="actualResult" prefix="descriptions."/>
+        <form-rich-text-item :title="$t('custom_field.issue_content')" :data="form.descriptions" prop="preconditions" key="preconditions" prefix="descriptions." :disabled="isDisabled"/>
+        <form-rich-text-item title="操作步骤" :data="form.descriptions" prop="operatingSteps" key="operatingSteps" prefix="descriptions." :disabled="isDisabled"/>
+        <form-rich-text-item title="预期结果" :data="form.descriptions" prop="expectedResult" key="expectedResult" prefix="descriptions." :disabled="isDisabled"/>
+        <form-rich-text-item title="实际结果" :data="form.descriptions" prop="actualResult" key="actualResult" prefix="descriptions." :disabled="isDisabled"/>
 
         <el-row class="custom-field-row">
           <el-col :span="8" v-if="hasTapdId">
@@ -337,6 +337,12 @@ export default {
         return false;
       }
     },
+    isDisabled: {
+      type: Boolean,
+      default() {
+        return false;
+      }
+    },
     caseId: String,
     planId: String
   },
@@ -353,8 +359,8 @@ export default {
   },
   methods: {
     open(data) {
-      this.initEdit(data);
       this.initList();
+      this.initEdit(data);
       this.getThirdPartyInfo();
 
       // getIssueTemplate()
@@ -451,6 +457,10 @@ export default {
     },
     getList(type, name = '') {
       let url = '/field/template/issue/templates/list/{goPage}/{pageSize}'
+      // // mock数据
+      // this.defectList = [{"id":30801759,"name":"功能缺陷","statusName":null,"statusType":null},{"id":30801760,"name":"UI 界面问题","statusName":null,"statusType":null},{"id":30801761,"name":"易用性问题","statusName":null,"statusType":null},{"id":30801762,"name":"安全问题","statusName":null,"statusType":null},{"id":30801763,"name":"性能问题","statusName":null,"statusType":null}].map(item => ({label: item.name, value: item.id}));
+      // this.requirementList = [{"id":190,"name":"需求-测试中-子需求2","statusName":"未开始","statusType":"TODO"},{"id":189,"name":"需求-测试中-子需求1","statusName":"未开始","statusType":"TODO"},{"id":181,"name":"需求-测试中","statusName":"测试中","statusType":"PROCESSING"},{"id":180,"name":"需求-开发中","statusName":"开发中","statusType":"PROCESSING"},{"id":179,"name":"需求-未开始","statusName":"未开始","statusType":"TODO"},{"id":3,"name":"需求-已完成","statusName":"已完成","statusType":"COMPLETED"}].map(item => ({label: item.name, value: item.id}));
+      // this.iterationList = [{"id":91,"name":"迭代-进行中","statusName":"PROCESSING","statusType":null},{"id":2,"name":"迭代-已完成","statusName":"COMPLETED","statusType":null},{"id":1,"name":"迭代-未开始","statusName":"WAIT_PROCESS","statusType":null}].map(item => ({label: item.name, value: item.id}));
       this.$post(url, {projectId: this.projectId, type, name}, res => {
         let {data: {options}} = res
         switch(type) {

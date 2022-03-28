@@ -13,7 +13,7 @@
     </el-col>
     <el-col :span="12" class="head-right">
       <el-button plain size="mini" @click="handleCancel">{{$t('test_track.cancel')}}</el-button>
-      <el-button type="primary" size="mini" @click="handleSave">{{$t(isSaveTitle ? 'test_track.save' : 'test_track.create')}}</el-button>
+      <el-button type="primary" size="mini" v-if="!isDisabled" @click="handleSave">{{$t(isCreateTitle ? 'test_track.create' : 'test_track.save')}}</el-button>
       <el-button type="primary" size="mini" @click="handleCreateNext" v-if="showCreateNext">{{$t('test_track.create_next')}}</el-button>
     </el-col>
 
@@ -60,7 +60,13 @@
             return false;
           }
         },
-        isSaveTitle: {
+        isCreateTitle: {
+          type: Boolean,
+          default() {
+            return false;
+          }
+        },
+        isDisabled: {
           type: Boolean,
           default() {
             return false;
