@@ -40,6 +40,7 @@
               prop="num"
               :field="item"
               sortable
+              min-width="130px"
               :fields-width="fieldsWidth">
               <template v-slot="scope">
                 <el-link :href="linkBaseUrl + scope.row.id" type="primary" target="_blank" >
@@ -88,7 +89,6 @@
               :field="item"
               :fields-width="fieldsWidth"
               :filters="getFilterOptions('assigneeName')" 
-              column-key="assigneeName "
               sortable
               min-width="130px"
               :label="$t('test_track.issue.handler')"
@@ -139,7 +139,6 @@
               :field="item"
               :fields-width="fieldsWidth"
               min-width="140px"
-              column-key="defectTypeName"
               :filters="getFilterOptions('defectTypeName')" 
               :label="$t('test_track.issue.defect_type')"
               prop="defectTypeName">
@@ -148,7 +147,6 @@
             <ms-table-column
               :field="item"
               :fields-width="fieldsWidth"
-              column-key="creator"
               sortable
               min-width="130px"
               :label="$t('test_track.issue.priority')"
@@ -162,7 +160,6 @@
             <ms-table-column
               :field="item"
               :fields-width="fieldsWidth"
-              column-key="creator"
               :label="$t('test_track.issue.working_hours')"
               prop="workingHours">
                <template v-slot:default="scope">
@@ -190,7 +187,6 @@
             <ms-table-column
               :field="item"
               :fields-width="fieldsWidth"
-              column-key="watcherName"
               :label="$t('test_track.issue.followers')"
               prop="watcherName">
             </ms-table-column>
@@ -431,11 +427,15 @@ export default {
       if(orderArr){
         this.page.condition.orders = orderArr;
       }
+      console.log(this.page);
       this.page.result = getIssues(this.page);
     },
     handleEdit(data) {
       // 传了row(data)和index 只用到了data
+      console.log(data);
       data = {
+          "id": data.id,
+          "issueId": data.num,
           "title": "默认",
           "descriptions": {
               "preconditions": "缺陷内容",
@@ -462,6 +462,7 @@ export default {
           "testCaseIds": []
       }
       data.drawerTitle = '编辑缺陷'
+      data.isEdit = true
       this.$refs.issueEdit.open(data);
     },
     handleCreate() {

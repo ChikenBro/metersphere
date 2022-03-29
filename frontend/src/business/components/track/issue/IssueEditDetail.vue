@@ -7,11 +7,23 @@
             <el-form-item :label="$t('commons.title')" prop="title">
               <el-input v-model="form.title" autocomplete="off"></el-input>
             </el-form-item>
-          </el-col>         
+          </el-col>   
+          <el-col :span="6" v-if="isEdit" :push="2">
+            <el-form-item :label="$t('test_track.issue.status')" prop="fields.statusId" :label-width="formLabelWidth">
+               <el-select v-model="form.fields.statusId" :placeholder="$t('commons.default')">
+                  <el-option
+                    v-for="(item,index) in statusList"
+                    :key="index"
+                    :label="item.label"
+                    :value="item.value">
+                  </el-option>
+                </el-select>
+            </el-form-item>
+        </el-col>      
         </el-row>
         <el-row class="custom-field-row">
           <el-col :span="8">
-            <el-form-item label="缺陷类型" prop="fields.defectTypeId" :label-width="formLabelWidth">
+            <el-form-item :label="$t('test_track.issue.defect_type')" prop="fields.defectTypeId" :label-width="formLabelWidth">
                <el-select v-model="form.fields.defectTypeId" placeholder="缺陷类型" remote filterable :remote-method="query => getList(1, query)">
                   <el-option
                     v-for="(item,index) in defectList"
@@ -24,7 +36,7 @@
           </el-col>
 
           <el-col :span="8">
-            <el-form-item label="优先级" prop="fields.priority" :label-width="formLabelWidth">
+            <el-form-item :label="$t('test_track.issue.priority')" prop="fields.priority" :label-width="formLabelWidth">
                <el-select v-model="form.fields.priority" :placeholder="$t('commons.default')">
                   <el-option
                     v-for="(item,index) in priorityList"
@@ -37,7 +49,7 @@
           </el-col>
 
           <el-col :span="8">
-            <el-form-item label="关联需求" prop="fields.requirementCode" :label-width="formLabelWidth">
+            <el-form-item :label="$t('test_track.issue.related_requirements')"  prop="fields.requirementCode" :label-width="formLabelWidth">
                <el-select v-model="form.fields.requirementCode" placeholder="未关联需求" remote filterable :remote-method="query => getList(2, query)">
                   <el-option
                     v-for="(item,index) in requirementList"
@@ -50,7 +62,7 @@
           </el-col>
         
           <el-col :span="8">
-            <el-form-item label="所属迭代" prop="fields.iterationCode" :label-width="formLabelWidth">
+            <el-form-item :label="$t('test_track.issue.iteration')" prop="fields.iterationCode" :label-width="formLabelWidth">
                <el-select v-model="form.fields.iterationCode" placeholder="请选择迭代" remote filterable :remote-method="query => getList(3, query)">
                   <el-option
                     v-for="(item,index) in iterationList"
@@ -63,7 +75,7 @@
           </el-col>
 
           <el-col :span="8">
-            <el-form-item label="处理人" prop="fields.assigneeName" :label-width="formLabelWidth">
+            <el-form-item :label="$t('test_track.issue.handler')" prop="fields.assigneeName" :label-width="formLabelWidth">
                <el-select
                 filterable v-model="form.fields.assigneeName" placeholder="未指定">
                   <el-option
@@ -77,7 +89,7 @@
           </el-col>
 
           <el-col :span="5">
-             <el-form-item label="预计工时" prop="fields.workingHours" :label-width="formLabelWidth">
+             <el-form-item :label="$t('test_track.issue.working_hours')" prop="fields.workingHours" :label-width="formLabelWidth">
                 <el-input
                   type="number"
                   v-model="form.fields.workingHours"
@@ -88,7 +100,7 @@
           </el-col>
 
            <el-col :span="8">
-            <el-form-item label="模块" prop="fields.moduleId" :label-width="formLabelWidth">
+            <el-form-item :label="$t('test_track.issue.module')" prop="fields.moduleId" :label-width="formLabelWidth">
                <el-select
                 filterable v-model="form.fields.moduleId" placeholder="未指定">
                   <el-option
@@ -102,7 +114,7 @@
           </el-col>
 
           <el-col :span="8">
-            <el-form-item label="开始时间" prop="fields.startDate" :label-width="formLabelWidth">
+            <el-form-item :label="$t('test_track.issue.start_date')" prop="fields.startDate" :label-width="formLabelWidth">
               <el-date-picker
                 v-model="form.fields.startDate"
                 type="date"
@@ -113,7 +125,7 @@
           </el-col>
         
           <el-col :span="8">
-            <el-form-item label="截止时间" prop="fields.dueDate" :label-width="formLabelWidth">
+            <el-form-item :label="$t('test_track.issue.due_date')" prop="fields.dueDate" :label-width="formLabelWidth">
               <el-date-picker
                 v-model="form.fields.dueDate"
                 type="date"
@@ -124,7 +136,7 @@
           </el-col>
 
           <el-col :span="8">
-            <el-form-item label="复现环境" prop="environment" :label-width="formLabelWidth">
+            <el-form-item :label="$t('test_track.issue.repetition_environment')" prop="environment" :label-width="formLabelWidth">
                 <el-select v-model="form.environment" :placeholder="$t('commons.default')">
                   <el-option
                     v-for="(item,index) in environmentList"
@@ -137,7 +149,7 @@
           </el-col>      
 
           <el-col :span="8">
-            <el-form-item label="复现频率" prop="repetitionFrequency" :label-width="formLabelWidth">
+            <el-form-item :label="$t('test_track.issue.repetition_frequency')" prop="repetitionFrequency" :label-width="formLabelWidth">
                 <el-select v-model="form.repetitionFrequency" :placeholder="$t('commons.default')">
                   <el-option
                     v-for="(item,index) in repetitionFrequencyList"
@@ -163,9 +175,9 @@
         </el-form> -->
 
         <form-rich-text-item :title="$t('custom_field.issue_content')" :data="form.descriptions" prop="preconditions" key="preconditions" prefix="descriptions." :disabled="isDisabled"/>
-        <form-rich-text-item title="操作步骤" :data="form.descriptions" prop="operatingSteps" key="operatingSteps" prefix="descriptions." :disabled="isDisabled"/>
-        <form-rich-text-item title="预期结果" :data="form.descriptions" prop="expectedResult" key="expectedResult" prefix="descriptions." :disabled="isDisabled"/>
-        <form-rich-text-item title="实际结果" :data="form.descriptions" prop="actualResult" key="actualResult" prefix="descriptions." :disabled="isDisabled"/>
+        <form-rich-text-item :title="$t('custom_field.operating_steps')" :data="form.descriptions" prop="operatingSteps" key="operatingSteps" prefix="descriptions." :disabled="isDisabled"/>
+        <form-rich-text-item :title="$t('custom_field.expected_result')" :data="form.descriptions" prop="expectedResult" key="expectedResult" prefix="descriptions." :disabled="isDisabled"/>
+        <form-rich-text-item :title="$t('custom_field.actual_result')" :data="form.descriptions" prop="actualResult" key="actualResult" prefix="descriptions." :disabled="isDisabled"/>
 
         <el-row class="custom-field-row">
           <el-col :span="8" v-if="hasTapdId">
@@ -269,6 +281,8 @@ export default {
         },
         environment: '',
         repetitionFrequency: '',
+        statusId: undefined,
+        issueId: undefined,
       },
       rules: {
         title: [
@@ -311,6 +325,9 @@ export default {
         'descriptions.actualResult': [
           {required: true, message: this.$t('commons.please_fill_content'), trigger: 'blur'},
         ],
+        'fields.statusId': [
+          {required: true, message: this.$t('commons.please_fill_content'), trigger: 'blur'},
+        ],
       },
       testCaseContainIds: new Set(),
       url: '',
@@ -329,10 +346,17 @@ export default {
       endDatePicker: this.processDate(), // 结束日期限制
       environmentList: [{label: '开发环境', value: 'dev'}, {label: '测试环境', value: 'test'}, {label: '预发环境', value: 'uat'}, {label: '线上环境', value: 'prod'}], // 复现环境列表
       repetitionFrequencyList: [{label: '必须', value: 'must'}, {label: '偶现', value: 'sometimes'}, {label: '高出现率', value: 'manyTimes'}], // 复现频率
-    };
+      statusList: [{label: '待处理', value: 1}, {label: '重新打开', value: '2'}, {label: '处理中', value: 3}, {label: '待验证', value: 4},  {label: '已拒绝', value: 5},  {label: '已关闭', value: 6},],
+   };
   },
   props: {
     isPlan: {
+      type: Boolean,
+      default() {
+        return false;
+      }
+    },
+    isEdit: {
       type: Boolean,
       default() {
         return false;
@@ -517,7 +541,6 @@ export default {
     },
     _save(type) {
       let param = this.buildPram();
-      console.log(param);
       this.parseOldFields(param);
       this.result = this.$post(this.url, param, () => {
         if(type !== 'reCreate') this.$emit('close');

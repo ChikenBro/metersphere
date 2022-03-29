@@ -5,7 +5,6 @@
       :width="fieldsWidth ? fieldsWidth[prop] : width"
       :fixed="fixed"
       :filters="filters"
-      :filter-method="filters ? filterHandler : null"
       :prop="prop"
       :column-key="columnKey ? columnKey : prop"
       :label="label"

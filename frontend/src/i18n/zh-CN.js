@@ -319,6 +319,9 @@ export default {
     issue_template: '缺陷模版',
     issue_platform: '缺陷平台',
     issue_content: '缺陷内容',
+    operating_steps: '操作步骤',
+    expected_result: '预期结果',
+    actual_result: '实际结果',
     template_create: '创建模板',
     case_template: '测试用例模板',
     default_template: '默认模板',
@@ -1702,7 +1705,9 @@ export default {
       zentao_bug_build: "禅道 影响版本",
       zentao_bug_assigned: "禅道 处理人",
       update_third_party_bugs: "更新第三方平台的缺陷",
-      sync_bugs: "同步缺陷"
+      sync_bugs: "同步缺陷",
+      repetition_environment: "复现环境",
+      repetition_frequency: "复现频率"
     },
     report: {
       name: "测试计划报告",
