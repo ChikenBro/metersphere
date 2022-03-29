@@ -5,6 +5,7 @@
       :width="fieldsWidth ? fieldsWidth[prop] : width"
       :fixed="fixed"
       :filters="filters"
+      :filter-method="filters ? filterHandler : null"
       :prop="prop"
       :column-key="columnKey ? columnKey : prop"
       :label="label"
@@ -56,6 +57,12 @@ export default {
       default() {
         return null;
       }
+    }
+  },
+  methods: {
+    filterHandler(value, row, column) {
+      const property = column['property'];
+      return row[property] === value;
     }
   }
 };

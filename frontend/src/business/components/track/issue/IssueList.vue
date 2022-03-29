@@ -30,123 +30,233 @@
           :field-key="tableHeaderKey"
           @saveSortField="saveSortField"
           @refresh="getIssues"
-          :custom-fields="issueTemplate.customFields"
+          :custom-fields="[]"
           ref="table"
         >
-        <span v-for="(item) in fields" :key="item.key">
-<!--          <ms-table-column
-           :label="$t('test_track.issue.id')"
-           prop="id"
-           :field="item"
-           :fields-width="fieldsWidth"
-           v-if="false">
-          </ms-table-column>-->
-        <ms-table-column width="1">
-        </ms-table-column>
-          <ms-table-column
-            :label="$t('test_track.issue.id')"
-            prop="num"
-            :field="item"
-            sortable
-            :fields-width="fieldsWidth">
-             <template v-slot="scope">
-              <el-link :href="linkBaseUrl + scope.row.id" type="primary" target="_blank" >
-                {{scope.row.num}}
-              </el-link>
-            </template>
-          </ms-table-column>
-
-          <ms-table-column
-            :field="item"
-            :fields-width="fieldsWidth"
-            :label="$t('test_track.issue.title')"
-            sortable
-            prop="title">
-          </ms-table-column>
-
-          <ms-table-column
-            :field="item"
-            :fields-width="fieldsWidth"
-            :filters="platformFilters"
-            :label="$t('test_track.issue.platform')"
-            prop="platform">
-          </ms-table-column>
-
-          <ms-table-column
-                  :field="item"
-                  :fields-width="fieldsWidth"
-                  sortable
-                  :label="$t('test_track.issue.platform_status') "
-                  prop="platformStatus">
-            <template v-slot="scope">
-              {{ scope.row.platformStatus ? scope.row.platformStatus : '--'}}
-            </template>
-          </ms-table-column>
-
-          <ms-table-column
-            :field="item"
-            :fields-width="fieldsWidth"
-            column-key="creator"
-            sortable
-            :label="$t('custom_field.issue_creator')"
-            prop="creatorName">
-          </ms-table-column>
-
-<!--          <ms-table-column-->
-<!--            :field="item"-->
-<!--            :fields-width="fieldsWidth"-->
-<!--            :label="$t('test_track.issue.issue_resource')"-->
-<!--            prop="resourceName">-->
-<!--            <template v-slot="scope">-->
-<!--              <el-link v-if="scope.row.resourceName" @click="$router.push('/track/plan/view/' + scope.row.resourceId)">-->
-<!--                {{ scope.row.resourceName }}-->
-<!--              </el-link>-->
-<!--              <span v-else>-->
-<!--              &#45;&#45;-->
-<!--            </span>-->
-<!--            </template>-->
-<!--          </ms-table-column>-->
-        <ms-table-column prop="createTime"
-                       :field="item"
-                       :fields-width="fieldsWidth"
-                       :label="$t('commons.create_time')"
-                       sortable
-                       min-width="180px">
-            <template v-slot:default="scope">
-              <span>{{ scope.row.createTime | timestampFormatDate }}</span>
-            </template>
-          </ms-table-column >
-
-          <issue-description-table-item :fields-width="fieldsWidth" :field="item"/>
-
-         <ms-table-column
-           :field="item"
-           :fields-width="fieldsWidth"
-           :label="item.label"
-           prop="caseCount">
-            <template v-slot="scope">
-               <router-link :to="scope.row.caseCount > 0 ? {name: 'testCase', params: { projectId: 'all', ids: scope.row.caseIds }} : {}">
-                 {{scope.row.caseCount}}
-               </router-link>
-            </template>
-         </ms-table-column>
-
-          <ms-table-column v-for="field in issueTemplate.customFields" :key="field.id"
-                           :field="item"
-                           :fields-width="fieldsWidth"
-                           :label="field.name"
-                           :prop="field.name">
+          <span v-for="(item) in fields" :key="item.key">
+            <!-- 缺陷id -->
+            <ms-table-column
+              :label="$t('test_track.issue.id')"
+              prop="num"
+              :field="item"
+              sortable
+              :fields-width="fieldsWidth">
               <template v-slot="scope">
-                <span v-if="field.name === '状态'">
-                  {{getCustomFieldValue(scope.row, field) ? getCustomFieldValue(scope.row, field) : issueStatusMap[scope.row.status]}}
-                </span>
-                <span v-else>
-                  {{getCustomFieldValue(scope.row, field)}}
-                </span>
+                <el-link :href="linkBaseUrl + scope.row.id" type="primary" target="_blank" >
+                  {{scope.row.num}}
+                </el-link>
               </template>
-          </ms-table-column>
+            </ms-table-column>
+            <!-- 缺陷标题 -->
+            <ms-table-column
+              :field="item"
+              :fields-width="fieldsWidth"
+              :label="$t('test_track.issue.title')"
+              sortable
+              min-width="120px"
+              prop="title">
+            </ms-table-column>
+            <!-- 缺陷状态 -->
+            <ms-table-column
+              :field="item"
+              :fields-width="fieldsWidth"
+              :filters="getFilterOptions('platformStatus')" 
+              :label="$t('test_track.issue.status')"
+              min-width="140px"
+              prop="platformStatus">
+            </ms-table-column>
+            <!-- 平台 -->
+            <ms-table-column
+              :field="item"
+              :fields-width="fieldsWidth"
+              :filters="getFilterOptions('platform')" 
+              :label="$t('test_track.issue.platform')"
+              prop="platform">
+            </ms-table-column>
+            <!-- <ms-table-column
+                    :field="item"
+                    :fields-width="fieldsWidth"
+                    sortable
+                    :label="$t('test_track.issue.platform_status') "
+                    prop="platformStatus">
+              <template v-slot="scope">
+                {{ scope.row.platformStatus ? scope.row.platformStatus : '--'}}
+              </template>
+            </ms-table-column> -->
+            <!-- 处理人 -->
+            <ms-table-column
+              :field="item"
+              :fields-width="fieldsWidth"
+              :filters="getFilterOptions('assigneeName')" 
+              column-key="assigneeName "
+              sortable
+              min-width="130px"
+              :label="$t('test_track.issue.handler')"
+              prop="assigneeName">
+            </ms-table-column>
+            <!-- 缺陷描述 -->
+            <issue-description-table-item :fields-width="fieldsWidth" :field="item"/>
 
-        </span>
+  <!--          <ms-table-column-->
+  <!--            :field="item"-->
+  <!--            :fields-width="fieldsWidth"-->
+  <!--            :label="$t('test_track.issue.issue_resource')"-->
+  <!--            prop="resourceName">-->
+  <!--            <template v-slot="scope">-->
+  <!--              <el-link v-if="scope.row.resourceName" @click="$router.push('/track/plan/view/' + scope.row.resourceId)">-->
+  <!--                {{ scope.row.resourceName }}-->
+  <!--              </el-link>-->
+  <!--              <span v-else>-->
+  <!--              &#45;&#45;-->
+  <!--            </span>-->
+  <!--            </template>-->
+  <!--          </ms-table-column>-->
+            <!-- 用例数 -->
+            <ms-table-column
+              :field="item"
+              :fields-width="fieldsWidth"
+              :label="$t('test_track.issue.case_number')"
+              prop="caseCount">
+                <template v-slot="scope">
+                  <router-link :to="scope.row.caseCount > 0 ? {name: 'testCase', params: { projectId: 'all', ids: scope.row.caseIds }} : {}">
+                    {{scope.row.caseCount}}
+                  </router-link>
+                </template>
+            </ms-table-column>
+            <!-- 创建时间 -->
+            <ms-table-column prop="createTime"
+                        :field="item"
+                        :fields-width="fieldsWidth"
+                        :label="$t('commons.create_time')"
+                        sortable
+                        min-width="180px">
+              <template v-slot:default="scope">
+                <span>{{ scope.row.createTime | timestampFormatDate }}</span>
+              </template>
+            </ms-table-column >
+            <!-- 缺陷类型 -->
+            <ms-table-column
+              :field="item"
+              :fields-width="fieldsWidth"
+              min-width="140px"
+              column-key="defectTypeName"
+              :filters="getFilterOptions('defectTypeName')" 
+              :label="$t('test_track.issue.defect_type')"
+              prop="defectTypeName">
+            </ms-table-column>
+            <!-- 优先级 -->
+            <ms-table-column
+              :field="item"
+              :fields-width="fieldsWidth"
+              column-key="creator"
+              sortable
+              min-width="130px"
+              :label="$t('test_track.issue.priority')"
+              :filters="[{text:'紧急', value: 3}, {text:'高', value: 2}, {text:'中', value: 1}, {text:'低', value: 0}]" 
+              prop="priority">
+              <template v-slot:default="scope">
+                <span>{{ scope.row.priority | priorityFormat }}</span>
+              </template>
+            </ms-table-column>
+            <!-- 预计工时 -->
+            <ms-table-column
+              :field="item"
+              :fields-width="fieldsWidth"
+              column-key="creator"
+              :label="$t('test_track.issue.working_hours')"
+              prop="workingHours">
+               <template v-slot:default="scope">
+                <span>{{ scope.row.workingHours }} 小时</span>
+              </template>
+            </ms-table-column>
+            <!-- 所属迭代 -->
+            <ms-table-column
+              :field="item"
+              :fields-width="fieldsWidth"
+              :label="$t('test_track.issue.iteration')"
+              prop="iterationName">
+            </ms-table-column>
+            <!-- 工时记录 -->
+            <ms-table-column
+              :field="item"
+              :fields-width="fieldsWidth"
+              :label="$t('test_track.issue.working_hours_log')"
+              prop="recordedHours">
+               <template v-slot:default="scope">
+                <span>{{ scope.row.recordedHours }} 小时</span>
+              </template>
+            </ms-table-column>
+            <!-- 关注人 -->
+            <ms-table-column
+              :field="item"
+              :fields-width="fieldsWidth"
+              column-key="watcherName"
+              :label="$t('test_track.issue.followers')"
+              prop="watcherName">
+            </ms-table-column>
+            <!-- 开始时间 -->
+            <ms-table-column prop="startDate"
+                        :field="item"
+                        :fields-width="fieldsWidth"
+                        :label="$t('test_track.issue.start_date')"
+                        sortable
+                        min-width="180px">
+              <template v-slot:default="scope">
+                <span>{{ scope.row.startDate | timestampFormatDate }}</span>
+              </template>
+            </ms-table-column >
+            <!-- 截止时间 -->
+            <ms-table-column prop="dueDate"
+                        :field="item"
+                        :fields-width="fieldsWidth"
+                        :label="$t('test_track.issue.due_date')"
+                        sortable
+                        min-width="180px">
+              <template v-slot:default="scope">
+                <span>{{ scope.row.dueDate | timestampFormatDate }}</span>
+              </template>
+            </ms-table-column >
+             <!-- 创建人 -->
+            <ms-table-column
+              :field="item"
+              :fields-width="fieldsWidth"
+              :filters="getFilterOptions('creatorName')" 
+              :label="$t('test_track.issue.creator')"
+              prop="creatorName">
+            </ms-table-column>
+            <!-- 关联需求 -->
+            <ms-table-column
+              :field="item"
+              :fields-width="fieldsWidth"
+              :filters="getFilterOptions('requirementName')" 
+              min-width="140px"
+              :label="$t('test_track.issue.related_requirements')"
+              prop="requirementName">
+            </ms-table-column>
+            <!-- 模块 -->
+            <ms-table-column
+              :field="item"
+              :fields-width="fieldsWidth"
+              :filters="getFilterOptions('model')" 
+              :label="$t('test_track.issue.module')"
+              prop="model">
+            </ms-table-column>
+            <ms-table-column v-for="field in issueTemplate.customFields" :key="field.id"
+                            :field="item"
+                            :fields-width="fieldsWidth"
+                            :label="field.name"
+                            :prop="field.name">
+                <template v-slot="scope">
+                  <span v-if="field.name === '状态'">
+                    {{getCustomFieldValue(scope.row, field) ? getCustomFieldValue(scope.row, field) : issueStatusMap[scope.row.status]}}
+                  </span>
+                  <span v-else>
+                    {{getCustomFieldValue(scope.row, field)}}
+                  </span>
+                </template>
+            </ms-table-column>
+
+          </span>
         </ms-table>
         
         <!-- 删除确认框 -->
@@ -256,29 +366,36 @@ export default {
       },
     };
   },
+  filters: {
+    priorityFormat(value) {
+      return ['低', '中', '高', '紧急'][parseInt(value)]
+    }
+  },
   activated() {
     getProjectMember((data) => {
       this.members = data;
     });
-    getIssueTemplate()
-      .then((template) => {
-        this.issueTemplate = template;
-        if (this.issueTemplate.platform === 'metersphere') {
-          this.isThirdPart = false;
-        } else {
-          this.isThirdPart = true;
-        }
-        this.fields = getTableHeaderWithCustomFields('ISSUE_LIST', this.issueTemplate.customFields);
-        if (!this.isThirdPart) {
-          for (let i = 0; i < this.fields.length; i++) {
-            if (this.fields[i].id === 'platformStatus') {
-              this.fields.splice(i, 1);
-              break;
-            }
-          }
-        }
-        this.$refs.table.reloadTable();
-      });
+    this.fields = getTableHeaderWithCustomFields('ISSUE_LIST', []);
+    this.$refs.table.reloadTable();
+    // getIssueTemplate()
+    //   .then((template) => {
+    //     this.issueTemplate = template;
+    //     if (this.issueTemplate.platform === 'metersphere') {
+    //       this.isThirdPart = false;
+    //     } else {
+    //       this.isThirdPart = true;
+    //     }
+    //     this.fields = getTableHeaderWithCustomFields('ISSUE_LIST', this.issueTemplate.customFields);
+    //     if (!this.isThirdPart) {
+    //       for (let i = 0; i < this.fields.length; i++) {
+    //         if (this.fields[i].id === 'platformStatus') {
+    //           this.fields.splice(i, 1);
+    //           break;
+    //         }
+    //       }
+    //     }
+    //     this.$refs.table.reloadTable();
+    //   });
     this.getIssues();
   },
   computed: {
@@ -430,7 +547,23 @@ export default {
       });
       this.dialogVisible = false;
       this.deleteIssueInfo.remark = ''
-    }
+    },
+    // 根据属性获取筛选列表
+    getFilterOptions(prop) {
+      const options = []
+      const hasExist = {}
+      if(this.page.data) {
+        this.page.data.forEach(item => {
+          let value = item[prop]
+          if(!!value && hasExist[value] === undefined) {
+            options.push({text: value, value})
+            hasExist[value] = true
+          }
+        })
+
+      }
+      return options
+    },
   }
 };
 </script>
