@@ -33,6 +33,8 @@
                        show-overflow-tooltip></el-table-column>
       <el-table-column prop="testPlanName" min-width="150" sortable :label="$t('test_track.report.list.test_plan')"
                        show-overflow-tooltip></el-table-column>
+      <el-table-column prop="iterationName" label="所属迭代"
+                       show-overflow-tooltip></el-table-column>
       <el-table-column prop="creator" :label="$t('test_track.report.list.creator')"
                        show-overflow-tooltip></el-table-column>
       <el-table-column prop="createTime" sortable :label="$t('test_track.report.list.create_time' )" show-overflow-tooltip>
