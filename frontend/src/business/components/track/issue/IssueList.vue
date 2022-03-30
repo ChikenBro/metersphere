@@ -94,8 +94,17 @@
               :label="$t('test_track.issue.handler')"
               prop="assigneeName">
             </ms-table-column>
-            <!-- 缺陷描述 -->
-            <issue-description-table-item :fields-width="fieldsWidth" :field="item"/>
+            <!-- 缺陷描述 两种方案-->
+            <!-- <issue-description-table-item :fields-width="fieldsWidth" :field="item"/> -->
+            <ms-table-column
+              :label="$t('test_track.issue.description')"
+              prop="description"
+              :field="item"
+              :fields-width="fieldsWidth">
+              <template v-slot:default="scope">
+                  <el-button slot="reference" type="text" @click="handlePreview(scope.row)">{{ $t('test_track.issue.preview') }}</el-button>
+              </template>
+            </ms-table-column>            
 
   <!--          <ms-table-column-->
   <!--            :field="item"-->
@@ -565,6 +574,38 @@ export default {
       }
       return options
     },
+    // 打开预览
+    handlePreview(data) {
+      console.log(data)
+      data = {
+          "title": "默认",
+          "descriptions": {
+              "preconditions": "缺陷内容",
+              "operatingSteps": "操作步骤",
+              "expectedResult": "预期结果",
+              "actualResult": "实际结果"
+          },
+          "creator": "0852",
+          "fields": {
+              "defectTypeId": 30801759,
+              "priority": 1,
+              "workingHours": "12",
+              "iterationCode": 91,
+              "assigneeName": "0852",
+              "requirementCode": 190,
+              "moduleId": "",
+              "startDate": "2022-02-28T16:00:00.000Z",
+              "dueDate": "2022-03-01T16:00:00.000Z"
+          },
+          "environment": "dev",
+          "repetitionFrequency": "must",
+          "projectId": "648d74c1-4973-4d1c-8c22-a68a0357d6c4",
+          "organizationId": "d1ab2464-0a3d-11ec-b53d-0c42a1eda428",
+          "testCaseIds": []
+      } 
+      data.isOnlyRead = true
+      this.$refs.issueEdit.open(data);
+    }
   }
 };
 </script>

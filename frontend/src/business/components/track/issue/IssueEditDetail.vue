@@ -9,8 +9,8 @@
             </el-form-item>
           </el-col>   
           <el-col :span="6" v-if="isEdit" :push="2">
-            <el-form-item :label="$t('test_track.issue.status')" prop="fields.statusId" :label-width="formLabelWidth">
-               <el-select v-model="form.fields.statusId" :placeholder="$t('commons.default')">
+            <el-form-item :label="$t('test_track.issue.status')" prop="statusId" :label-width="formLabelWidth">
+               <el-select v-model="form.statusId" :placeholder="$t('commons.default')">
                   <el-option
                     v-for="(item,index) in statusList"
                     :key="index"
@@ -325,7 +325,7 @@ export default {
         'descriptions.actualResult': [
           {required: true, message: this.$t('commons.please_fill_content'), trigger: 'blur'},
         ],
-        'fields.statusId': [
+        'statusId': [
           {required: true, message: this.$t('commons.please_fill_content'), trigger: 'blur'},
         ],
       },
