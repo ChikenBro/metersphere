@@ -85,6 +85,48 @@
               <ms-instructions-icon :content="'当功能用例关联的接口或性能用例在测试计划执行后，自动更新功能用例的状态'"/>
             </el-form-item>
           </el-col>
+          
+          <!-- 所属迭代 -->
+          <el-col :span="8" :push="2">
+            <el-form-item
+              :label="$t('所属迭代')"
+              :label-width="formLabelWidth"
+              prop="iterationId">
+               <el-select v-model="form.iterationId" clearable placeholder="请选择迭代" filterable remote :remote-method="getIterationOptions" @change="getPlanInheritOptions">
+                <el-option v-for="(item, index) in iterationOptions" :key="index" :label="item.id" :value="item.name"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-row>
+           <el-col :span="10" :offset="1">
+            <el-form-item :label="$t('环境')" :label-width="formLabelWidth" prop="environment">
+              <el-select v-model="form.environment" clearable placeholder="请选择环境">
+                <el-option v-for="(item, index) in environmentOptions" :key="index" :label="item.label" :value="item.value"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+
+           <el-col :span="8">
+            <el-form-item :label="$t('计划继承')" :label-width="formLabelWidth" prop="testPlanInherit">
+              <el-select v-model="form.testPlanInherit" clearable placeholder="选择迭代中计划" @clear="resetRetain">
+                <el-option v-for="(item, index) in planInheritOptions" :key="index" :label="item.label" :value="item.value"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-row>
+          <el-col :span="8" :offset="1" v-if="form.testPlanInherit !== ''">
+            <el-form-item
+              label="保留缺陷状态"
+              :label-width="formLabelWidth"
+              prop="ifRetain">
+              <el-switch v-model="form.ifRetain"/>
+              <ms-instructions-icon :content="'继承后是否保留缺陷状态'"/>
+            </el-form-item>
+          </el-col> 
         </el-row>
 
         <el-row type="flex" justify="left" style="margin-top: 10px;">
@@ -155,7 +197,11 @@ export default {
         description: '',
         plannedStartTime: '',
         plannedEndTime: '',
-        automaticStatusUpdate: false
+        automaticStatusUpdate: false,
+        iterationId: '',
+        environment: '',
+        testPlanInherit: '',
+        ifRetain: false,
       },
       rules: {
         name: [
@@ -164,11 +210,16 @@ export default {
         ],
         principal: [{required: true, message: this.$t('test_track.plan.input_plan_principal'), trigger: 'change'}],
         stage: [{required: true, message: this.$t('test_track.plan.input_plan_stage'), trigger: 'change'}],
-        description: [{max: 200, message: this.$t('test_track.length_less_than') + '200', trigger: 'blur'}]
+        description: [{max: 200, message: this.$t('test_track.length_less_than') + '200', trigger: 'blur'}],
+        iterationId: [{required: true, message: "请选择所属迭代", trigger: 'blur'}],
+        environment: [{required: true, message: "请选择环境", trigger: 'blur'}],
       },
       formLabelWidth: "100px",
       operationType: '',
-      principalOptions: []
+      principalOptions: [],
+      iterationOptions: [],
+      environmentOptions:[{label: '开发环境', value: 'dev'}, {label: '测试环境', value: 'test'}, {label: '预发环境', value: 'uat'}, {label: '线上环境', value: 'pord'}],
+      planInheritOptions:[],
     };
   },
   created() {
@@ -176,6 +227,7 @@ export default {
     this.form.stage = 'smoke';
     const adminToken = JSON.parse(localStorage.getItem("Admin-Token"));
     this.form.principal = adminToken.id;
+    this.getIterationOptions()
   },
   methods: {
     reload() {
@@ -290,6 +342,29 @@ export default {
           return true;
         });
       }
+    },
+    // 获取迭代列表
+    getIterationOptions(name="") {
+      // const url = '/field/template/issue/templates/list/1/10'
+      const url = 'http://yapi.mudutv.com/mock/1451/field/template/issue/templates/list/1/10'
+      this.$post(url, {projectId: getCurrentProjectID(), type: 3, name}, response => {
+        this.iterationOptions = response.options || []
+      });
+    },
+    // 获取计划继承列表
+    getPlanInheritOptions(iterationId) {
+      // const url = `/test/plan/iteration/${iterationId}`
+      const url = `http://yapi.mudutv.com/mock/1451/test/plan/iteration/${iterationId}`
+      this.planInheritOptions = []
+      this.$post(url, {}, response => {
+        response.data.forEach(item => {
+          this.planInheritOptions.push({label: item.testPlanName, value: item.testPlanId})
+        })
+      });   
+    },
+    // 重置保留缺陷状态
+    resetRetain() {
+      this.form.ifRetain = false
     }
   }
 }

@@ -105,6 +105,13 @@
           show-overflow-tooltip
           :key="index">
         </el-table-column>
+        <el-table-column
+          v-if="item.id == 'iterationId'"
+          prop="iterationName"
+          :label="$t('test_track.issue.iteration')"
+          show-overflow-tooltip
+          :key="index">
+        </el-table-column>
         <el-table-column v-if="item.id == 'tags'" prop="tags"
                          :label="$t('api_test.automation.tag')" :key="index">
           <template v-slot:default="scope">
@@ -360,10 +367,14 @@ export default {
           //     item.createUser = name;
           //   });
           // }
+          
+          // mock新添加的字段
+          item.iterationId=Math.random().toFixed(2)
+          item.iterationName='Ver 1.1.0'
+          item.iterationStatus='未完成'
         });
       });
-      getLabel(this, TEST_PLAN_LIST);
-
+     getLabel(this, TEST_PLAN_LIST);
     },
     copyData(status) {
       return JSON.parse(JSON.stringify(this.dataMap.get(status)));

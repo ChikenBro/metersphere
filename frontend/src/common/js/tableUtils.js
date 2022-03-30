@@ -180,6 +180,8 @@ export function getLabel(vueObj, type) {
         if (response.data != null) {
           vueObj.tableLabel = eval(response.data.props);
         }
+        // 该接口需多返回一个{label: '所属迭代', id: 'iterationId'}数据, 以下是mock的
+        vueObj.tableLabel.splice(7,0,{label: '所属迭代', id: 'iterationId'})
       });
     }
   });
