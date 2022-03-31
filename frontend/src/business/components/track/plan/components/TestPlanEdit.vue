@@ -11,7 +11,6 @@
       width="65%"
       @close="close"
     >
-      >
       <el-form
         v-if="isStepTableAlive"
         ref="planFrom"
