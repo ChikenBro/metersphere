@@ -20,7 +20,6 @@ import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
-import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -37,7 +36,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
-public class IssueTrendStatisticsService{
+public class IssueTrendStatisticsServiceNew {
 
     private String jsonString ;
     private String projectId ;
@@ -192,9 +191,9 @@ public class IssueTrendStatisticsService{
     public Map<String, Object> fromProjectUnresolved(String youToken,String projectName){
         Map<String, Object> modulName = new HashMap<>();
 
-//        String jsonString1 = String.format("{\"Action\": \"DescribeIssueListWithPage\", \t\"ProjectName\": \"%s\", \t\"IssueType\": \"DEFECT\", \t\"PageNumber\": 1, \t\"PageSize\": 500  }", projectName);
+        String jsonString1 = String.format("{\"Action\": \"DescribeIssueListWithPage\", \t\"ProjectName\": \"%s\", \t\"IssueType\": \"DEFECT\", \t\"PageNumber\": 1, \t\"PageSize\": 500  }", projectName);
 
-        JSONObject respResult_AddBug = this.codingGetProjectIssueList(projectName,youToken );
+        JSONObject respResult_AddBug = this.codingGetProjectIssueList(jsonString1,youToken );
 //        JSONObject respResult_AddBug = this.codingGetProjectIssueList(jsonString1,e1.get("id").toString(),hashMap.get("token") );
         if (respResult_AddBug == null){
             modulName.put("allIssue",0);
@@ -250,9 +249,9 @@ public class IssueTrendStatisticsService{
 //        Map<String, Object> modulName = new HashMap<>();
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         ArrayList<Object> testName = new ArrayList<>();
-//        String jsonString1 = String.format("{\"Action\": \"DescribeIssueListWithPage\", 	\"ProjectName\": \"%s\", 	\"IssueType\": \"DEFECT\", 	\"PageNumber\": 1, 	\"PageSize\": 500  }",  projectName);
+        String jsonString1 = String.format("{\"Action\": \"DescribeIssueListWithPage\", 	\"ProjectName\": \"%s\", 	\"IssueType\": \"DEFECT\", 	\"PageNumber\": 1, 	\"PageSize\": 500  }",  projectName);
 
-        JSONObject respResult_AddBug = this.codingGetProjectIssueList(projectName,youToken );
+        JSONObject respResult_AddBug = this.codingGetProjectIssueList(jsonString1,youToken );
 
         if (respResult_AddBug == null){
 //            modulName.add(testMap);
@@ -298,7 +297,7 @@ public class IssueTrendStatisticsService{
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         String jsonString1 = String.format("{\"Action\": \"DescribeIssueListWithPage\", 	\"ProjectName\": \"%s\", 	\"IssueType\": \"DEFECT\", 	\"PageNumber\": 1, 	\"PageSize\": 500  }",  projectName);
 
-        JSONObject respResult_AddBug = this.codingGetProjectIssueList(projectName,youToken );
+        JSONObject respResult_AddBug = this.codingGetProjectIssueList(jsonString1,youToken );
 
         if (respResult_AddBug == null){
 //            modulName.add(testMap);
@@ -348,10 +347,10 @@ public class IssueTrendStatisticsService{
         ArrayList<Object> testName = new ArrayList<>();
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         String jsonString1 = String.format("{\"Action\": \"DescribeIssueListWithPage\", 	\"ProjectName\": \"%s\", 	\"IssueType\": \"DEFECT\", 	\"PageNumber\": 1, 	\"PageSize\": 500  }",  projectName);
-//        System.out.println(jsonString1);
+        System.out.println(jsonString1);
 //        String jsonString1 = String.format("{\"page\":1,\"pageSize\":10000,\"content\":{\"sort\":{\"key\":\"PRIORITY\",\"value\":\"DESC\"},\"conditions\":[{\"key\":\"STATUS_TYPE\",\"customFieldId\":null,\"value\":[],\"fixed\":true,\"constValue\":[],\"userMap\":{\"COMPLETED\":{\"value\":\"COMPLETED\"},\"PROCESSING\":{\"value\":\"PROCESSING\"},\"TODO\":{\"value\":\"TODO\"}},\"validInfo\":[]},{\"key\":\"KEYWORD\",\"customFieldId\":null,\"value\":null,\"fixed\":true},{\"key\":\"STATUS\",\"customFieldId\":null,\"value\":[43257750],\"fixed\":false,\"userMap\":{\"43257750\":{\"value\":43257750}},\"validInfo\":[]}]}}",  "");
 
-        JSONObject respResult_AddBug = this.codingGetProjectIssueList(projectName,youToken );
+        JSONObject respResult_AddBug = this.codingGetProjectIssueList(jsonString1,youToken );
 
         if (respResult_AddBug == null){
 //            modulName.add(testMap);
@@ -546,8 +545,8 @@ public class IssueTrendStatisticsService{
     public Future<List<JSONObject>> codingGetProjectIssueListAsync( String projectName,String youToken,Integer pageNumber) {
         Future<List<JSONObject>> returnmsg = null;
 //        List<JSONObject> resultNew = new ArrayList<>();
-        String jsonString = String.format("{\"Action\": \"DescribeIssueListWithPage\", 	\"ProjectName\": \"%s\", 	\"IssueType\": \"DEFECT\", 	\"PageNumber\": %d, 	\"PageSize\": 500  }",  projectName,pageNumber);
-//        System.out.println(jsonString);
+        String jsonString = String.format("{\"Action\": \"DescribeIssueListWithPage\", 	\"ProjectName\": \"%s\", 	\"IssueType\": \"DEFECT\", 	\"PageNumber\": \"%d\", 	\"PageSize\": 20  }",  projectName,pageNumber);
+
         String url = "https://mudu1.coding.net/open-api";
         JSONObject json_test = null;
 
@@ -580,7 +579,7 @@ public class IssueTrendStatisticsService{
             result = EntityUtils.toString(entity);
 
             json_test = JSONObject.parseObject(result);
-//            System.out.println(json_test);
+
             List<JSONObject> resultNew = (List<JSONObject>) json_test.getJSONObject("Response").getJSONObject("Data").get("List");
             returnmsg=new AsyncResult(resultNew);
 //            if (PageNumber == 1){
@@ -601,7 +600,7 @@ public class IssueTrendStatisticsService{
 
 
     private JSONObject codingGetProjectIssueList( String projectName,String youToken) {
-        String jsonString = String.format("{\"Action\": \"DescribeIssueListWithPage\", 	\"ProjectName\": \"%s\", 	\"IssueType\": \"DEFECT\", 	\"PageNumber\": 1, 	\"PageSize\": 500  }",  projectName);
+        String jsonString = String.format("{\"Action\": \"DescribeIssueListWithPage\", 	\"ProjectName\": \"%s\", 	\"IssueType\": \"DEFECT\", 	\"PageNumber\": 1, 	\"PageSize\": 20  }",  projectName);
 
         String url = "https://mudu1.coding.net/open-api";
         JSONObject json_test = null;
@@ -636,14 +635,8 @@ public class IssueTrendStatisticsService{
 
             json_test = JSONObject.parseObject(result);
             List<JSONObject> resultNew = new ArrayList<>();
-//            System.out.println(json_test);
-            Integer PageNumber = null;
-            try {
-                PageNumber = (Integer) json_test.getJSONObject("Response").getJSONObject("Data").get("TotalPage");
-                resultNew = (List<JSONObject>) json_test.getJSONObject("Response").getJSONObject("Data").get("List");
-            } catch (Exception e) {
-                return json_test;
-            }
+            Integer PageNumber = (Integer) json_test.getJSONObject("Response").getJSONObject("Data").get("TotalCount");
+            resultNew = (List<JSONObject>) json_test.getJSONObject("Response").getJSONObject("Data").get("List");
 
             if (PageNumber == 1){
                 return json_test;
@@ -660,11 +653,9 @@ public class IssueTrendStatisticsService{
                 }
                 for (Future<List<JSONObject>> s2:tmpResult) {
                     try {
-
                         resultNew = Stream.of(s2.get(),resultNew)
                                 .flatMap(Collection::stream).distinct().collect(Collectors.toList());
-//                        System.out.println(resultNew);
-//                        System.out.println(s2.get());
+
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     } catch (ExecutionException e) {
@@ -672,10 +663,7 @@ public class IssueTrendStatisticsService{
                     }
 
                 }
-//                System.out.println(resultNew);
-                JSONObject json_data_test = json_test.getJSONObject("Response").getJSONObject("Data");
-                json_data_test.put("List",resultNew);
-                json_test.put("Data",json_data_test);
+                json_test.put("List",resultNew);
                 return json_test;
             }
 
@@ -692,7 +680,7 @@ public class IssueTrendStatisticsService{
 
 //        long start = System.currentTimeMillis( );
         Future<Map<String,Object>> returnmsg;
-        System.out.println("线程名字" + Thread.currentThread().getName());
+
         Integer a1 = 0;
         Integer a2 = 0;
         Integer a3 = 0;
@@ -798,32 +786,24 @@ public class IssueTrendStatisticsService{
         return returnmsg;
     }
 
-    public List<Map<String,Object>> getIssueTrendTotal(HashMap<String, String> hashMap) {
+    public List<Map<String,Object>> getIssueTrendTotal(HashMap<String, String> hashMap) throws HttpProcessException, ExecutionException, InterruptedException, ParseException {
         String currentTimeNow = null;
         String currentTime = null;
         long start = 0 ;
         long end = 0;
-        Date date = null;
+        Date date ;
         ArrayList<Map<String, Object>> modulName = new ArrayList<>();
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         if (hashMap.get("startDate") != null){
             currentTime = hashMap.get("startDate");
-            try {
-                date = df.parse(currentTime);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
+            date = df.parse(currentTime);
             start = date.getTime();
             if (hashMap.get("endDate") != null){
                 currentTimeNow = hashMap.get("endDate");
 //                Calendar nowTimeNow = Calendar.getInstance();
 
 //                currentTimeNow = df.format(nowTimeNow.getTime());
-                try {
-                    date = df.parse(currentTimeNow);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
+                date = df.parse(currentTimeNow);
                 end = date.getTime();
             }
             else {
@@ -838,20 +818,12 @@ public class IssueTrendStatisticsService{
             Calendar nowTimeNow = Calendar.getInstance();
 
             currentTimeNow = df.format(nowTimeNow.getTime());
-            try {
-                date = df.parse(currentTimeNow);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
+            date = df.parse(currentTimeNow);
 
             start = System.currentTimeMillis( )-24*1000*7*3600-12*1000*3600;
             if (hashMap.get("endDate") != null){
                 currentTimeNow = hashMap.get("endDate");
-                try {
-                    date = df.parse(currentTimeNow);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
+                date = df.parse(currentTimeNow);
                 end = date.getTime();
             }
             else {
@@ -881,10 +853,8 @@ public class IssueTrendStatisticsService{
             //System.out.println(end);
             //System.out.println(start);
             Map<String,Object> testMap2 = new HashMap<>();
-//            System.out.println(String.format("respResult_AddBug:%s", respResult_AddBug));
             for (Object e2 : respResult_AddBug.getJSONObject("Response").getJSONObject("Data").getJSONArray("List")) {
                 JSONObject e3 = JSONObject.parseObject(e2.toString());
-//                System.out.println(String.format("%s,%s", e3.get("IssueStatusId"),e3.get("Name")));
                 if (((long)e3.get("CreatedAt") < end+24*3600*1000-600) && ((long)e3.get("CreatedAt") > start)){
                     a1 = a1 +1 ;
 //                        //System.out.println(e3.get("code"));
@@ -897,8 +867,8 @@ public class IssueTrendStatisticsService{
 
                     if (e3.get("IssueStatusId").equals(43257756) ){
                         if(((long)e3.get("CompletedAt") < end+24*3600*1000-600) && ((long)e3.get("CompletedAt") > start)){
-//                            System.out.println(start-24*3600*1000);
-//                            System.out.println(end+24*3600*1000-600*1000);
+                            System.out.println(start-24*3600*1000);
+                            System.out.println(end+24*3600*1000-600*1000);
 
                             a3 = a3 +1;
                         }
@@ -910,7 +880,7 @@ public class IssueTrendStatisticsService{
                     if (e3.get("IssueStatusId").equals(43257756) ){
                         if(((long)e3.get("CompletedAt") < end+24*3600*1000-600) && ((long)e3.get("CompletedAt") > start)){
 
-//                            System.out.println(e3);
+                            System.out.println(e3);
 
                             a5 = a5 +1;
                         }
@@ -948,32 +918,14 @@ public class IssueTrendStatisticsService{
 
         }
         else if(hashMap.get("projectName") == null ){
-            List<Future<Map<String,Object>>> s1 = new ArrayList<>();
+            Future<Map<String,Object>> future = null;
 //                long start1 = System.currentTimeMillis( );
             JSONObject respResult = this.codingGetProjectAll(hashMap.get("token"));
             for (Object e:respResult.getJSONObject("Response").getJSONObject("Data").getJSONArray("ProjectList")) {
 //
-                long start1 = System.currentTimeMillis( );
-                Future<Map<String,Object>>   future=this.AsytGetIssueTotal(hashMap.get("token"),e,start,end);
-                s1.add(future);
-                long end1 = System.currentTimeMillis( );
-                System.out.println(String.format("time1:%s",end1-start1 ));
+                future=this.AsytGetIssueTotal(hashMap.get("token"),e,start,end);
+                modulName.add(future.get());
             }
-            for (Future<Map<String,Object>> s2:s1) {
-                long start2 = System.currentTimeMillis( );
-
-                try {
-                    modulName.add(s2.get());
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
-                }
-                long end2 = System.currentTimeMillis( );
-                System.out.println(String.format("time2:%s",end2-start2 ));
-            }
-
-
         }
         return modulName;
 

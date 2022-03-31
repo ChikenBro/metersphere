@@ -9,7 +9,6 @@ import java.util.Objects;
 public class ApiMethodUrlDTO {
     public String url;
     public String method;
-    public String scenarioId;
 
     public ApiMethodUrlDTO(String url, String method) {
         this.url = url == null ? "" : url;

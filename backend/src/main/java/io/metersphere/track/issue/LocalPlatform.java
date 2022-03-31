@@ -38,7 +38,7 @@ public class LocalPlatform extends LocalAbstractPlatform {
     }
 
     @Override
-    public String addIssue(IssuesUpdateRequest issuesRequest) {
+    public void addIssue(IssuesUpdateRequest issuesRequest) {
         SessionUser user = SessionUtils.getUser();
         String id = UUID.randomUUID().toString();
         IssuesWithBLOBs issues = new IssuesWithBLOBs();
@@ -48,19 +48,17 @@ public class LocalPlatform extends LocalAbstractPlatform {
         issues.setReporter(user.getId());
         issues.setCreateTime(System.currentTimeMillis());
         issues.setUpdateTime(System.currentTimeMillis());
-        issues.setPlatform(IssuesManagePlatform.Local.toString());
+        issues.setPlatform(IssuesManagePlatform.Local.toString());;
         issues.setNum(getNextNum(issuesRequest.getProjectId()));
         issuesMapper.insert(issues);
 
         issuesRequest.setId(id);
         handleTestCaseIssues(issuesRequest);
-        return null;
     }
 
     @Override
-    public String updateIssue(IssuesUpdateRequest request) {
+    public void updateIssue(IssuesUpdateRequest request) {
         handleIssueUpdate(request);
-        return null;
     }
 
     @Override

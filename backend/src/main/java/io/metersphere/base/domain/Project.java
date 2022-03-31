@@ -37,5 +37,11 @@ public class Project implements Serializable {
 
     private String systemId;
 
+    private String codingProjectId;
+
+    private String codingDisplayName;
+
+    private String codingProjectName;
+
     private static final long serialVersionUID = 1L;
 }

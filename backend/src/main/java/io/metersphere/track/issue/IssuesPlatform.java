@@ -27,13 +27,13 @@ public interface IssuesPlatform {
      *
      * @param issuesRequest issueRequest
      */
-    String addIssue(IssuesUpdateRequest issuesRequest);
+    void addIssue(IssuesUpdateRequest issuesRequest);
 
     /**
      * 更新缺陷
      * @param request
      */
-    String updateIssue(IssuesUpdateRequest request);
+    void updateIssue(IssuesUpdateRequest request);
 
     /**
      * 删除缺陷平台缺陷

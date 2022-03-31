@@ -537,7 +537,6 @@ public class XmindCaseParser {
         // 获取所有用例数据,解析模块
         handleNode(children);
         LogUtil.info("当前测试模块: " + caseNode);
-        LogUtil.info("当前XMind导入内容: " + children);
         //解析成用例内容
         parseCase(children, "");
         return prefixTestCase;
@@ -755,11 +754,9 @@ public class XmindCaseParser {
                 List<Attached> results = root.getChildren().getAttached();
                 for (Attached result : results) {
                     //只有2级
-                    if (null == result.getChildren()) {
+                    if ((result.getChildren() == null)) {
                         expect = result.getTitle();
                         //3级，取后面2级为步骤和结果
-                    } else if (null == result.getChildren().getAttached()) {
-                        expect = result.getTitle();
                     } else {
                         step = result.getTitle();
                         expect = result.getChildren().getAttached().get(0).getTitle();
@@ -816,8 +813,6 @@ public class XmindCaseParser {
             testCaseTemplate.setPrecondition(precondition);
             //前置条件后无更新用例id
             if (root.getChildren() == null) {
-                testCaseTemplate.setCustomNum(null);
-            } else if (root.getChildren().getAttached() == null) {
                 testCaseTemplate.setCustomNum(null);
             } else if (root.getChildren().getAttached().get(0).getTitle().split("id").length > 1) {
                 customNum = root.getChildren().getAttached().get(0).getTitle().replace("id:", "").replace("id：", "");

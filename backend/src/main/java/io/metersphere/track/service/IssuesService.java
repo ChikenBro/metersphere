@@ -91,18 +91,10 @@ public class IssuesService {
         abstractPlatform.testAuth();
     }
 
-    public String addIssues(IssuesUpdateRequest issuesRequest) {
+    public void addIssues(IssuesUpdateRequest issuesRequest) {
         List<AbstractIssuePlatform> platformList = getUpdatePlatforms(issuesRequest);
         platformList.forEach(platform -> {
-            String message = platform.addIssue(issuesRequest);
-            //coding返回错误信息
-            if (message.contains("Error")) {
-                MSException.throwException(message);
-            } else if (message.contains("平台入库失败")) {
-                MSException.throwException("coding同步成功，平台入库失败，重试终止");
-            } else if ("ms-coding服务异常".equals(message)) {
-                MSException.throwException("ms-coding服务异常");
-            }
+            platform.addIssue(issuesRequest);
         });
         issuesRequest.getTestCaseIds().forEach(l -> {
             try {
@@ -117,7 +109,6 @@ public class IssuesService {
             }
         });
         noticeIssueEven(issuesRequest, "IssuesCreate");
-        return null;
     }
 
     public void noticeIssueEven(IssuesUpdateRequest issuesRequest, String type) {
@@ -233,7 +224,7 @@ public class IssuesService {
         boolean tapd = isIntegratedPlatform(orgId, IssuesManagePlatform.Tapd.toString());
         boolean jira = isIntegratedPlatform(orgId, IssuesManagePlatform.Jira.toString());
         boolean zentao = isIntegratedPlatform(orgId, IssuesManagePlatform.Zentao.toString());
-        boolean coding = isIntegratedPlatform(orgId, IssuesManagePlatform.Coding.toString());
+
         List<String> platforms = new ArrayList<>();
         if (tapd) {
             // 是否关联了项目
@@ -255,13 +246,6 @@ public class IssuesService {
             String zentaoId = project.getZentaoId();
             if (StringUtils.isNotBlank(zentaoId)) {
                 platforms.add(IssuesManagePlatform.Zentao.name());
-            }
-        }
-
-        if (coding) {
-            String codingId = project.getZentaoId();
-            if (StringUtils.isNotBlank(codingId)) {
-                platforms.add(IssuesManagePlatform.Coding.name());
             }
         }
         return platforms;

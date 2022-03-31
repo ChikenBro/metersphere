@@ -18,6 +18,9 @@
         <result column="scenario_custom_num" jdbcType="BIT" property="scenarioCustomNum"/>
         <result column="create_user" jdbcType="VARCHAR" property="createUser"/>
         <result column="system_id" jdbcType="VARCHAR" property="systemId"/>
+        <result column="coding_project_id" jdbcType="VARCHAR" property="codingProjectId"/>
+        <result column="coding_display_name" jdbcType="VARCHAR" property="codingDisplayName"/>
+        <result column="coding_project_name" jdbcType="VARCHAR" property="codingProjectName"/>
     </resultMap>
     <sql id="Example_Where_Clause">
         <where>
@@ -82,7 +85,7 @@
     <sql id="Base_Column_List">
     id, workspace_id, `name`, description, create_time, update_time, tapd_id, jira_key, 
     zentao_id, `repeatable`, case_template_id, issue_template_id, custom_num, scenario_custom_num, 
-    create_user, system_id
+    create_user, system_id,coding_project_id,coding_display_name,coding_project_name
   </sql>
     <select id="selectByExample" parameterType="io.metersphere.base.domain.ProjectExample" resultMap="BaseResultMap">
         select
@@ -120,13 +123,13 @@
       tapd_id, jira_key, zentao_id, 
       `repeatable`, case_template_id, issue_template_id, 
       custom_num, scenario_custom_num, create_user, 
-      system_id)
+      system_id,coding_project_id,coding_display_name,coding_project_name)
     values (#{id,jdbcType=VARCHAR}, #{workspaceId,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, 
       #{description,jdbcType=VARCHAR}, #{createTime,jdbcType=BIGINT}, #{updateTime,jdbcType=BIGINT}, 
       #{tapdId,jdbcType=VARCHAR}, #{jiraKey,jdbcType=VARCHAR}, #{zentaoId,jdbcType=VARCHAR}, 
       #{repeatable,jdbcType=BIT}, #{caseTemplateId,jdbcType=VARCHAR}, #{issueTemplateId,jdbcType=VARCHAR}, 
       #{customNum,jdbcType=BIT}, #{scenarioCustomNum,jdbcType=BIT}, #{createUser,jdbcType=VARCHAR}, 
-      #{systemId,jdbcType=VARCHAR})
+      #{systemId,jdbcType=VARCHAR},#{codingProjectId,jdbcType=VARCHAR},#{codingDisplayName,jdbcType=VARCHAR},#{codingProjectName,jdbcType=VARCHAR})
   </insert>
     <insert id="insertSelective" parameterType="io.metersphere.base.domain.Project">
         insert into project
@@ -148,6 +151,15 @@
             </if>
             <if test="updateTime != null">
                 update_time,
+            </if>
+            <if test="codingDisplayName != null">
+                coding_display_name,
+            </if>
+            <if test="codingProjectName != null">
+                coding_project_name,
+            </if>
+            <if test="codingProjectId != null">
+                coding_project_id,
             </if>
             <if test="tapdId != null">
                 tapd_id,
@@ -178,6 +190,15 @@
             </if>
             <if test="systemId != null">
                 system_id,
+            </if>
+            <if test="codingProjectId != null">
+                coding_project_id,
+            </if>
+            <if test="codingDisplayName != null">
+                coding_display_name,
+            </if>
+            <if test="codingProjectName != null">
+                coding_project_name,
             </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -228,6 +249,15 @@
             </if>
             <if test="systemId != null">
                 #{systemId,jdbcType=VARCHAR},
+            </if>
+            <if test="codingProjectId != null">
+                #{codingProjectId,jdbcType=VARCHAR},
+            </if>
+            <if test="codingDisplayName != null">
+                #{codingDisplayName,jdbcType=VARCHAR},
+            </if>
+            <if test="codingProjectName != null">
+                #{codingProjectName,jdbcType=VARCHAR},
             </if>
         </trim>
     </insert>
@@ -288,6 +318,15 @@
             <if test="record.systemId != null">
                 system_id = #{record.systemId,jdbcType=VARCHAR},
             </if>
+            <if test="record.codingProjectId != null">
+                coding_project_id=#{record.codingProjectId,jdbcType=VARCHAR},
+            </if>
+            <if test="codingDisplayName != null">
+                coding_display_name=#{record.codingDisplayName,jdbcType=VARCHAR},
+            </if>
+            <if test="codingProjectName != null">
+                coding_project_name=#{record.codingProjectName,jdbcType=VARCHAR},
+            </if>
         </set>
         <if test="_parameter != null">
             <include refid="Update_By_Example_Where_Clause"/>
@@ -310,7 +349,10 @@
         custom_num = #{record.customNum,jdbcType=BIT},
         scenario_custom_num = #{record.scenarioCustomNum,jdbcType=BIT},
         create_user = #{record.createUser,jdbcType=VARCHAR},
-        system_id = #{record.systemId,jdbcType=VARCHAR}
+        system_id = #{record.systemId,jdbcType=VARCHAR},
+        coding_project_id = #{record.codingProjectId,jdbcType=VARCHAR},
+        coding_display_name = #{record.codingDisplayName,jdbcType=VARCHAR},
+        coding_project_name = #{record.codingProjectName,jdbcType=VARCHAR}
         <if test="_parameter != null">
             <include refid="Update_By_Example_Where_Clause"/>
         </if>
@@ -363,6 +405,15 @@
             <if test="systemId != null">
                 system_id = #{systemId,jdbcType=VARCHAR},
             </if>
+            <if test="record.codingProjectId != null">
+                coding_project_id=#{codingProjectId,jdbcType=VARCHAR},
+            </if>
+            <if test="codingDisplayName != null">
+                coding_display_name=#{codingDisplayName,jdbcType=VARCHAR},
+            </if>
+            <if test="codingProjectName != null">
+                coding_project_name=#{codingProjectName,jdbcType=VARCHAR},
+            </if>
         </set>
         where id = #{id,jdbcType=VARCHAR}
     </update>
@@ -382,7 +433,10 @@
       custom_num = #{customNum,jdbcType=BIT},
       scenario_custom_num = #{scenarioCustomNum,jdbcType=BIT},
       create_user = #{createUser,jdbcType=VARCHAR},
-      system_id = #{systemId,jdbcType=VARCHAR}
+      system_id = #{systemId,jdbcType=VARCHAR},
+      coding_project_id = #{record.codingProjectId,jdbcType=VARCHAR},
+      coding_display_name = #{record.codingDisplayName,jdbcType=VARCHAR},
+      coding_project_name = #{record.codingProjectName,jdbcType=VARCHAR}
     where id = #{id,jdbcType=VARCHAR}
   </update>
 

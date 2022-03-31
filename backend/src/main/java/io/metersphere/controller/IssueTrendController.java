@@ -7,6 +7,8 @@ import io.metersphere.base.domain.IssueTrend;
 
 import io.metersphere.performance.base.TrendChartsData;
 import io.metersphere.service.IssueTrendStatisticsService;
+import io.metersphere.service.IssueTrendStatisticsServiceNew;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -38,7 +40,7 @@ public class IssueTrendController {
         return issueTrendStatisticsService.getIssueTrendList();
     }
     @GetMapping("/issue/total/projectquality/resolved/list")
-    public ResultHolder issueTrendTotal(@RequestParam HashMap<String, String> hashMap) throws HttpProcessException, ExecutionException, InterruptedException, ParseException {
+    public ResultHolder issueTrendTotal(@RequestParam HashMap<String, String> hashMap)  {
         try {
 //            System.out.println(hashMap.get("token"));
             JSONObject resultToken = issueTrendStatisticsService.checkToken(hashMap.get("token"));
@@ -51,17 +53,11 @@ public class IssueTrendController {
 //            return ResultHolder.selfInface(1,"fail","请检查环境或者个人令牌权限",0);
 //        }
             return ResultHolder.selfInface(0,"success",result,result.size());
-        } catch (HttpProcessException e) {
-            return ResultHolder.selfInface(1,"fail","请检查请求消息体",0);
-        } catch (ExecutionException e) {
-            return ResultHolder.selfInface(1,"fail","请检查请求消息体",0);
-        } catch (InterruptedException e) {
-            return ResultHolder.selfInface(1,"fail","请检查请求消息体",0);
-        } catch (ParseException e) {
+        }          catch (Exception e) {
             return ResultHolder.selfInface(1,"fail","请检查请求消息体",0);
         }
     }
-//    @RequestMapping(value = "/queryStmp", method = RequestMethod.GET)
+    //    @RequestMapping(value = "/queryStmp", method = RequestMethod.GET)
     @GetMapping("/issue/total/getAllProject")
     public ResultHolder getAllProject(@RequestParam HashMap<String, String> hashMap) throws HttpProcessException {
         try {
@@ -115,9 +111,9 @@ public class IssueTrendController {
                     try {
                         result = issueTrendStatisticsService.fromProjectUnresolved(hashMap.get("token"),e1.get("Name").toString());
                     } catch (Exception e) {
-            result.put("allIssue",0);
-            result.put("allUnresolvedIssue",0);
-            result.put("unresolvedIssuePercent",0);
+                        result.put("allIssue",0);
+                        result.put("allUnresolvedIssue",0);
+                        result.put("unresolvedIssuePercent",0);
                         e.printStackTrace();
                     }
                     newMap.put("data",result);
@@ -128,7 +124,7 @@ public class IssueTrendController {
             }
             else {
                 HashMap<String, Object> newMap = new HashMap<>();
-            Map<String,Object> result = issueTrendStatisticsService.fromProjectUnresolved(hashMap.get("token"),hashMap.get("projectName"));
+                Map<String,Object> result = issueTrendStatisticsService.fromProjectUnresolved(hashMap.get("token"),hashMap.get("projectName"));
                 newMap.put("data",result);
                 newMap.put("projectName",hashMap.get("projectName").toString());
                 testMap.add(newMap);
@@ -262,7 +258,7 @@ public class IssueTrendController {
                 testMap.add(newMap);
             }
 
-           //        if (result.size()==0){
+            //        if (result.size()==0){
 //            return ResultHolder.selfInface(1,"fail",result,0);
 //        }
             return ResultHolder.selfInface(0,"success",testMap,testMap.size());

@@ -12,6 +12,7 @@ public class Issues implements Serializable {
     private String status;
 
     private Long createTime;
+    private Long completedTime;
 
     private Long updateTime;
 

@@ -218,7 +218,7 @@ public class JiraPlatform extends AbstractIssuePlatform {
     }
 
     @Override
-    public String addIssue(IssuesUpdateRequest issuesRequest) {
+    public void addIssue(IssuesUpdateRequest issuesRequest) {
         issuesRequest.setPlatform(IssuesManagePlatform.Jira.toString());
 
         JiraConfig config = getUserConfig();
@@ -287,7 +287,6 @@ public class JiraPlatform extends AbstractIssuePlatform {
 
         // 插入缺陷表
         insertIssues(result.getKey(), issuesRequest);
-        return null;
     }
 
     private void handleMuDuCustomData(CustomFieldItemDTO item, JSONObject fields) {
@@ -323,11 +322,10 @@ public class JiraPlatform extends AbstractIssuePlatform {
     }
 
     @Override
-    public String updateIssue(IssuesUpdateRequest request) {
+    public void updateIssue(IssuesUpdateRequest request) {
         // todo 调用接口
         request.setDescription(null);
         handleIssueUpdate(request);
-        return null;
     }
 
     @Override

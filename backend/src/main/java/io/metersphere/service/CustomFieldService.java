@@ -9,11 +9,10 @@ import io.metersphere.base.domain.CustomFieldTemplate;
 import io.metersphere.base.mapper.CustomFieldMapper;
 import io.metersphere.base.mapper.ext.ExtCustomFieldMapper;
 import io.metersphere.commons.constants.TemplateConstants;
-import io.metersphere.commons.exception.CodingException;
 import io.metersphere.commons.exception.MSException;
 import io.metersphere.commons.utils.*;
 import io.metersphere.controller.request.QueryCustomFieldRequest;
-import io.metersphere.dto.*;
+import io.metersphere.dto.CustomFieldDao;
 import io.metersphere.i18n.Translator;
 import io.metersphere.log.utils.ReflexObjectUtil;
 import io.metersphere.log.vo.DetailColumn;
@@ -113,12 +112,6 @@ public class CustomFieldService {
         return customFieldMapper.selectByExampleWithBLOBs(example);
     }
 
-    /**
-     * jira customField
-     *
-     * @param templateId
-     * @return
-     */
     public List<CustomFieldDao> getCustomFieldByTemplateId(String templateId) {
         List<CustomFieldTemplate> customFields = customFieldTemplateService.getCustomFields(templateId);
         List<String> fieldIds = customFields.stream()
@@ -140,21 +133,6 @@ public class CustomFieldService {
             });
         }
         return result;
-    }
-
-    /**
-     * coding customField
-     * @param goPage 当前页数
-     * @param pageSize 1页多少数量
-     * @param customFieldListRequest
-     * @return
-     */
-    public CustomFieldList getCodingCustomFieldByTemplateId(Integer goPage, Integer pageSize, CodingCustomFieldListRequest customFieldListRequest) {
-
-        String url = String.format("http://10.20.11.185:8088/field/template/issue//requirement/list/%s/%s", goPage, pageSize);
-        LogUtil.info("get coding customField: " + customFieldListRequest);
-        String result = CodingException.checkCodingException(url, customFieldListRequest);
-        return JSON.parseObject(result, CustomFieldList.class);
     }
 
     public List<CustomField> getFieldByIds(List<String> ids) {
