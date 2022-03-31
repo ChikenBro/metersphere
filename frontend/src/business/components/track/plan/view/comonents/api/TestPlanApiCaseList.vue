@@ -14,10 +14,10 @@
       </template>
 
       <ms-table
+        ref="table"
         v-loading="result.loading"
         :data="tableData"
         :condition="condition"
-        ref="table"
         :total="total"
         :page-size.sync="pageSize"
         :operators="operators"
@@ -127,9 +127,14 @@
           >
             <template v-slot:default="scope">
               <div v-loading="rowLoading === scope.row.id">
-                <el-link v-if="scope.row.execResult && scope.row.execResult ===
-                'error'" type="danger" " @click="getReportResult(scope.row)"
-                v-text="getResult(scope.row.execResult)" />
+                <el-link
+                  v-if="
+                    scope.row.execResult && scope.row.execResult === 'error'
+                  "
+                  type="danger"
+                  @click="getReportResult(scope.row)"
+                  v-text="getResult(scope.row.execResult)"
+                />
                 <el-link
                   v-else-if="
                     scope.row.execResult && scope.row.execResult === 'success'

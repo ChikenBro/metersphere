@@ -13,11 +13,17 @@
               @keyup.enter.native="search"
             />
           </el-col>
-          <env-popover ref="envPopover" :env-map="projectEnvMap"
-          :project-ids="projectIds"
-          :show-config-button-with-out-permission="showConfigButtonWithOutPermission"
-          " :project-list="projectList" class="env-popover"
-          @setProjectEnvMap="setProjectEnvMap" />
+          <env-popover
+            ref="envPopover"
+            :env-map="projectEnvMap"
+            :project-ids="projectIds"
+            :show-config-button-with-out-permission="
+              showConfigButtonWithOutPermission
+            "
+            :project-list="projectList"
+            class="env-popover"
+            @setProjectEnvMap="setProjectEnvMap"
+          />
         </el-row>
       </template>
 

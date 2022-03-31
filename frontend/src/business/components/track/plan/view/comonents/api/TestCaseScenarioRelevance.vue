@@ -1,28 +1,28 @@
 <template>
   <test-case-relevance-base
-    @setProject="setProject"
-    :plan-id="planId"
-    @save="saveCaseRelevance"
     ref="baseRelevance"
+    :plan-id="planId"
+    @setProject="setProject"
+    @save="saveCaseRelevance"
   >
     <template v-slot:aside>
       <ms-api-scenario-module
+        ref="nodeTree"
+        :relevance-project-id="projectId"
+        :is-read-only="true"
         @nodeSelectEvent="nodeChange"
         @refreshTable="refresh"
-        :relevance-project-id="projectId"
         @setModuleOptions="setModuleOptions"
-        :is-read-only="true"
-        ref="nodeTree"
       />
     </template>
 
     <relevance-scenario-list
+      ref="apiScenarioList"
       :select-node-ids="selectNodeIds"
       :trash-enable="trashEnable"
       :plan-id="planId"
-      ref="apiScenarioList"
-      :project-id="projectId"/>
-
+      :project-id="projectId"
+    />
   </test-case-relevance-base>
 </template>
 
@@ -50,24 +50,23 @@ export default {
     MsApiModule,
     TestCaseRelevanceBase,
   },
-    props: {
-      planId: {
-        type: String
-      },
+  props: {
+    planId: {
+      type: String,
     },
-    data() {
-      return {
-        showCasePage: true,
-        currentProtocol: null,
-        currentModule: null,
-        selectNodeIds: [],
-        moduleOptions: {},
-        trashEnable: false,
-        condition: {},
-        currentRow: {},
-        projectId: ""
-      };
-    },
+  },
+  data() {
+    return {
+      showCasePage: true,
+      currentProtocol: null,
+      currentModule: null,
+      selectNodeIds: [],
+      moduleOptions: {},
+      trashEnable: false,
+      condition: {},
+      currentRow: {},
+      projectId: "",
+    };
   },
   watch: {
     planId() {

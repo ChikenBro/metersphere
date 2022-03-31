@@ -7,10 +7,17 @@
     trigger="click"
     @show="showPopover"
   >
-    <env-select ref="envSelect" :project-ids="projectIds" :env-map="envMap"
-    :show-config-button-with-out-permission="showConfigButtonWithOutPermission"
-    " :project-list="projectList" @close="visible = false"
-    @setProjectEnvMap="setProjectEnvMap" />
+    <env-select
+      ref="envSelect"
+      :project-ids="projectIds"
+      :env-map="envMap"
+      :show-config-button-with-out-permission="
+        showConfigButtonWithOutPermission
+      "
+      :project-list="projectList"
+      @close="visible = false"
+      @setProjectEnvMap="setProjectEnvMap"
+    />
     <el-button
       slot="reference"
       type="primary"
