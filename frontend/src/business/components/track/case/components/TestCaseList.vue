@@ -1,9 +1,12 @@
 <template>
-
   <div class="card-container">
-
-    <ms-table-header :condition.sync="condition" @search="initTableData"
-                     :tip="$t('commons.search_by_name_or_id')" title="" :show-create="false"/>
+    <ms-table-header
+      :condition.sync="condition"
+      :tip="$t('commons.search_by_name_or_id')"
+      title=""
+      :show-create="false"
+      @search="initTableData"
+    />
 
     <ms-table
       v-loading="page.result.loading"
@@ -12,45 +15,48 @@
       :total="page.total"
       :page-size.sync="page.pageSize"
       :operators="operators"
+      ref="table"
       :screen-height="screenHeight"
       :batch-operators="batchButtons"
-      @handlePageChange="initTableData"
-      @handleRowClick="handleEdit"
       :fields.sync="fields"
       :field-key="tableHeaderKey"
+      :custom-fields="testCaseTemplate.customFields"
+      @handlePageChange="initTableData"
+      @handleRowClick="handleEdit"
       @refresh="initTableData"
       @saveSortField="saveSortField"
-      :custom-fields="testCaseTemplate.customFields"
-      ref="table">
-
+    >
       <ms-table-column
+        v-if="this.trashEnable"
         prop="deleteTime"
         sortable
-        v-if="this.trashEnable"
         :fields-width="fieldsWidth"
         :label="$t('commons.delete_time')"
-        min-width="150px">
+        min-width="150px"
+      >
         <template v-slot:default="scope">
           <span>{{ scope.row.deleteTime | timestampFormatDate }}</span>
         </template>
       </ms-table-column>
 
       <ms-table-column
+        v-if="this.trashEnable"
         prop="deleteUserId"
         :fields-width="fieldsWidth"
-        v-if="this.trashEnable"
         :label="$t('commons.delete_user')"
-        min-width="120"/>
+        min-width="120"
+      />
 
       <span v-for="item in fields" :key="item.key">
         <ms-table-column
-            v-if="!customNum"
-            :field="item"
-            :fields-width="fieldsWidth"
-            prop="num"
-            sortable
-            :label="$t('commons.id')"
-            min-width="80"/>
+          v-if="!customNum"
+          :field="item"
+          :fields-width="fieldsWidth"
+          prop="num"
+          sortable
+          :label="$t('commons.id')"
+          min-width="80"
+        />
 
         <ms-table-column
           v-if="item.id === 'num' && customNum"
@@ -58,7 +64,8 @@
           prop="customNum"
           sortable
           :label="$t('commons.id')"
-          min-width="80"/>
+          min-width="80"
+        />
 
         <ms-table-column
           prop="name"
@@ -74,9 +81,10 @@
           :field="item"
           :fields-width="fieldsWidth"
           :label="$t('commons.create_user')"
-          min-width="120">
+          min-width="120"
+        >
           <template v-slot:default="scope">
-            {{memberMap.get(scope.row.createUser)}}
+            {{ memberMap.get(scope.row.createUser) }}
           </template>
         </ms-table-column>
 
@@ -85,10 +93,11 @@
           min-width="100px"
           :field="item"
           :fields-width="fieldsWidth"
-          :label="$t('test_track.case.status')">
+          :label="$t('test_track.case.status')"
+        >
           <template v-slot:default="scope">
             <span class="el-dropdown-link">
-              <review-status :value="scope.row.reviewStatus"/>
+              <review-status :value="scope.row.reviewStatus" />
             </span>
           </template>
         </ms-table-column>
@@ -98,94 +107,119 @@
           :field="item"
           :fields-width="fieldsWidth"
           :label="$t('commons.tag')"
-          min-width="80">
+          min-width="80"
+        >
           <template v-slot:default="scope">
-            <ms-tag v-for="(itemName,index)  in scope.row.tags" :key="index" type="success" effect="plain"
-                    :content="itemName" style="margin-left: 0px; margin-right: 2px"/>
-            <span/>
+            <ms-tag
+              v-for="(itemName, index) in scope.row.tags"
+              :key="index"
+              type="success"
+              effect="plain"
+              :content="itemName"
+              style="margin-left: 0px; margin-right: 2px"
+            />
+            <span />
           </template>
         </ms-table-column>
 
         <ms-table-column
-            prop="nodePath"
-            :field="item"
-            :fields-width="fieldsWidth"
-            :label="$t('test_track.case.module')"
-            min-width="150px">
+          prop="nodePath"
+          :field="item"
+          :fields-width="fieldsWidth"
+          :label="$t('test_track.case.module')"
+          min-width="150px"
+        >
         </ms-table-column>
 
         <ms-table-column
-            prop="updateTime"
-            sortable
-            :field="item"
-            :fields-width="fieldsWidth"
-            :label="$t('commons.update_time')"
-            min-width="150px">
+          prop="updateTime"
+          sortable
+          :field="item"
+          :fields-width="fieldsWidth"
+          :label="$t('commons.update_time')"
+          min-width="150px"
+        >
           <template v-slot:default="scope">
             <span>{{ scope.row.updateTime | timestampFormatDate }}</span>
           </template>
         </ms-table-column>
-        <ms-table-column prop="createTime"
-                         :field="item"
-                         :fields-width="fieldsWidth"
-                         :label="$t('commons.create_time')"
-                         sortable
-                         min-width="150px">
+        <ms-table-column
+          prop="createTime"
+          :field="item"
+          :fields-width="fieldsWidth"
+          :label="$t('commons.create_time')"
+          sortable
+          min-width="150px"
+        >
           <template v-slot:default="scope">
             <span>{{ scope.row.createTime | timestampFormatDate }}</span>
           </template>
-        </ms-table-column >
+        </ms-table-column>
 
-        <ms-table-column v-for="field in testCaseTemplate.customFields" :key="field.id"
-                         :filters="field.name === '用例等级' ? priorityFilters : null"
-                         :field="item"
-                         :fields-width="fieldsWidth"
-                         :label="field.name"
-                         :min-width="90"
-                         :prop="field.name">
+        <ms-table-column
+          v-for="field in testCaseTemplate.customFields"
+          :key="field.id"
+          :filters="field.name === '用例等级' ? priorityFilters : null"
+          :field="item"
+          :fields-width="fieldsWidth"
+          :label="field.name"
+          :min-width="90"
+          :prop="field.name"
+        >
           <template v-slot="scope">
             <span v-if="field.name === '用例等级'">
-                <priority-table-item :value="getCustomFieldValue(scope.row, field) ? getCustomFieldValue(scope.row, field) : scope.row.priority"/>
+              <priority-table-item
+                :value="
+                  getCustomFieldValue(scope.row, field)
+                    ? getCustomFieldValue(scope.row, field)
+                    : scope.row.priority
+                "
+              />
             </span>
             <span v-else>
-              {{getCustomFieldValue(scope.row, field)}}
+              {{ getCustomFieldValue(scope.row, field) }}
             </span>
           </template>
         </ms-table-column>
-
       </span>
-
     </ms-table>
 
-    <ms-table-pagination :change="initTableData" :current-page.sync="page.currentPage" :page-size.sync="page.pageSize"
-                         :total="page.total"/>
+    <ms-table-pagination
+      :change="initTableData"
+      :current-page.sync="page.currentPage"
+      :page-size.sync="page.pageSize"
+      :total="page.total"
+    />
 
-    <batch-edit ref="batchEdit" @batchEdit="batchEdit"
-                :typeArr="typeArr" :value-arr="valueArr" :dialog-title="$t('test_track.case.batch_edit_case')"/>
+    <batch-edit
+      ref="batchEdit"
+      :type-arr="typeArr"
+      :value-arr="valueArr"
+      :dialog-title="$t('test_track.case.batch_edit_case')"
+      @batchEdit="batchEdit"
+    />
 
-    <batch-move @refresh="refresh" @moveSave="moveSave" ref="testBatchMove"/>
+    <batch-move ref="testBatchMove" @refresh="refresh" @moveSave="moveSave" />
   </div>
-
 </template>
 
 <script>
-
-import MsCreateBox from '../../../settings/CreateBox';
+import MsCreateBox from "../../../settings/CreateBox";
 import MsTableHeaderSelectPopover from "@/business/components/common/components/table/MsTableHeaderSelectPopover";
-import TestCaseImport from '../components/TestCaseImport';
-import TestCaseExport from '../components/TestCaseExport';
-import MsTablePagination from '../../../../components/common/pagination/TablePagination';
-import NodeBreadcrumb from '../../common/NodeBreadcrumb';
-import MsTableHeader from '../../../../components/common/components/MsTableHeader';
+import TestCaseImport from "../components/TestCaseImport";
+import TestCaseExport from "../components/TestCaseExport";
+import MsTablePagination from "../../../../components/common/pagination/TablePagination";
+import NodeBreadcrumb from "../../common/NodeBreadcrumb";
+import MsTableHeader from "../../../../components/common/components/MsTableHeader";
 import PriorityTableItem from "../../common/tableItems/planview/PriorityTableItem";
 import TypeTableItem from "../../common/tableItems/planview/TypeTableItem";
 import MethodTableItem from "../../common/tableItems/planview/MethodTableItem";
 import MsTableOperator from "../../../common/components/MsTableOperator";
 import MsTableOperatorButton from "../../../common/components/MsTableOperatorButton";
 import MsTableButton from "../../../common/components/MsTableButton";
-import {TEST_CASE_CONFIGS} from "../../../common/components/search/search-components";
+import { TEST_CASE_CONFIGS } from "../../../common/components/search/search-components";
 import BatchEdit from "./BatchEdit";
-import {PROJECT_NAME, TEST_CASE_LIST} from "@/common/js/constants";
+import { PROJECT_NAME, TEST_CASE_LIST } from "@/common/js/constants";
 import StatusTableItem from "@/business/components/track/common/tableItems/planview/StatusTableItem";
 import TestCaseDetail from "./TestCaseDetail";
 import ReviewStatus from "@/business/components/track/case/components/ReviewStatus";
@@ -196,16 +230,18 @@ import {
   deepClone,
   getCustomFieldBatchEditOption,
   getCustomFieldValue,
-  getCustomTableWidth, getLastTableSortField,
+  getCustomTableWidth,
+  getLastTableSortField,
   getPageInfo,
   getTableHeaderWithCustomFields,
-  initCondition, saveLastTableSortField,
+  initCondition,
+  saveLastTableSortField,
 } from "@/common/js/tableUtils";
 import HeaderLabelOperate from "@/business/components/common/head/HeaderLabelOperate";
 import PlanStatusTableItem from "@/business/components/track/common/tableItems/plan/PlanStatusTableItem";
-import {getCurrentProjectID} from "@/common/js/utils";
-import {getTestTemplate} from "@/network/custom-field-template";
-import {getProjectMember} from "@/network/user";
+import { getCurrentProjectID } from "@/common/js/utils";
+import { getTestTemplate } from "@/network/custom-field-template";
+import { getProjectMember } from "@/network/user";
 import MsTable from "@/business/components/common/components/table/MsTable";
 import MsTableColumn from "@/business/components/common/components/table/MsTableColumn";
 import BatchMove from "@/business/components/track/case/components/BatchMove";
@@ -237,97 +273,121 @@ export default {
     ReviewStatus,
     MsTag,
   },
+  props: {
+    treeNodes: {
+      type: Array,
+    },
+    trashEnable: {
+      type: Boolean,
+      default: false,
+    },
+    customNum: {
+      type: Boolean,
+      default: false,
+    },
+  },
   data() {
     return {
       projectName: "",
       type: TEST_CASE_LIST,
       tableHeaderKey: "TRACK_TEST_CASE",
-      screenHeight: 'calc(100vh - 258px)',
+      screenHeight: "calc(100vh - 258px)",
       tableLabel: [],
       deletePath: "/test/case/delete",
       condition: {
-        components: TEST_CASE_CONFIGS
+        components: TEST_CASE_CONFIGS,
       },
       priorityFilters: [
-        {text: 'P0', value: 'P0'},
-        {text: 'P1', value: 'P1'},
-        {text: 'P2', value: 'P2'},
-        {text: 'P3', value: 'P3'}
+        { text: "P0", value: "P0" },
+        { text: "P1", value: "P1" },
+        { text: "P2", value: "P2" },
+        { text: "P3", value: "P3" },
       ],
       methodFilters: [
-        {text: this.$t('test_track.case.manual'), value: 'manual'},
-        {text: this.$t('test_track.case.auto'), value: 'auto'}
+        { text: this.$t("test_track.case.manual"), value: "manual" },
+        { text: this.$t("test_track.case.auto"), value: "auto" },
       ],
       typeFilters: [
-        {text: this.$t('commons.functional'), value: 'functional'},
-        {text: this.$t('commons.performance'), value: 'performance'},
-        {text: this.$t('commons.api'), value: 'api'}
+        { text: this.$t("commons.functional"), value: "functional" },
+        { text: this.$t("commons.performance"), value: "performance" },
+        { text: this.$t("commons.api"), value: "api" },
       ],
       reviewStatusFilters: [
-        {text: this.$t('test_track.review.prepare'), value: 'Prepare'},
-        {text: this.$t('test_track.review.pass'), value: 'Pass'},
-        {text: this.$t('test_track.review.un_pass'), value: 'UnPass'},
+        { text: this.$t("test_track.review.prepare"), value: "Prepare" },
+        { text: this.$t("test_track.review.pass"), value: "Pass" },
+        { text: this.$t("test_track.review.un_pass"), value: "UnPass" },
       ],
       statusFilters: [
-        {text: '未开始', value: 'Prepare'},
-        {text: '进行中', value: 'Underway'},
-        {text: '已完成', value: 'Completed'},
+        { text: "未开始", value: "Prepare" },
+        { text: "进行中", value: "Underway" },
+        { text: "已完成", value: "Completed" },
       ],
-      batchButtons:[],
+      batchButtons: [],
       simpleButtons: [
         {
-          name: this.$t('test_track.case.batch_edit_case'),
+          name: this.$t("test_track.case.batch_edit_case"),
           handleClick: this.handleBatchEdit,
-          permissions: ['PROJECT_TRACK_CASE:READ+EDIT']
-        }, {
-          name: this.$t('test_track.case.batch_move_case'),
+          permissions: ["PROJECT_TRACK_CASE:READ+EDIT"],
+        },
+        {
+          name: this.$t("test_track.case.batch_move_case"),
           handleClick: this.handleBatchMove,
-          permissions: ['PROJECT_TRACK_CASE:READ+EDIT']
-        }, {
-          name: this.$t('test_track.case.batch_delete_case'),
+          permissions: ["PROJECT_TRACK_CASE:READ+EDIT"],
+        },
+        {
+          name: this.$t("test_track.case.batch_delete_case"),
           handleClick: this.handleDeleteBatchToGc,
-          permissions: ['PROJECT_TRACK_CASE:READ+DELETE']
-        }
+          permissions: ["PROJECT_TRACK_CASE:READ+DELETE"],
+        },
       ],
       trashButtons: [
         {
-          name: this.$t('commons.reduction'),
+          name: this.$t("commons.reduction"),
           handleClick: this.batchReduction,
-          permissions: ['PROJECT_TRACK_CASE:READ+EDIT']
-        }, {
-          name: this.$t('test_track.case.batch_delete_case'),
+          permissions: ["PROJECT_TRACK_CASE:READ+EDIT"],
+        },
+        {
+          name: this.$t("test_track.case.batch_delete_case"),
           handleClick: this.handleDeleteBatch,
-          permissions: ['PROJECT_TRACK_CASE:READ+DELETE']
-        }
+          permissions: ["PROJECT_TRACK_CASE:READ+DELETE"],
+        },
       ],
       operators: [],
       simpleOperators: [
         {
-          tip: this.$t('commons.edit'), icon: "el-icon-edit",
+          tip: this.$t("commons.edit"),
+          icon: "el-icon-edit",
           exec: this.handleEdit,
-          permissions: ['PROJECT_TRACK_CASE:READ+EDIT']
+          permissions: ["PROJECT_TRACK_CASE:READ+EDIT"],
         },
         {
-          tip: this.$t('commons.copy'), icon: "el-icon-copy-document", type: "success",
+          tip: this.$t("commons.copy"),
+          icon: "el-icon-copy-document",
+          type: "success",
           exec: this.handleCopy,
-          permissions: ['PROJECT_TRACK_CASE:READ+COPY']
+          permissions: ["PROJECT_TRACK_CASE:READ+COPY"],
         },
         {
-          tip: this.$t('commons.delete'), icon: "el-icon-delete", type: "danger",
+          tip: this.$t("commons.delete"),
+          icon: "el-icon-delete",
+          type: "danger",
           exec: this.handleDeleteToGc,
-          permissions: ['PROJECT_TRACK_CASE:READ+DELETE']
-        }
+          permissions: ["PROJECT_TRACK_CASE:READ+DELETE"],
+        },
       ],
       trashOperators: [
         {
-          tip: this.$t('commons.reduction'),
+          tip: this.$t("commons.reduction"),
           icon: "el-icon-refresh-left",
-          exec: this.reduction},
+          exec: this.reduction,
+        },
         {
-          tip: this.$t('commons.delete'), icon: "el-icon-delete", type: "danger",
+          tip: this.$t("commons.delete"),
+          icon: "el-icon-delete",
+          type: "danger",
           exec: this.handleDelete,
-          permissions: ['PROJECT_TRACK_CASE:READ+DELETE']
-        }
+          permissions: ["PROJECT_TRACK_CASE:READ+DELETE"],
+        },
       ],
       typeArr: [],
       valueArr: {},
@@ -336,22 +396,9 @@ export default {
       members: [],
       page: getPageInfo(),
       fields: [],
-      fieldsWidth: getCustomTableWidth('TRACK_TEST_CASE'),
-      memberMap: new Map()
+      fieldsWidth: getCustomTableWidth("TRACK_TEST_CASE"),
+      memberMap: new Map(),
     };
-  },
-  props: {
-    treeNodes: {
-      type: Array
-    },
-    trashEnable: {
-      type: Boolean,
-      default: false,
-    },
-    customNum: {
-      type: Boolean,
-      default: false
-    }
   },
   computed: {
     projectId() {
@@ -364,53 +411,17 @@ export default {
       return this.$store.state.testCaseModuleOptions;
     },
   },
-  created: function () {
-    this.getTemplateField();
-    this.$emit('setCondition', this.condition);
-    if(this.trashEnable){
-      this.condition.filters = {status: ["Trash"]};
-    }else {
-      this.condition.filters = {reviewStatus: ["Prepare", "Pass", "UnPass"]};
-    }
-    let orderArr = this.getSortField();
-    if(orderArr){
-      this.condition.orders = orderArr;
-    }
-    this.initTableData();
-    let redirectParam = this.$route.query.dataSelectRange;
-    this.checkRedirectEditPage(redirectParam);
-    if(this.trashEnable){
-      this.operators = this.trashOperators;
-      this.batchButtons = this.trashButtons;
-    }else {
-      this.operators = this.simpleOperators;
-      this.batchButtons = this.simpleButtons;
-    }
-    if(!this.projectName || this.projectName === ""){
-      this.getProjectName();
-    }
-  },
-  activated() {
-    this.getTemplateField();
-    this.condition.filters = {reviewStatus: ["Prepare", "Pass", "UnPass"]};
-    let ids = this.$route.params.ids;
-    if (ids) {
-      this.condition.ids = ids;
-    }
-    this.initTableData();
-    this.condition.ids = null;
-  },
   watch: {
     selectNodeIds() {
       this.page.currentPage = 1;
-      if(!this.trashEnable){
+      if (!this.trashEnable) {
         this.condition.filters.status = [];
       }
       initCondition(this.condition, false);
       this.initTableData();
     },
     condition() {
-      this.$emit('setCondition', this.condition);
+      this.$emit("setCondition", this.condition);
     },
     trashEnable() {
       if (this.trashEnable) {
@@ -418,7 +429,7 @@ export default {
         this.operators = this.trashOperators;
         this.batchButtons = this.trashButtons;
         //更改查询条件
-        this.condition.filters = {status: ["Trash"]};
+        this.condition.filters = { status: ["Trash"] };
         this.condition.moduleIds = [];
         initCondition(this.condition, false);
         this.initTableData();
@@ -428,14 +439,50 @@ export default {
         this.batchButtons = this.simpleButtons;
         this.condition.filters.status = [];
       }
+    },
+  },
+  created: function () {
+    this.getTemplateField();
+    this.$emit("setCondition", this.condition);
+    if (this.trashEnable) {
+      this.condition.filters = { status: ["Trash"] };
+    } else {
+      this.condition.filters = { reviewStatus: ["Prepare", "Pass", "UnPass"] };
     }
+    let orderArr = this.getSortField();
+    if (orderArr) {
+      this.condition.orders = orderArr;
+    }
+    this.initTableData();
+    let redirectParam = this.$route.query.dataSelectRange;
+    this.checkRedirectEditPage(redirectParam);
+    if (this.trashEnable) {
+      this.operators = this.trashOperators;
+      this.batchButtons = this.trashButtons;
+    } else {
+      this.operators = this.simpleOperators;
+      this.batchButtons = this.simpleButtons;
+    }
+    if (!this.projectName || this.projectName === "") {
+      this.getProjectName();
+    }
+  },
+  activated() {
+    this.getTemplateField();
+    this.condition.filters = { reviewStatus: ["Prepare", "Pass", "UnPass"] };
+    let ids = this.$route.params.ids;
+    if (ids) {
+      this.condition.ids = ids;
+    }
+    this.initTableData();
+    this.condition.ids = null;
   },
   methods: {
     getTemplateField() {
       this.page.result.loading = true;
       let p1 = getProjectMember((data) => {
         this.members = data;
-        this.members.forEach(item => {
+        this.members.forEach((item) => {
           this.memberMap.set(item.id, item.name);
         });
       });
@@ -444,24 +491,32 @@ export default {
         let template = data[1];
         this.page.result.loading = true;
         this.testCaseTemplate = template;
-        this.fields = getTableHeaderWithCustomFields('TRACK_TEST_CASE', this.testCaseTemplate.customFields);
+        this.fields = getTableHeaderWithCustomFields(
+          "TRACK_TEST_CASE",
+          this.testCaseTemplate.customFields
+        );
         this.page.result.loading = false;
         if (this.$refs.table) {
           this.$refs.table.reloadTable();
         }
-        getCustomFieldBatchEditOption(template.customFields, this.typeArr, this.valueArr, this.members);
+        getCustomFieldBatchEditOption(
+          template.customFields,
+          this.typeArr,
+          this.valueArr,
+          this.members
+        );
       });
     },
     getCustomFieldValue(row, field) {
       let value = getCustomFieldValue(row, field, this.members);
       if (!value) {
-        if (field.name === '用例等级') {
+        if (field.name === "用例等级") {
           return row.priority;
         }
-        if (field.name === '责任人') {
+        if (field.name === "责任人") {
           return row.maintainer;
         }
-        if (field.name === '用例状态') {
+        if (field.name === "用例状态") {
           return row.status;
         }
       }
@@ -469,17 +524,17 @@ export default {
     },
     checkRedirectEditPage(redirectParam) {
       if (redirectParam != null) {
-        this.$get('test/case/get/' + redirectParam, response => {
+        this.$get("test/case/get/" + redirectParam, (response) => {
           let testCase = response.data;
           testCase.label = "redirect";
-          this.$emit('testCaseEdit', testCase);
+          this.$emit("testCaseEdit", testCase);
         });
       }
     },
-    getProjectName (){
-      this.$get('project/get/' + this.projectId, response => {
+    getProjectName() {
+      this.$get("project/get/" + this.projectId, (response) => {
         let project = response.data;
-        if(project){
+        if (project) {
           this.projectName = project.name;
         }
       });
@@ -491,7 +546,7 @@ export default {
     getSelectDataRange() {
       let dataRange = this.$route.params.dataSelectRange;
       let dataType = this.$route.params.dataType;
-      this.selectDataRange = dataType === 'case' ? dataRange : 'all';
+      this.selectDataRange = dataType === "case" ? dataRange : "all";
     },
     initTableData() {
       this.condition.planId = "";
@@ -502,7 +557,7 @@ export default {
         // param.planId = this.planId;
         this.condition.planId = this.planId;
       }
-      if(!this.trashEnable){
+      if (!this.trashEnable) {
         if (this.selectNodeIds && this.selectNodeIds.length > 0) {
           // param.nodeIds = this.selectNodeIds;
           this.condition.nodeIds = this.selectNodeIds;
@@ -517,52 +572,56 @@ export default {
       this.condition.selectThisWeedRelevanceData = false;
       this.condition.caseCoverage = null;
       switch (this.selectDataRange) {
-        case 'thisWeekCount':
+        case "thisWeekCount":
           this.condition.selectThisWeedData = true;
           break;
-        case 'thisWeekRelevanceCount':
+        case "thisWeekRelevanceCount":
           this.condition.selectThisWeedRelevanceData = true;
           break;
-        case 'uncoverage':
-          this.condition.caseCoverage = 'uncoverage';
+        case "uncoverage":
+          this.condition.caseCoverage = "uncoverage";
           break;
-        case 'coverage':
-          this.condition.caseCoverage = 'coverage';
+        case "coverage":
+          this.condition.caseCoverage = "coverage";
           break;
-        case 'Prepare':
+        case "Prepare":
           this.condition.filters.reviewStatus = [this.selectDataRange];
           break;
-        case 'Pass':
+        case "Pass":
           this.condition.filters.reviewStatus = [this.selectDataRange];
           break;
-        case 'UnPass':
+        case "UnPass":
           this.condition.filters.reviewStatus = [this.selectDataRange];
           break;
       }
-      this.condition.filters.priority = this.condition.filters['用例等级'];
+      this.condition.filters.priority = this.condition.filters["用例等级"];
       if (this.projectId) {
         this.condition.projectId = this.projectId;
-        this.$emit('setCondition', this.condition);
-        this.page.result = this.$post(this.buildPagePath('/test/case/list'), this.condition, response => {
-          let data = response.data;
-          this.page.total = data.itemCount;
-          this.page.data = data.listObject;
-          if (this.$refs.table) {
-            this.$refs.table.clear();
-            this.$nextTick(() => {
-              this.$refs.table.doLayout();
-            });
-          }
-          this.page.data.forEach(item => {
-            if (item.customFields) {
-              item.customFields = JSON.parse(item.customFields);
+        this.$emit("setCondition", this.condition);
+        this.page.result = this.$post(
+          this.buildPagePath("/test/case/list"),
+          this.condition,
+          (response) => {
+            let data = response.data;
+            this.page.total = data.itemCount;
+            this.page.data = data.listObject;
+            if (this.$refs.table) {
+              this.$refs.table.clear();
+              this.$nextTick(() => {
+                this.$refs.table.doLayout();
+              });
             }
-          });
-          this.page.data.forEach((item) => {
-            item.tags = JSON.parse(item.tags);
-          });
-          checkTableRowIsSelected(this, this.$refs.table);
-        });
+            this.page.data.forEach((item) => {
+              if (item.customFields) {
+                item.customFields = JSON.parse(item.customFields);
+              }
+            });
+            this.page.data.forEach((item) => {
+              item.tags = JSON.parse(item.tags);
+            });
+            checkTableRowIsSelected(this, this.$refs.table);
+          }
+        );
       }
     },
     search() {
@@ -572,134 +631,150 @@ export default {
       return path + "/" + this.page.currentPage + "/" + this.page.pageSize;
     },
     testCaseCreate() {
-      this.$emit('testCaseEdit');
+      this.$emit("testCaseEdit");
     },
     handleEdit(testCase) {
-      this.$get('test/case/get/' + testCase.id, response => {
+      this.$get("test/case/get/" + testCase.id, (response) => {
         let testCase = response.data;
-        this.$emit('testCaseEdit', testCase);
+        this.$emit("testCaseEdit", testCase);
       });
     },
     handleCopy(testCase) {
-      this.$get('test/case/get/' + testCase.id, response => {
+      this.$get("test/case/get/" + testCase.id, (response) => {
         let testCase = response.data;
-        testCase.name = 'copy_' + testCase.name;
-        this.$emit('testCaseCopy', testCase);
+        testCase.name = "copy_" + testCase.name;
+        this.$emit("testCaseCopy", testCase);
       });
     },
     handleDelete(testCase) {
-      this.$alert(this.$t('test_track.case.delete_confirm') + '\'' + testCase.name + '\'' + "？", '', {
-        confirmButtonText: this.$t('commons.confirm'),
-        callback: (action) => {
-          if (action === 'confirm') {
-            this._handleDelete(testCase);
-          }
+      this.$alert(
+        this.$t("test_track.case.delete_confirm") +
+          "'" +
+          testCase.name +
+          "'" +
+          "？",
+        "",
+        {
+          confirmButtonText: this.$t("commons.confirm"),
+          callback: (action) => {
+            if (action === "confirm") {
+              this._handleDelete(testCase);
+            }
+          },
         }
-      });
+      );
     },
-    reduction(testCase){
+    reduction(testCase) {
       let param = {};
       param.ids = [testCase.id];
       param.projectId = getCurrentProjectID();
-      this.$post('/test/case/reduction', param, () => {
-        this.$emit('refreshTable');
+      this.$post("/test/case/reduction", param, () => {
+        this.$emit("refreshTable");
         this.initTableData();
-        this.$success(this.$t('commons.save_success'));
+        this.$success(this.$t("commons.save_success"));
       });
     },
     handleDeleteToGc(testCase) {
-      this.$alert(this.$t('test_track.case.delete_confirm') + '\'' + testCase.name + '\'' + "？", '', {
-        confirmButtonText: this.$t('commons.confirm'),
-        callback: (action) => {
-          if (action === 'confirm') {
-            this._handleDeleteToGc(testCase);
-          }
+      this.$alert(
+        this.$t("test_track.case.delete_confirm") +
+          "'" +
+          testCase.name +
+          "'" +
+          "？",
+        "",
+        {
+          confirmButtonText: this.$t("commons.confirm"),
+          callback: (action) => {
+            if (action === "confirm") {
+              this._handleDeleteToGc(testCase);
+            }
+          },
         }
-      });
+      );
     },
-    batchReduction(){
+    batchReduction() {
       let param = buildBatchParam(this, this.$refs.table.selectIds);
-      this.$post('/test/case/reduction', param, () => {
-        this.$emit('refreshTable');
+      this.$post("/test/case/reduction", param, () => {
+        this.$emit("refreshTable");
         this.initTableData();
-        this.$success(this.$t('commons.save_success'));
+        this.$success(this.$t("commons.save_success"));
       });
     },
     handleDeleteBatch() {
-      this.$alert(this.$t('test_track.case.delete_confirm') + "？", '', {
-        confirmButtonText: this.$t('commons.confirm'),
+      this.$alert(this.$t("test_track.case.delete_confirm") + "？", "", {
+        confirmButtonText: this.$t("commons.confirm"),
         callback: (action) => {
-          if (action === 'confirm') {
+          if (action === "confirm") {
             let param = buildBatchParam(this, this.$refs.table.selectIds);
-            this.$post('/test/case/batch/delete', param, () => {
+            this.$post("/test/case/batch/delete", param, () => {
               this.$refs.table.clear();
               this.$emit("refresh");
-              this.$success(this.$t('commons.delete_success'));
+              this.$success(this.$t("commons.delete_success"));
             });
           }
-        }
+        },
       });
     },
     handleDeleteBatchToGc() {
-      this.$alert(this.$t('test_track.case.delete_confirm') + "？", '', {
-        confirmButtonText: this.$t('commons.confirm'),
+      this.$alert(this.$t("test_track.case.delete_confirm") + "？", "", {
+        confirmButtonText: this.$t("commons.confirm"),
         callback: (action) => {
-          if (action === 'confirm') {
+          if (action === "confirm") {
             let param = buildBatchParam(this, this.$refs.table.selectIds);
-            this.$post('/test/case/batch/deleteToGc', param, () => {
+            this.$post("/test/case/batch/deleteToGc", param, () => {
               this.$refs.table.clear();
               this.$emit("refresh");
-              this.$success(this.$t('commons.delete_success'));
+              this.$success(this.$t("commons.delete_success"));
             });
           }
-        }
+        },
       });
     },
     _handleDelete(testCase) {
       let testCaseId = testCase.id;
-      this.$post('/test/case/delete/' + testCaseId, {}, () => {
+      this.$post("/test/case/delete/" + testCaseId, {}, () => {
         this.initTableData();
-        this.$success(this.$t('commons.delete_success'));
-        this.$emit('decrease', testCase.nodeId);
+        this.$success(this.$t("commons.delete_success"));
+        this.$emit("decrease", testCase.nodeId);
       });
     },
     _handleDeleteToGc(testCase) {
       let testCaseId = testCase.id;
-      this.$post('/test/case/deleteToGc/' + testCaseId, {}, () => {
-        this.$emit('refreshTable');
+      this.$post("/test/case/deleteToGc/" + testCaseId, {}, () => {
+        this.$emit("refreshTable");
         this.initTableData();
-        this.$success(this.$t('commons.delete_success'));
+        this.$success(this.$t("commons.delete_success"));
       });
     },
     refresh() {
       this.$refs.table.clear();
-      this.$emit('refresh');
+      this.$emit("refresh");
     },
     refreshAll() {
       this.$refs.table.clear();
-      this.$emit('refreshAll');
+      this.$emit("refreshAll");
     },
     showDetail(row, event, column) {
-      this.$emit('testCaseDetail', row);
+      this.$emit("testCaseDetail", row);
     },
     importTestCase() {
       if (!this.projectId) {
-        this.$warning(this.$t('commons.check_project_tip'));
+        this.$warning(this.$t("commons.check_project_tip"));
         return;
       }
       this.$refs.testCaseImport.open();
     },
     exportTestCase() {
       if (!this.projectId) {
-        this.$warning(this.$t('commons.check_project_tip'));
+        this.$warning(this.$t("commons.check_project_tip"));
         return;
       }
 
       let config = {
-        url: '/test/case/export/testcase',
-        method: 'post',
-        responseType: 'blob',
-        data: buildBatchParam(this, this.$refs.table.selectIds)
+        url: "/test/case/export/testcase",
+        method: "post",
+        responseType: "blob",
+        data: buildBatchParam(this, this.$refs.table.selectIds),
       };
 
       if (config.data.ids === undefined || config.data.ids.length < 1) {
@@ -707,11 +782,11 @@ export default {
         return;
       }
 
-      this.page.result = this.$request(config).then(response => {
-        const filename = "Metersphere_case_" + this.projectName+ ".xlsx";
+      this.page.result = this.$request(config).then((response) => {
+        const filename = "Metersphere_case_" + this.projectName + ".xlsx";
         const blob = new Blob([response.data]);
         if ("download" in document.createElement("a")) {
-          let aTag = document.createElement('a');
+          let aTag = document.createElement("a");
           aTag.download = filename;
           aTag.href = URL.createObjectURL(blob);
           aTag.click();
@@ -723,18 +798,18 @@ export default {
     },
     handleBatch(type) {
       if (this.$refs.selectRows.size < 1) {
-        if (type === 'export') {
+        if (type === "export") {
           this.exportTestCase();
           return;
         } else {
-          this.$warning(this.$t('test_track.plan_view.select_manipulate'));
+          this.$warning(this.$t("test_track.plan_view.select_manipulate"));
           return;
         }
       }
-      if (type === 'move') {
+      if (type === "move") {
         let ids = this.$refs.table.selectIds;
-        this.$emit('moveToNode', ids);
-      } else if (type === 'delete') {
+        this.$emit("moveToNode", ids);
+      } else if (type === "delete") {
         this.handleDeleteBatch();
       } else {
         this.exportTestCase();
@@ -747,8 +822,8 @@ export default {
       param.customField.name = form.type;
       param.ids = ids;
       param.condition = this.condition;
-      this.$post('/test/case/batch/edit', param, () => {
-        this.$success(this.$t('commons.save_success'));
+      this.$post("/test/case/batch/edit", param, () => {
+        this.$success(this.$t("commons.save_success"));
         this.refresh();
       });
     },
@@ -757,42 +832,49 @@ export default {
       this.$refs.batchEdit.open();
     },
     handleBatchMove() {
-      this.$refs.testBatchMove.open(this.treeNodes, this.$refs.table.selectIds, this.moduleOptions);
+      this.$refs.testBatchMove.open(
+        this.treeNodes,
+        this.$refs.table.selectIds,
+        this.moduleOptions
+      );
     },
     getMaintainerOptions() {
-      this.$post('/user/project/member/tester/list', {projectId: getCurrentProjectID()}, response => {
-        this.valueArr.maintainer = response.data;
-      });
+      this.$post(
+        "/user/project/member/tester/list",
+        { projectId: getCurrentProjectID() },
+        (response) => {
+          this.valueArr.maintainer = response.data;
+        }
+      );
     },
     moveSave(param) {
       param.condition = this.condition;
-      this.page.result = this.$post('/test/case/batch/edit', param, () => {
-        this.$success(this.$t('commons.save_success'));
+      this.page.result = this.$post("/test/case/batch/edit", param, () => {
+        this.$success(this.$t("commons.save_success"));
         this.$refs.testBatchMove.close();
         this.refresh();
       });
     },
-    saveSortField(key,orders){
-      saveLastTableSortField(key,JSON.stringify(orders));
+    saveSortField(key, orders) {
+      saveLastTableSortField(key, JSON.stringify(orders));
     },
-    getSortField(){
+    getSortField() {
       let orderJsonStr = getLastTableSortField(this.tableHeaderKey);
       let returnObj = null;
-      if(orderJsonStr){
+      if (orderJsonStr) {
         try {
           returnObj = JSON.parse(orderJsonStr);
-        }catch (e){
+        } catch (e) {
           return null;
         }
       }
       return returnObj;
-    }
-  }
+    },
+  },
 };
 </script>
 
 <style scoped>
-
 .table-page {
   padding-top: 10px;
   margin-right: -9px;

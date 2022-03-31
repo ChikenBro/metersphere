@@ -1,24 +1,25 @@
 <template>
-
   <test-case-relevance-base
+    ref="baseRelevance"
+    :plan-id="planId"
     @setProject="setProject"
     @save="saveCaseRelevance"
-    :plan-id="planId"
-    ref="baseRelevance">
-
+  >
     <template v-slot:aside>
       <ms-api-module
+        ref="nodeTree"
         :relevance-project-id="projectId"
+        :is-read-only="true"
         @nodeSelectEvent="nodeChange"
         @protocolChange="handleProtocolChange"
         @refreshTable="refresh"
         @setModuleOptions="setModuleOptions"
-        :is-read-only="true"
-        ref="nodeTree"/>
+      />
     </template>
 
     <relevance-api-list
       v-if="isApiListEnable"
+      ref="apiList"
       :current-protocol="currentProtocol"
       :select-node-ids="selectNodeIds"
       :is-api-list-enable="isApiListEnable"
@@ -26,10 +27,11 @@
       :is-test-plan="true"
       :plan-id="planId"
       @isApiListEnableChange="isApiListEnableChange"
-      ref="apiList"/>
+    />
 
     <relevance-case-list
       v-if="!isApiListEnable"
+      ref="apiCaseList"
       :current-protocol="currentProtocol"
       :select-node-ids="selectNodeIds"
       :is-api-list-enable="isApiListEnable"
@@ -37,157 +39,157 @@
       :is-test-plan="true"
       :plan-id="planId"
       @isApiListEnableChange="isApiListEnableChange"
-      ref="apiCaseList"/>
-
+    />
   </test-case-relevance-base>
-
 </template>
 
 <script>
+import TestCaseRelevanceBase from "../base/TestCaseRelevanceBase";
+import MsApiModule from "../../../../../api/definition/components/module/ApiModule";
+import RelevanceApiList from "../../../../../api/automation/scenario/api/RelevanceApiList";
+import RelevanceCaseList from "../../../../../api/automation/scenario/api/RelevanceCaseList";
 
-  import TestCaseRelevanceBase from "../base/TestCaseRelevanceBase";
-  import MsApiModule from "../../../../../api/definition/components/module/ApiModule";
-  import RelevanceApiList from "../../../../../api/automation/scenario/api/RelevanceApiList";
-  import RelevanceCaseList from "../../../../../api/automation/scenario/api/RelevanceCaseList";
-
-  export default {
-    name: "TestCaseApiRelevance",
-    components: {
-      RelevanceCaseList,
-      RelevanceApiList,
-      MsApiModule,
-      TestCaseRelevanceBase,
+export default {
+  name: "TestCaseApiRelevance",
+  components: {
+    RelevanceCaseList,
+    RelevanceApiList,
+    MsApiModule,
+    TestCaseRelevanceBase,
+  },
+  props: {
+    planId: {
+      type: String,
     },
-    data() {
-      return {
-        showCasePage: true,
-        currentProtocol: null,
-        currentModule: null,
-        selectNodeIds: [],
-        moduleOptions: {},
-        trashEnable: false,
-        isApiListEnable: true,
-        condition: {},
-        currentRow: {},
-        projectId: ""
-      };
+  },
+  data() {
+    return {
+      showCasePage: true,
+      currentProtocol: null,
+      currentModule: null,
+      selectNodeIds: [],
+      moduleOptions: {},
+      trashEnable: false,
+      isApiListEnable: true,
+      condition: {},
+      currentRow: {},
+      projectId: "",
+    };
+  },
+  watch: {
+    planId() {
+      this.condition.planId = this.planId;
     },
-    props: {
-      planId: {
-        type: String
+  },
+  methods: {
+    open() {
+      this.init();
+      this.$refs.baseRelevance.open();
+      if (this.$refs.apiList) {
+        this.$refs.apiList.clear();
+      }
+      if (this.$refs.apiCaseList) {
+        this.$refs.apiCaseList.clear();
       }
     },
-    watch: {
-      planId() {
-        this.condition.planId = this.planId;
-      },
+    init() {
+      if (this.$refs.apiList) {
+        this.$refs.apiList.initTable();
+      }
+      if (this.$refs.apiCaseList) {
+        this.$refs.apiCaseList.initTable();
+      }
+      if (this.$refs.nodeTree) {
+        this.$refs.nodeTree.list();
+      }
     },
-    methods: {
-      open() {
-        this.init();
-        this.$refs.baseRelevance.open();
-        if (this.$refs.apiList) {
-          this.$refs.apiList.clear();
-        }
-        if (this.$refs.apiCaseList) {
-          this.$refs.apiCaseList.clear();
-        }
-      },
-      init() {
-        if (this.$refs.apiList) {
-          this.$refs.apiList.initTable();
-        }
-        if (this.$refs.apiCaseList) {
-          this.$refs.apiCaseList.initTable();
-        }
-        if (this.$refs.nodeTree) {
-          this.$refs.nodeTree.list();
-        }
-      },
-      setProject(projectId) {
-        this.projectId = projectId;
-      },
-      isApiListEnableChange(data) {
-        this.isApiListEnable = data;
-      },
+    setProject(projectId) {
+      this.projectId = projectId;
+    },
+    isApiListEnableChange(data) {
+      this.isApiListEnable = data;
+    },
 
-      refresh(data) {
-        if (this.isApiListEnable) {
-          this.$refs.apiList.initTable(data);
-        } else {
-          this.$refs.apiCaseList.initTable(data);
-        }
-      },
+    refresh(data) {
+      if (this.isApiListEnable) {
+        this.$refs.apiList.initTable(data);
+      } else {
+        this.$refs.apiCaseList.initTable(data);
+      }
+    },
 
-      nodeChange(node, nodeIds, pNodes) {
-        this.selectNodeIds = nodeIds;
-      },
-      handleProtocolChange(protocol) {
-        this.currentProtocol = protocol;
-      },
-      setModuleOptions(data) {
-        this.moduleOptions = data;
-      },
+    nodeChange(node, nodeIds, pNodes) {
+      this.selectNodeIds = nodeIds;
+    },
+    handleProtocolChange(protocol) {
+      this.currentProtocol = protocol;
+    },
+    setModuleOptions(data) {
+      this.moduleOptions = data;
+    },
 
-      saveCaseRelevance() {
-
-
-        let url = '';
-        let environmentId = undefined;
-        let selectIds = [];
-        if (this.isApiListEnable) {
-          //查找所有数据
-          let params = this.$refs.apiList.getConditions();
-          this.result = this.$post("/api/definition/list/batch", params, (response) => {
+    saveCaseRelevance() {
+      let url = "";
+      let environmentId = undefined;
+      let selectIds = [];
+      if (this.isApiListEnable) {
+        //查找所有数据
+        let params = this.$refs.apiList.getConditions();
+        this.result = this.$post(
+          "/api/definition/list/batch",
+          params,
+          (response) => {
             let apis = response.data;
-            url = '/api/definition/relevance';
+            url = "/api/definition/relevance";
             environmentId = this.$refs.apiList.environmentId;
-            selectIds = Array.from(apis).map(row => row.id);
+            selectIds = Array.from(apis).map((row) => row.id);
             this.postRelevance(url, environmentId, selectIds);
-          });
-        } else {
-          let params = this.$refs.apiCaseList.getConditions();
-          this.result = this.$post("/api/testcase/get/caseBLOBs/request", params, (response) => {
+          }
+        );
+      } else {
+        let params = this.$refs.apiCaseList.getConditions();
+        this.result = this.$post(
+          "/api/testcase/get/caseBLOBs/request",
+          params,
+          (response) => {
             let apiCases = response.data;
-            url = '/api/testcase/relevance';
+            url = "/api/testcase/relevance";
             environmentId = this.$refs.apiCaseList.environmentId;
-            selectIds = Array.from(apiCases).map(row => row.id);
+            selectIds = Array.from(apiCases).map((row) => row.id);
             this.postRelevance(url, environmentId, selectIds);
-          });
-        }
+          }
+        );
+      }
+    },
 
-      },
+    postRelevance(url, environmentId, selectIds) {
+      let param = {};
+      if (!environmentId) {
+        this.$warning(this.$t("api_test.environment.select_environment"));
+        return;
+      }
+      param.planId = this.planId;
+      param.selectIds = selectIds;
+      param.environmentId = environmentId;
 
-      postRelevance(url, environmentId, selectIds) {
-        let param = {};
-        if (!environmentId) {
-          this.$warning(this.$t('api_test.environment.select_environment'));
-          return;
-        }
-        param.planId = this.planId;
-        param.selectIds = selectIds;
-        param.environmentId = environmentId;
-
-        this.result = this.$post(url, param, () => {
-          this.$success(this.$t('commons.save_success'));
-          this.$emit('refresh');
-          this.refresh();
-          this.$refs.baseRelevance.close();
-        });
-      },
-    }
-  }
+      this.result = this.$post(url, param, () => {
+        this.$success(this.$t("commons.save_success"));
+        this.$emit("refresh");
+        this.refresh();
+        this.$refs.baseRelevance.close();
+      });
+    },
+  },
+};
 </script>
 
 <style scoped>
+/deep/ .select-menu {
+  margin-bottom: 15px;
+}
 
-  /deep/ .select-menu {
-    margin-bottom: 15px;
-  }
-
-  /deep/ .environment-select {
-    float: right;
-    margin-right: 10px;
-  }
-
+/deep/ .environment-select {
+  float: right;
+  margin-right: 10px;
+}
 </style>

@@ -1,18 +1,21 @@
 <template>
   <ms-table-header
     :condition="condition"
-    @search="$emit('refresh')"
     :show-create="false"
-    :tip="$t('commons.search_by_name_or_id')">
+    :tip="$t('commons.search_by_name_or_id')"
+    @search="$emit('refresh')"
+  >
     <template v-slot:title>
-      {{ $t('test_track.plan.load_case.case') }}
+      {{ $t("test_track.plan.load_case.case") }}
     </template>
     <template v-slot:button>
-      <ms-table-button v-permission="['PROJECT_TRACK_PLAN:READ+RELEVANCE_OR_CANCEL']" icon="el-icon-connection"
-                       :content="$t('test_track.plan_view.relevance_test_case')"
-                       @click="$emit('relevanceCase')"/>
+      <ms-table-button
+        v-permission="['PROJECT_TRACK_PLAN:READ+RELEVANCE_OR_CANCEL']"
+        icon="el-icon-connection"
+        :content="$t('test_track.plan_view.relevance_test_case')"
+        @click="$emit('relevanceCase')"
+      />
     </template>
-
   </ms-table-header>
 </template>
 
@@ -22,11 +25,9 @@ import MsTableHeader from "@/business/components/common/components/MsTableHeader
 
 export default {
   name: "TestPlanLoadCaseListHeader",
-  components: {MsTableButton, MsTableHeader},
-  props: ['condition'],
+  components: { MsTableButton, MsTableHeader },
+  props: ["condition"],
 };
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

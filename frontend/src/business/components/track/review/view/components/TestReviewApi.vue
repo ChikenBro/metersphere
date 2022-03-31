@@ -3,31 +3,32 @@
     <template v-slot:aside>
       <ms-api-module
         v-if="model === 'api'"
+        ref="apiNodeTree"
+        :review-id="reviewId"
+        :is-read-only="true"
+        :redirect-char-type="redirectCharType"
         @nodeSelectEvent="nodeChange"
         @protocolChange="handleProtocolChange"
         @refreshTable="refreshTable"
         @setModuleOptions="setModuleOptions"
-        :review-id="reviewId"
-        :is-read-only="true"
-        :redirectCharType="redirectCharType"
-        ref="apiNodeTree"
       >
-      <template v-slot:header>
-        <div class="model-change-radio">
-          <el-radio v-model="model" label="api">接口用例</el-radio>
-          <el-radio v-model="model" label="scenario">场景用例</el-radio>
-        </div>
-      </template>
+        <template v-slot:header>
+          <div class="model-change-radio">
+            <el-radio v-model="model" label="api">接口用例</el-radio>
+            <el-radio v-model="model" label="scenario">场景用例</el-radio>
+          </div>
+        </template>
       </ms-api-module>
 
       <ms-api-scenario-module
         v-if="model === 'scenario'"
+        ref="scenarioNodeTree"
+        :is-read-only="true"
+        :review-id="reviewId"
         @nodeSelectEvent="nodeChange"
         @refreshTable="refreshTable"
         @setModuleOptions="setModuleOptions"
-        :is-read-only="true"
-        :review-id="reviewId"
-        ref="scenarioNodeTree">
+      >
         <template v-slot:header>
           <div class="model-change-radio">
             <el-radio v-model="model" label="api">接口用例</el-radio>
@@ -37,43 +38,44 @@
       </ms-api-scenario-module>
     </template>
     <template v-slot:main>
-     <test-plan-api-case-list
-       v-if="model === 'api'"
-       :current-protocol="currentProtocol"
-       :currentRow="currentRow"
-       :select-node-ids="selectNodeIds"
-       :trash-enable="trashEnable"
-       :is-case-relevance="true"
-       :model="'plan'"
-       :review-id="reviewId"
-       :clickType="clickType"
-       @refresh="refreshTree"
-       @relevanceCase="openTestCaseRelevanceDialog"
-       ref="apiCaseList"/>
+      <test-plan-api-case-list
+        v-if="model === 'api'"
+        ref="apiCaseList"
+        :current-protocol="currentProtocol"
+        :current-row="currentRow"
+        :select-node-ids="selectNodeIds"
+        :trash-enable="trashEnable"
+        :is-case-relevance="true"
+        :model="'plan'"
+        :review-id="reviewId"
+        :click-type="clickType"
+        @refresh="refreshTree"
+        @relevanceCase="openTestCaseRelevanceDialog"
+      />
 
       <ms-test-plan-api-scenario-list
         v-if="model === 'scenario'"
+        ref="apiScenarioList"
         :select-node-ids="selectNodeIds"
         :trash-enable="trashEnable"
         :review-id="reviewId"
-        :clickType="clickType"
+        :click-type="clickType"
         @refresh="refreshTree"
         @relevanceCase="openTestCaseRelevanceDialog"
-        ref="apiScenarioList"/>
+      />
     </template>
     <test-review-relevance-api
-      @refresh="refresh"
+      ref="apiCaseRelevance"
       :review-id="reviewId"
       :model="model"
-      ref="apiCaseRelevance"
+      @refresh="refresh"
     />
     <test-review-relevance-scenario
-      @refresh="refresh"
+      ref="scenarioCaseRelevance"
       :review-id="reviewId"
       :model="model"
-      ref="scenarioCaseRelevance"
+      @refresh="refresh"
     />
-
   </ms-test-plan-common-component>
 </template>
 
@@ -85,10 +87,9 @@ import ApiCaseSimpleList from "@/business/components/api/definition/components/l
 import TestPlanApiCaseList from "@/business/components/track/plan/view/comonents/api/TestPlanApiCaseList";
 import TestCaseRelevance from "@/business/components/track/plan/view/comonents/functional/TestCaseFunctionalRelevance";
 import NodeTree from "@/business/components/track/common/NodeTree";
-import MsApiModule from "../../../../api/definition/components/module/ApiModule"
+import MsApiModule from "../../../../api/definition/components/module/ApiModule";
 import TestReviewRelevanceApi from "@/business/components/track/review/view/components/TestReviewRelevanceApi";
-import TestReviewRelevanceScenario
-  from "@/business/components/track/review/view/components/TestReviewRelevanceScenario";
+import TestReviewRelevanceScenario from "@/business/components/track/review/view/components/TestReviewRelevanceScenario";
 
 export default {
   name: "TestReviewApi",
@@ -104,6 +105,7 @@ export default {
     NodeTree,
     MsApiModule,
   },
+  props: ["reviewId", "redirectCharType", "clickType"],
   data() {
     return {
       result: {},
@@ -114,36 +116,31 @@ export default {
       currentModule: null,
       selectNodeIds: [],
       moduleOptions: {},
-      model: 'api'
-    }
-  },
-  props: [
-    'reviewId',
-    'redirectCharType',
-    'clickType'
-  ],
-  mounted() {
-    this.checkRedirectCharType();
+      model: "api",
+    };
   },
   watch: {
     model() {
       this.selectNodeIds = [];
       this.moduleOptions = {};
     },
-    redirectCharType(){
-      if(this.redirectCharType=='scenario'){
-        this.model = 'scenario';
-      }else{
-        this.model = 'api';
+    redirectCharType() {
+      if (this.redirectCharType == "scenario") {
+        this.model = "scenario";
+      } else {
+        this.model = "api";
       }
-    }
+    },
+  },
+  mounted() {
+    this.checkRedirectCharType();
   },
   methods: {
-    checkRedirectCharType(){
-      if(this.redirectCharType=='scenario'){
-        this.model = 'scenario';
-      }else{
-        this.model = 'api';
+    checkRedirectCharType() {
+      if (this.redirectCharType == "scenario") {
+        this.model = "scenario";
+      } else {
+        this.model = "api";
       }
     },
     refresh() {
@@ -178,14 +175,14 @@ export default {
     },
 
     openTestCaseRelevanceDialog(model) {
-      if (model === 'scenario') {
+      if (model === "scenario") {
         this.$refs.scenarioCaseRelevance.open();
       } else {
         this.$refs.apiCaseRelevance.open();
       }
     },
-  }
-}
+  },
+};
 </script>
 
 <style scoped>
@@ -194,5 +191,4 @@ export default {
   line-height: 25px;
   margin: 5px 10px;
 }
-
 </style>

@@ -1,34 +1,36 @@
 <template>
   <ms-test-plan-common-component>
     <template v-slot:aside>
-      <node-tree class="node-tree"
-                 v-loading="result.loading"
-                 @nodeSelectEvent="nodeChange"
-                 :tree-nodes="treeNodes"
-                 ref="nodeTree"/>
+      <node-tree
+        ref="nodeTree"
+        v-loading="result.loading"
+        class="node-tree"
+        :tree-nodes="treeNodes"
+        @nodeSelectEvent="nodeChange"
+      />
     </template>
     <template v-slot:main>
       <test-plan-load-case-list
+        ref="testPlanLoadCaseList"
         class="table-list"
-        @refresh="refresh"
         :plan-id="planId"
-        :clickType="clickType"
+        :click-type="clickType"
         :select-project-id="selectProjectId"
         :select-parent-nodes="selectParentNodes"
+        @refresh="refresh"
         @relevanceCase="openTestCaseRelevanceDialog"
-        ref="testPlanLoadCaseList"/>
+      />
     </template>
 
     <test-case-load-relevance
-      @refresh="refresh"
+      ref="testCaseLoadRelevance"
       :plan-id="planId"
-      ref="testCaseLoadRelevance"/>
+      @refresh="refresh"
+    />
   </ms-test-plan-common-component>
 </template>
 
 <script>
-
-
 import MsTestPlanCommonComponent from "@/business/components/track/plan/view/comonents/base/TestPlanCommonComponent";
 import NodeTree from "@/business/components/track/common/NodeTree";
 import TestPlanLoadCaseList from "@/business/components/track/plan/view/comonents/load/TestPlanLoadCaseList";
@@ -42,6 +44,7 @@ export default {
     TestPlanLoadCaseList,
     TestCaseLoadRelevance,
   },
+  props: ["planId", "redirectCharType", "clickType"],
   data() {
     return {
       result: {},
@@ -49,24 +52,19 @@ export default {
       selectParentNodes: [],
       selectProjectId: "",
       treeNodes: [],
-    }
+    };
   },
-  props: [
-    'planId',
-    'redirectCharType',
-    'clickType'
-  ],
   watch: {
     planId() {
       this.initData();
-    }
+    },
   },
   mounted() {
     this.initData();
   },
   methods: {
     refresh() {
-      this.selectProjectId = '';
+      this.selectProjectId = "";
       this.selectParentNodes = [];
       this.$refs.testPlanLoadCaseList.initTable();
       this.getNodeTreeByPlanId();
@@ -85,17 +83,18 @@ export default {
     },
     getNodeTreeByPlanId() {
       if (this.planId) {
-        this.result = this.$get("/case/node/list/plan/" + this.planId, response => {
-          this.treeNodes = response.data;
-          // 性能测试与模块无关，过滤项目下模块
-          this.treeNodes.map(node => node.children = null);
-        });
+        this.result = this.$get(
+          "/case/node/list/plan/" + this.planId,
+          (response) => {
+            this.treeNodes = response.data;
+            // 性能测试与模块无关，过滤项目下模块
+            this.treeNodes.map((node) => (node.children = null));
+          }
+        );
       }
     },
-  }
-}
+  },
+};
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>
