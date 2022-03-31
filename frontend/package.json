@@ -70,7 +70,7 @@
     "babel-eslint": "^10.0.3",
     "eslint": "^5.16.0",
     "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-prettier": "^3.1.4",
+    "eslint-plugin-prettier": "3.1.4",
     "eslint-plugin-vue": "^5.0.0",
     "file-writer": "^1.0.2",
     "vue-template-compiler": "2.6.14"
@@ -87,12 +87,11 @@
     ],
     "rules": {
       "vue/no-unused-components": "off",
-      "no-console": "off",
-      "no-unused-vars": "off",
+      "no-console": 1,
+      "no-unused-vars": 1,
       "no-unused-expressions": "off",
       "no-unused-labels": "off",
-      "no-useless-escape": "off",
-      "prettier/prettier": "error"
+      "no-useless-escape": "off"
     },
     "parserOptions": {
       "parser": "babel-eslint"
