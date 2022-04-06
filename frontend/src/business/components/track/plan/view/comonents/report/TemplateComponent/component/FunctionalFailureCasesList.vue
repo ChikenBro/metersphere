@@ -10,7 +10,7 @@
       :data="functionalTestCases"
     >
       <el-table-column
-        prop="customNum"
+        :prop="functionalTestCases.customNum ? 'customNum' : 'num'"
         :label="$t('commons.id')"
         show-overflow-tooltip
       >
@@ -21,6 +21,21 @@
         show-overflow-tooltip
       >
       </el-table-column>
+
+      <el-table-column
+        :prop="functionalTestCases.projectName ? 'projectName' : 'testPlanName'"
+        label="所属计划"
+        show-overflow-tooltip
+      >
+      </el-table-column>
+
+      <el-table-column
+        :prop="functionalTestCases.nodePath ? 'nodePath' : 'module'"
+        :label="$t('test_track.case.module')"
+        show-overflow-tooltip
+      >
+      </el-table-column>
+
       <el-table-column
         prop="priority"
         column-key="priority"
@@ -43,43 +58,31 @@
       </el-table-column>
 
       <el-table-column
-        prop="method"
         column-key="method"
+        :prop="functionalTestCases.method ? 'method' : 'testMode'"
         :label="$t('test_track.case.method')"
         show-overflow-tooltip
       >
         <template v-slot:default="scope">
-          <method-table-item :value="scope.row.method" />
+          <method-table-item :value="scope.row.method || scope.row.testMode" />
         </template>
       </el-table-column>
 
       <el-table-column
-        prop="nodePath"
-        :label="$t('test_track.case.module')"
-        show-overflow-tooltip
-      >
-      </el-table-column>
-
-      <el-table-column
-        prop="projectName"
-        :label="$t('test_track.case.project_name')"
-        show-overflow-tooltip
-      >
-      </el-table-column>
-
-      <el-table-column
-        prop="executorName"
+        :prop="functionalTestCases.executorName ? 'executorName' : 'executor'"
         :label="$t('test_track.plan_view.executor')"
       >
       </el-table-column>
 
       <el-table-column
-        prop="status"
         column-key="status"
+        :prop="functionalTestCases.status ? 'status' : 'executeResult'"
         :label="$t('test_track.plan_view.execute_result')"
       >
         <template v-slot:default="scope">
-          <status-table-item :value="scope.row.status" />
+          <status-table-item
+            :value="scope.row.status || scope.row.executeResult"
+          />
         </template>
       </el-table-column>
 
