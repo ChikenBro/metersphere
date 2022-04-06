@@ -53,6 +53,7 @@ export default {
           orient: "vertical",
           x: "2%",
           y: "10%",
+          selectedMode: false,
         },
         grid: {
           containLabel: true,
