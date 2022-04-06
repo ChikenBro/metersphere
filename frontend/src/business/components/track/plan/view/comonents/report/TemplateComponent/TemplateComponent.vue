@@ -42,7 +42,7 @@
       <!--<failure-result-component id="failureResultComponent" :failure-test-cases="metric.failureTestCases" v-if="preview.id == 4"/>-->
       <failure-result-advance-component
         id="failureResultComponent"
-        :failure-test-cases="metric.failureTestCases"
+        :failure-test-cases="failureTestCases || metric.failureTestCases"
         v-if="preview.id == 4"
       />
       <defect-list-component
@@ -90,6 +90,12 @@ export default {
       iterationReport: null,
       testResult: [],
       caseExecutiveCondition: [],
+      failureTestCases: {
+        functionalTestCases: [],
+        apiTestCases: [],
+        scenarioTestCases: [],
+        loadTestCases: [],
+      },
     };
   },
   props: {
@@ -237,6 +243,21 @@ export default {
             ],
           },
         ],
+        failureTestCases: [
+          {
+            id: "1",
+            num: "1",
+            name: "失败名称",
+            testPlanName: "所属计划",
+            module: "所属模块",
+            priority: "P0",
+            type: "api",
+            testMode: "manual",
+            executor: "zrf",
+            executeResult: "Pass",
+            updateTime: "2022-02-01",
+          },
+        ],
       };
 
       this.testResult = this.iterationReport.testResult.map((item) => {
@@ -252,7 +273,6 @@ export default {
           ],
         };
       });
-      // });
       this.caseExecutiveCondition =
         this.iterationReport.caseExecutiveCondition.map((item) => {
           return {
@@ -272,7 +292,8 @@ export default {
             }),
           };
         });
-      // });
+      this.failureTestCases.functionalTestCases =
+        this.iterationReport.failureTestCases;
     },
   },
 };
