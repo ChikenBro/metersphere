@@ -1,19 +1,19 @@
 <template>
-  <common-component :title="$t('test_track.plan_view.result_statistics')">
+  <common-component title="用例执行情况">
     <div class="char-component">
       <el-row>
         <el-col
           :span="8"
-          v-for="(item, index) in testResultCharData"
+          v-for="(item, index) in executerTestList"
           :key="index"
         >
-          <ms-pie-chart
+          <ms-stack-bar-chart
             v-if="isShow"
             :text="item.title"
             :is-show-legend="index === 0"
             @onClick="onTestResultClick"
             :name="$t('test_track.plan_view.test_result')"
-            :data="item.dataList"
+            :data="item.executerTestList"
           />
         </el-col>
       </el-row>
@@ -23,11 +23,11 @@
 
 <script>
 import CommonComponent from "./CommonComponent";
-import MsPieChart from "../../../../../../common/components/MsPieChart";
+import MsStackBarChart from "../../../../../../common/components/MsStackBarChart";
 
 export default {
-  name: "TestResultAdvanceChartComponent",
-  components: { MsPieChart, CommonComponent },
+  name: "ExecutiveConditionAdvanceChartComponent",
+  components: { MsStackBarChart, CommonComponent },
   data() {
     return {
       dataMap: new Map([
@@ -74,7 +74,7 @@ export default {
           },
         ],
       ]),
-      testResultCharData: [],
+      executerTestList: [],
       isShow: true,
     };
   },
@@ -84,14 +84,7 @@ export default {
     executeResult: {
       type: Array,
       default() {
-        return [
-          { status: "Pass", count: "1" },
-          { status: "Failure", count: "2" },
-          { status: "Blocking", count: "3" },
-          { status: "Skip", count: "4" },
-          { status: "Underway", count: "5" },
-          { status: "Prepare", count: "6" },
-        ];
+        return [];
       },
     },
   },
@@ -111,16 +104,18 @@ export default {
     getTestResultCharData() {
       if (this.executeResult) {
         this.executeResult.forEach((obj) => {
-          const arr = [];
-          obj.dataList.forEach((item) => {
-            let data = this.copyData(item.status);
-            data.value = item.count;
-            arr.push(data);
+          obj.executerTestList.forEach((role) => {
+            const arr = [];
+            role.dataList.forEach((item) => {
+              let data = this.copyData(item.status);
+              data.value = item.count;
+              arr.push(data);
+            });
+            role.dataList = arr;
           });
-          obj.dataList = arr;
         });
       }
-      this.testResultCharData = this.executeResult;
+      this.executerTestList = this.executeResult;
     },
     copyData(status) {
       if (this.dataMap.get(status)) {

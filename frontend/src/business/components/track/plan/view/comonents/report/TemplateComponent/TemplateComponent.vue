@@ -32,6 +32,13 @@
         :planId="planId"
         v-if="preview.id == 3"
       />
+      <executive-condition-advance-chart-component
+        id="executiveConditionChartComponent"
+        :execute-result="caseExecutiveCondition"
+        :source="source"
+        :planId="planId"
+        v-if="preview.id == 3"
+      />
       <!--<failure-result-component id="failureResultComponent" :failure-test-cases="metric.failureTestCases" v-if="preview.id == 4"/>-->
       <failure-result-advance-component
         id="failureResultComponent"
@@ -63,6 +70,7 @@ import DefectListComponent from "./DefectListComponent";
 import html2canvas from "html2canvas";
 import TestResultAdvanceChartComponent from "./TestResultAdvanceChartComponent";
 import FailureResultAdvanceComponent from "./FailureResultAdvanceComponent";
+import ExecutiveConditionAdvanceChartComponent from "./ExecutiveConditionAdvanceChartComponent";
 
 export default {
   name: "TemplateComponent",
@@ -75,11 +83,13 @@ export default {
     TestResultChartComponent,
     TestResultComponent,
     BaseInfoComponent,
+    ExecutiveConditionAdvanceChartComponent,
   },
   data() {
     return {
       iterationReport: null,
       testResult: [],
+      caseExecutiveCondition: [],
     };
   },
   props: {
@@ -172,7 +182,7 @@ export default {
         caseExecutiveCondition: [
           {
             testPlanId: "1",
-            testPlanName: "测试用力",
+            testPlanName: "测试用例",
             executerTestList: [
               {
                 executor: "1",
@@ -187,13 +197,41 @@ export default {
               },
               {
                 executor: "2",
-                executorName: "zerdawdwf",
+                executorName: "coder",
                 caseCount: 2,
                 passCount: 3,
                 failureCount: 4,
                 blockingCount: 1,
                 skipCount: 4,
                 underwayCount: 3,
+                prepareCount: 2,
+              },
+            ],
+          },
+          {
+            testPlanId: "2",
+            testPlanName: "测试用例2",
+            executerTestList: [
+              {
+                executor: "3",
+                executorName: "zzzzzrf",
+                caseCount: 2,
+                passCount: 3,
+                failureCount: 4,
+                blockingCount: 4,
+                skipCount: 4,
+                underwayCount: 1,
+                prepareCount: 2,
+              },
+              {
+                executor: "3",
+                executorName: "coding",
+                caseCount: 2,
+                passCount: 3,
+                failureCount: 3,
+                blockingCount: 1,
+                skipCount: 1,
+                underwayCount: 6,
                 prepareCount: 2,
               },
             ],
@@ -214,6 +252,26 @@ export default {
           ],
         };
       });
+      // });
+      this.caseExecutiveCondition =
+        this.iterationReport.caseExecutiveCondition.map((item) => {
+          return {
+            title: item.testPlanName,
+            executerTestList: item.executerTestList.map((ele) => {
+              return {
+                executorName: ele.executorName,
+                dataList: [
+                  { status: "Pass", count: ele.passCount },
+                  { status: "Failure", count: ele.failureCount },
+                  { status: "Blocking", count: ele.blockingCount },
+                  { status: "Skip", count: ele.skipCount },
+                  { status: "Underway", count: ele.underwayCount },
+                  { status: "Prepare", count: ele.prepareCount },
+                ],
+              };
+            }),
+          };
+        });
       // });
     },
   },

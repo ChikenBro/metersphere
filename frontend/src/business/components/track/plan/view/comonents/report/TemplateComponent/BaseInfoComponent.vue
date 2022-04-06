@@ -109,9 +109,6 @@ export default {
       default: true,
     },
   },
-  mounted() {
-    console.log("reportInfo", this.reportInfo);
-  },
   methods: {
     planStartTimeChange(value) {
       if (
