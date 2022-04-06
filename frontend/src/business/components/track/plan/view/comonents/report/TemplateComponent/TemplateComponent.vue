@@ -21,13 +21,13 @@
       />
       <test-result-component
         id="testResultComponent"
-        :test-results="metric.moduleExecuteResult"
+        :test-results="iterationReport.testResult || metric.moduleExecuteResult"
         v-if="preview.id == 2"
       />
       <!--<test-result-chart-component id="resultChartComponent" :execute-result="metric.executeResult" v-if="preview.id == 3"/>-->
       <test-result-advance-chart-component
         id="resultChartComponent"
-        :execute-result="metric.executeResult"
+        :execute-result="testResult"
         :source="source"
         :planId="planId"
         v-if="preview.id == 3"
@@ -79,6 +79,7 @@ export default {
   data() {
     return {
       iterationReport: null,
+      testResult: [],
     };
   },
   props: {
@@ -126,9 +127,94 @@ export default {
     getIterationReport() {
       // const url = `/iteration/report/${this.planId}`;
       const url = `http://yapi.mudutv.com/mock/1451/iteration/report/${this.planId}`;
-      this.$post(url, {}, (res) => {
-        this.iterationReport = res.data;
+      // this.$post(url, {}, (res) => {
+      this.iterationReport = {
+        projectName: "中台微服务",
+        iterationName: "Ver 1.0.1",
+        leaderName: "Harry",
+        executorNames: ["Harry", "Jack"],
+        planStartTime: "2022-01-10",
+        planEndTime: "2022-02-10",
+        actualStartTime: "2022-01-10",
+        actualEndTime: "2022-02-10",
+        testResult: [
+          {
+            testPlanId: "1",
+            testPlanName: "测试计划",
+            moduleName: "模块",
+            moduleId: "1",
+            caseCount: 2,
+            passCount: 2,
+            failureCount: 3,
+            blockingCount: 4,
+            skipCount: 4,
+            underwayCount: 6,
+            prepareCount: 2,
+            passRate: 29,
+            issuesCount: 7,
+          },
+          {
+            testPlanId: "2",
+            testPlanName: "测试计划22",
+            moduleName: "模块22",
+            moduleId: "2",
+            caseCount: 3,
+            passCount: 4,
+            failureCount: 5,
+            blockingCount: 14,
+            skipCount: 3,
+            underwayCount: 6,
+            prepareCount: 2,
+            passRate: 38,
+            issuesCount: 7,
+          },
+        ],
+        caseExecutiveCondition: [
+          {
+            testPlanId: "1",
+            testPlanName: "测试用力",
+            executerTestList: [
+              {
+                executor: "1",
+                executorName: "zerf",
+                caseCount: 2,
+                passCount: 2,
+                failureCount: 3,
+                blockingCount: 4,
+                skipCount: 4,
+                underwayCount: 6,
+                prepareCount: 2,
+              },
+              {
+                executor: "2",
+                executorName: "zerdawdwf",
+                caseCount: 2,
+                passCount: 3,
+                failureCount: 4,
+                blockingCount: 1,
+                skipCount: 4,
+                underwayCount: 3,
+                prepareCount: 2,
+              },
+            ],
+          },
+        ],
+      };
+
+      this.testResult = this.iterationReport.testResult.map((item) => {
+        return {
+          title: item.testPlanName,
+          dataList: [
+            { status: "Pass", count: item.passCount },
+            { status: "Failure", count: item.failureCount },
+            { status: "Blocking", count: item.blockingCount },
+            { status: "Skip", count: item.skipCount },
+            { status: "Underway", count: item.underwayCount },
+            { status: "Prepare", count: item.prepareCount },
+          ],
+        };
       });
+      // });
     },
   },
 };

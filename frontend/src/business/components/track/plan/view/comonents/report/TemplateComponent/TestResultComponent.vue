@@ -9,14 +9,14 @@
         style="width: 100%"
       >
         <el-table-column
-          prop="moduleName"
-          :label="$t('test_track.module.module')"
+          prop="testPlanName"
+          label="测试计划名称"
+          show-overflow-tooltip
         >
         </el-table-column>
         <el-table-column
-          prop="projectName"
-          :label="$t('test_track.module.project_name')"
-          show-overflow-tooltip
+          prop="moduleName"
+          :label="$t('test_track.module.module')"
         >
         </el-table-column>
         <el-table-column
@@ -82,30 +82,7 @@ export default {
         return [
           {
             moduleName: this.$t("test_track.module.module") + "1",
-            caseCount: "14",
-            passRate: 10.8,
-            issuesCount: 3,
-            passCount: 0,
-            failureCount: 0,
-            blockingCount: 0,
-            skipCount: 0,
-            underwayCount: 0,
-            prepareCount: 0,
-          },
-          {
-            moduleName: this.$t("test_track.module.module") + "1",
-            caseCount: "14",
-            passRate: 10.8,
-            issuesCount: 3,
-            passCount: 0,
-            failureCount: 0,
-            blockingCount: 0,
-            skipCount: 0,
-            underwayCount: 0,
-            prepareCount: 0,
-          },
-          {
-            moduleName: this.$t("test_track.module.module") + "1",
+            testPlanName: "测试计划名称",
             caseCount: "14",
             passRate: 10.8,
             issuesCount: 3,

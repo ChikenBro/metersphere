@@ -9,6 +9,7 @@
     :watch-shallow="watchShallow"
     :manual-update="manualUpdate"
     :autoresize="autoresize"
+    class="chart"
   />
 </template>
 
@@ -34,7 +35,7 @@ export default {
     // 默认渲染svg
     // BUG: 渲染svg之后 图上的legend 太多会不显示
     // if (!this.defaultInitOptions.renderer) {
-    // this.defaultInitOptions.renderer = 'svg';
+    //   this.defaultInitOptions.renderer = "svg";
     // }
   },
   methods: {
@@ -48,4 +49,9 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.chart {
+  width: 100%;
+  height: 300px;
+}
+</style>

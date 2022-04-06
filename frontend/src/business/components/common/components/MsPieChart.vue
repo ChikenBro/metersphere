@@ -24,22 +24,25 @@ export default {
         title: {
           text: this.text,
           subtext: this.subtext,
-          left: "center",
+          left: "52%",
         },
         tooltip: {
           trigger: "item",
           formatter: "{a} <br/>({d}%)",
         },
         legend: {
+          show: this.isShowLegend,
           orient: "vertical",
-          left: 20,
+          selectedMode: false,
+          left: 0,
           data: this.dataNames,
         },
         series: [
           {
             name: this.name,
             type: "pie",
-            radius: ["40%", "70%"],
+            radius: ["25%", "50%"],
+            center: ["60%", "50%"],
             // roseType: 'angle',
             data: this.data,
             animation: false,
@@ -96,6 +99,10 @@ export default {
           },
         ];
       },
+    },
+    isShowLegend: {
+      type: Boolean,
+      default: false,
     },
   },
   methods: {
