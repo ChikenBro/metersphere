@@ -47,7 +47,7 @@
       />
       <defect-list-component
         id="defectListComponent"
-        :defect-list="metric.issues"
+        :defect-list="iterationReport.issues || metric.issues"
         v-if="preview.id == 5"
       />
       <rich-text-component
@@ -256,6 +256,17 @@ export default {
             executor: "zrf",
             executeResult: "Pass",
             updateTime: "2022-02-01",
+          },
+        ],
+        issues: [
+          {
+            num: 1,
+            title: "标题",
+            description: "描述",
+            module: "所属模块",
+            status: "功能测试",
+            handler: "处理人",
+            createTime: "2022-01-20",
           },
         ],
       };

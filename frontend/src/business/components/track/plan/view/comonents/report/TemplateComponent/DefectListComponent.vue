@@ -3,20 +3,8 @@
     <template>
       <el-table row-key="id" :data="defectList">
         <el-table-column
-          prop="id"
+          :prop="defectList.id ? 'id' : 'num'"
           :label="$t('commons.id')"
-          show-overflow-tooltip
-        >
-        </el-table-column>
-        <el-table-column
-          prop="model"
-          :label="$t('test_track.module.module')"
-          show-overflow-tooltip
-        >
-        </el-table-column>
-        <el-table-column
-          prop="projectName"
-          :label="$t('test_track.module.project_name')"
           show-overflow-tooltip
         >
         </el-table-column>
@@ -45,15 +33,27 @@
             </el-popover>
           </template>
         </el-table-column>
-
         <el-table-column
-          prop="platformStatus"
+          :prop="defectList.model ? 'model' : 'module'"
+          :label="$t('test_track.module.module')"
+          show-overflow-tooltip
+        >
+        </el-table-column>
+        <el-table-column
+          v-if="defectList.projectName"
+          prop="projectName"
+          :label="$t('test_track.module.project_name')"
+          show-overflow-tooltip
+        >
+        </el-table-column>
+        <el-table-column
+          :prop="defectList.platformStatus ? 'platformStatus' : 'status'"
           :label="$t('test_track.module.status')"
           show-overflow-tooltip
         >
         </el-table-column>
         <el-table-column
-          prop="lastmodify"
+          :prop="defectList.lastmodify ? 'lastmodify' : 'handler'"
           :label="$t('test_track.module.current_owner')"
           show-overflow-tooltip
         >
