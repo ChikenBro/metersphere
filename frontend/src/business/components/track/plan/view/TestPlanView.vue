@@ -1,5 +1,4 @@
 <template>
-
   <div>
     <ms-test-plan-header-bar>
       <template v-slot:info>
@@ -7,34 +6,64 @@
           :data="testPlans"
           :current-data="currentPlan"
           :title="$t('test_track.plan_view.plan')"
-          @dataChange="changePlan"/>
+          @dataChange="changePlan"
+        />
       </template>
       <template v-slot:menu>
-        <el-menu v-if="isMenuShow" :active-text-color="color" :default-active="activeIndex"
-                 class="el-menu-demo header-menu" mode="horizontal" @select="handleSelect">
-          <el-menu-item index="functional">{{ $t('test_track.functional_test_case') }}</el-menu-item>
-          <el-menu-item index="api" v-modules="['api']">{{ $t('test_track.api_test_case') }}</el-menu-item>
-          <el-menu-item index="load" v-modules="['performance']">{{ $t('test_track.performance_test_case') }}</el-menu-item>
-          <el-menu-item index="report">{{ $t('test_track.report_statistics') }}</el-menu-item>
+        <el-menu
+          v-if="isMenuShow"
+          :active-text-color="color"
+          :default-active="activeIndex"
+          class="el-menu-demo header-menu"
+          mode="horizontal"
+          @select="handleSelect"
+        >
+          <el-menu-item index="functional">{{
+            $t("test_track.functional_test_case")
+          }}</el-menu-item>
+          <el-menu-item index="api" v-modules="['api']">{{
+            $t("test_track.api_test_case")
+          }}</el-menu-item>
+          <el-menu-item index="load" v-modules="['performance']">{{
+            $t("test_track.performance_test_case")
+          }}</el-menu-item>
+          <el-menu-item index="report">{{
+            $t("test_track.report_statistics")
+          }}</el-menu-item>
         </el-menu>
       </template>
     </ms-test-plan-header-bar>
-    <test-plan-functional v-if="activeIndex === 'functional'" :redirectCharType="redirectCharType"
-                          :clickType="clickType" :plan-id="planId"/>
-    <test-plan-api v-if="activeIndex === 'api'" :redirectCharType="redirectCharType" :clickType="clickType"
-                   :plan-id="planId"/>
-    <test-plan-load v-if="activeIndex === 'load'" :redirectCharType="redirectCharType" :clickType="clickType"
-                    :plan-id="planId"/>
-    <test-case-statistics-report-view :test-plan="currentPlan" v-if="activeIndex === 'report'"/>
+    <test-plan-functional
+      v-if="activeIndex === 'functional'"
+      :redirectCharType="redirectCharType"
+      :clickType="clickType"
+      :plan-id="planId"
+    />
+    <test-plan-api
+      v-if="activeIndex === 'api'"
+      :redirectCharType="redirectCharType"
+      :clickType="clickType"
+      :plan-id="planId"
+    />
+    <test-plan-load
+      v-if="activeIndex === 'load'"
+      :redirectCharType="redirectCharType"
+      :clickType="clickType"
+      :plan-id="planId"
+    />
+    <test-case-statistics-report-view
+      :test-plan="currentPlan"
+      v-if="activeIndex === 'report'"
+    />
 
-    <test-report-template-list @openReport="openReport" ref="testReportTemplateList"/>
-
+    <test-report-template-list
+      @openReport="openReport"
+      ref="testReportTemplateList"
+    />
   </div>
-
 </template>
 
 <script>
-
 import NodeTree from "../../common/NodeTree";
 import TestPlanTestCaseList from "./comonents/functional/FunctionalTestCaseList";
 import TestCaseRelevance from "./comonents/functional/TestCaseFunctionalRelevance";
@@ -48,7 +77,7 @@ import TestPlanApi from "./comonents/api/TestPlanApi";
 import TestCaseStatisticsReportView from "./comonents/report/statistics/TestCaseStatisticsReportView";
 import TestReportTemplateList from "./comonents/TestReportTemplateList";
 import TestPlanLoad from "@/business/components/track/plan/view/comonents/load/TestPlanLoad";
-import {getCurrentProjectID} from "@/common/js/utils";
+import { getCurrentProjectID } from "@/common/js/utils";
 
 export default {
   name: "TestPlanView",
@@ -59,7 +88,13 @@ export default {
     TestPlanFunctional,
     MsTestPlanHeaderBar,
     MsMainContainer,
-    MsAsideContainer, MsContainer, NodeTree, TestPlanTestCaseList, TestCaseRelevance, SelectMenu, TestPlanLoad
+    MsAsideContainer,
+    MsContainer,
+    NodeTree,
+    TestPlanTestCaseList,
+    TestCaseRelevance,
+    SelectMenu,
+    TestPlanLoad,
   },
   data() {
     return {
@@ -68,9 +103,9 @@ export default {
       activeIndex: "functional",
       isMenuShow: true,
       //报表跳转过来的参数-通过哪个图表跳转的
-      redirectCharType: '',
+      redirectCharType: "",
       //报表跳转过来的参数-通过哪种数据跳转的
-      clickType: '',
+      clickType: "",
     };
   },
   computed: {
@@ -79,18 +114,18 @@ export default {
     },
     color: function () {
       return `var(--primary_color)`;
-    }
+    },
   },
   watch: {
-    '$route.params.planId'() {
+    "$route.params.planId"() {
       this.genRedirectParam();
       this.getTestPlans();
-    }
+    },
   },
   created() {
-    this.$EventBus.$on('projectChange', () => {
-      if (this.$route.name === 'planView') {
-        this.$router.push('/track/plan/all');
+    this.$EventBus.$on("projectChange", () => {
+      if (this.$route.name === "planView") {
+        this.$router.push("/track/plan/all");
       }
     });
   },
@@ -105,9 +140,12 @@ export default {
       this.redirectCharType = this.$route.params.charType;
       this.clickType = this.$route.params.clickType;
       if (this.redirectCharType != "") {
-        if (this.redirectCharType == 'scenario') {
-          this.activeIndex = 'api';
-        } else if (this.redirectCharType != null && this.redirectCharType != '') {
+        if (this.redirectCharType == "scenario") {
+          this.activeIndex = "api";
+        } else if (
+          this.redirectCharType != null &&
+          this.redirectCharType != ""
+        ) {
           this.activeIndex = this.redirectCharType;
         }
       } else {
@@ -115,22 +153,26 @@ export default {
       }
     },
     getTestPlans() {
-      this.$post('/test/plan/list/all', {projectId: getCurrentProjectID()}, response => {
-        this.testPlans = response.data;
-        this.testPlans.forEach(plan => {
-          if (this.planId && plan.id === this.planId) {
-            this.currentPlan = plan;
-          }
-        });
-      });
+      this.$post(
+        "/test/plan/list/all",
+        { projectId: getCurrentProjectID() },
+        (response) => {
+          this.testPlans = response.data;
+          this.testPlans.forEach((plan) => {
+            if (this.planId && plan.id === this.planId) {
+              this.currentPlan = plan;
+            }
+          });
+        }
+      );
     },
     changePlan(plan) {
       this.currentPlan = plan;
-      this.$router.push('/track/plan/view/' + plan.id);
+      this.$router.push("/track/plan/view/" + plan.id);
     },
     handleSelect(key) {
       this.activeIndex = key;
-      if (key === 'report' && !this.currentPlan.reportId) {
+      if (key === "report" && !this.currentPlan.reportId) {
         this.$refs.testReportTemplateList.open(this.planId);
       }
     },
@@ -145,13 +187,12 @@ export default {
       this.$nextTick(() => {
         this.isMenuShow = true;
       });
-    }
+    },
   },
 };
 </script>
 
 <style scoped>
-
 .select-menu {
   display: inline-block;
 }
@@ -170,6 +211,4 @@ export default {
   line-height: 50px;
   color: dimgray;
 }
-
-
 </style>
