@@ -2,49 +2,81 @@
   <common-component :title="$t('test_track.plan_view.base_info')">
     <template>
       <el-row type="flex" justify="space-between">
-        <el-col :span="12">
+        <el-col :span="8">
           <span>{{ $t("test_track.plan.plan_project") }}：</span>
           <span class="item-value">{{ reportInfo.projectName }}</span>
         </el-col>
-        <el-col :span="12">
-          <span>{{ $t("test_track.plan.plan_principal") }}：</span>
-          <span class="item-value">{{ reportInfo.principalName }}</span>
+        <el-col :span="8">
+          <span>所属迭代：</span>
+          <span class="item-value">{{ reportInfo.iterationName }}</span>
+        </el-col>
+        <el-col :span="8">
+          <span>实际开始时间：</span>
+          <span v-if="!isReport">{{ reportInfo.actualStartTime }}</span>
+          <el-date-picker
+            @change="planStartTimeChange"
+            v-if="isReport"
+            size="mini"
+            disabled
+            type="date"
+            :placeholder="$t('commons.select_date')"
+            v-model="reportInfo.planStartTime"
+          />
         </el-col>
       </el-row>
 
       <el-row type="flex" justify="space-between" class="select-time">
-        <el-col :span="12">
-          <span>{{ $t("report.test_start_time") }}：</span>
-          <span v-if="!isReport">{{ reportInfo.startTime }}</span>
+        <el-col :span="8">
+          <span>负责人：</span>
+          <span class="item-value">{{ reportInfo.leaderName }}</span>
+        </el-col>
+        <el-col :span="8">
+          <span>计划开始时间：</span>
+          <span v-if="!isReport">{{ reportInfo.planStartTime }}</span>
           <el-date-picker
-            @change="startTimeChange"
+            @change="planStartTimeChange"
             v-if="isReport"
             size="mini"
+            disabled
             type="date"
             :placeholder="$t('commons.select_date')"
-            v-model="reportInfo.startTime"
+            v-model="reportInfo.planStartTime"
           />
         </el-col>
-        <el-col :span="12">
-          <span>{{ $t("report.test_end_time") }}：</span>
-          <span v-if="!isReport">{{ reportInfo.endTime }}</span>
+        <el-col :span="8">
+          <span>实际结束时间：</span>
+          <span v-if="!isReport">{{ reportInfo.actualEndTime }}</span>
           <el-date-picker
-            @change="endTimeChange"
+            @change="planEndTimeChange"
             v-if="isReport"
             size="mini"
+            disabled
             type="date"
             :placeholder="$t('commons.select_date')"
-            v-model="reportInfo.endTime"
+            v-model="reportInfo.actualEndTime"
           />
         </el-col>
       </el-row>
 
-      <el-row type="flex" justify="space-between">
-        <el-col :span="12">
+      <el-row type="flex">
+        <el-col :span="8">
           <span>{{ $t("test_track.plan_view.executor") }}：</span>
-          <span v-for="item in reportInfo.executorNames" :key="item">{{
-            item
-          }}</span>
+          <span v-if="Array.isArray(reportInfo.executorNames)"
+            >{{ reportInfo.executorNames.join("、") }}
+          </span>
+        </el-col>
+        <el-col :span="8">
+          <span>计划结束时间：</span>
+          <span v-if="!isReport">{{ reportInfo.planEndTime }}</span>
+          <el-date-picker
+            @change="planEndTimeChange"
+            v-if="isReport"
+            size="mini"
+            disabled
+            type="date"
+            :placeholder="$t('commons.select_date')"
+            v-model="reportInfo.planEndTime"
+          />
         </el-col>
       </el-row>
     </template>
@@ -61,11 +93,14 @@ export default {
       type: Object,
       default() {
         return {
-          projectName: this.$t("test_track.project"),
-          principal: "Michael",
-          executors: ["Michael", "Tom", "Jiessie"],
-          startTime: "2020-6-18",
-          endTime: "2020-6-19",
+          projectName: "中台微服务",
+          iterationName: "Ver 1.0.1",
+          leaderName: "Harry",
+          executorNames: ["Harry", "Jack"],
+          planStartTime: "2022-01-10",
+          planEndTime: "2022-02-10",
+          actualStartTime: "2022-01-10",
+          actualEndTime: "2022-02-10",
         };
       },
     },
@@ -74,22 +109,25 @@ export default {
       default: true,
     },
   },
+  mounted() {
+    console.log("reportInfo", this.reportInfo);
+  },
   methods: {
-    startTimeChange(value) {
+    planStartTimeChange(value) {
       if (
-        !!this.reportInfo.endTime &&
-        this.reportInfo.endTime - this.reportInfo.startTime < 0
+        !!this.reportInfo.planEndTime &&
+        this.reportInfo.planEndTime - this.reportInfo.planStartTime < 0
       ) {
-        this.reportInfo.startTime = undefined;
+        this.reportInfo.planStartTime = undefined;
         this.$warning(this.$t("commons.date.data_time_error"));
       }
     },
-    endTimeChange(value) {
+    planEndTimeChange(value) {
       if (
-        !!this.reportInfo.startTime &&
-        this.reportInfo.endTime - this.reportInfo.startTime < 0
+        !!this.reportInfo.planStartTime &&
+        this.reportInfo.planEndTime - this.reportInfo.planStartTime < 0
       ) {
-        this.reportInfo.endTime = undefined;
+        this.reportInfo.planEndTime = undefined;
         this.$warning(this.$t("commons.date.data_time_error"));
       }
     },

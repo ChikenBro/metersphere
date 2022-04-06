@@ -16,7 +16,7 @@
     <div v-if="metric">
       <base-info-component
         id="baseInfoComponent"
-        :report-info="metric"
+        :report-info="iterationReport || metric"
         v-if="preview.id == 1"
       />
       <test-result-component
@@ -76,6 +76,11 @@ export default {
     TestResultComponent,
     BaseInfoComponent,
   },
+  data() {
+    return {
+      iterationReport: null,
+    };
+  },
   props: {
     preview: {
       type: Object,
@@ -98,6 +103,9 @@ export default {
       default: 0,
     },
   },
+  created() {
+    this.getIterationReport();
+  },
   methods: {
     getComponentId() {
       switch (this.preview.id) {
@@ -114,6 +122,13 @@ export default {
         default:
           return "richTextComponent";
       }
+    },
+    getIterationReport() {
+      // const url = `/iteration/report/${this.planId}`;
+      const url = `http://yapi.mudutv.com/mock/1451/iteration/report/${this.planId}`;
+      this.$post(url, {}, (res) => {
+        this.iterationReport = res.data;
+      });
     },
   },
 };
