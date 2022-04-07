@@ -45,9 +45,6 @@ export default {
   data() {
     return {};
   },
-  computed() {
-    this.template;
-  },
   props: {
     template: {
       type: Object,

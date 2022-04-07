@@ -3,13 +3,25 @@
     <ms-main-container>
       <el-card class="table-card">
         <template v-slot:header>
-          <ms-table-header :create-permission="['PROJECT_TRACK_ISSUE:READ+CREATE']" :condition.sync="page.condition" @search="getIssues" @create="handleCreate"
-                           :create-tip="$t('test_track.issue.create_issue')"
-                           :tip="$t('commons.search_by_name_or_id')">
+          <ms-table-header
+            :create-permission="['PROJECT_TRACK_ISSUE:READ+CREATE']"
+            :condition.sync="page.condition"
+            @search="getIssues"
+            @create="handleCreate"
+            :create-tip="$t('test_track.issue.create_issue')"
+            :tip="$t('commons.search_by_name_or_id')"
+          >
             <template v-slot:button>
-              <el-tooltip v-if="true" :content="$t('test_track.issue.update_third_party_bugs')">
-                <ms-table-button icon="el-icon-refresh" v-if="true"
-                                 :content="$t('test_track.issue.sync_bugs')" @click="syncIssues"/>
+              <el-tooltip
+                v-if="true"
+                :content="$t('test_track.issue.update_third_party_bugs')"
+              >
+                <ms-table-button
+                  icon="el-icon-refresh"
+                  v-if="true"
+                  :content="$t('test_track.issue.sync_bugs')"
+                  @click="syncIssues"
+                />
               </el-tooltip>
             </template>
           </ms-table-header>
@@ -33,7 +45,7 @@
           :custom-fields="[]"
           ref="table"
         >
-          <span v-for="(item) in fields" :key="item.key">
+          <span v-for="item in fields" :key="item.key">
             <!-- 缺陷id -->
             <ms-table-column
               :label="$t('test_track.issue.id')"
@@ -41,10 +53,15 @@
               :field="item"
               sortable
               min-width="130px"
-              :fields-width="fieldsWidth">
+              :fields-width="fieldsWidth"
+            >
               <template v-slot="scope">
-                <el-link :href="linkBaseUrl + scope.row.id" type="primary" target="_blank" >
-                  {{scope.row.num}}
+                <el-link
+                  :href="linkBaseUrl + scope.row.id"
+                  type="primary"
+                  target="_blank"
+                >
+                  {{ scope.row.num }}
                 </el-link>
               </template>
             </ms-table-column>
@@ -55,24 +72,27 @@
               :label="$t('test_track.issue.title')"
               sortable
               min-width="120px"
-              prop="title">
+              prop="title"
+            >
             </ms-table-column>
             <!-- 缺陷状态 -->
             <ms-table-column
               :field="item"
               :fields-width="fieldsWidth"
-              :filters="getFilterOptions('platformStatus')" 
+              :filters="getFilterOptions('platformStatus')"
               :label="$t('test_track.issue.status')"
               min-width="140px"
-              prop="platformStatus">
+              prop="platformStatus"
+            >
             </ms-table-column>
             <!-- 平台 -->
             <ms-table-column
               :field="item"
               :fields-width="fieldsWidth"
-              :filters="getFilterOptions('platform')" 
+              :filters="getFilterOptions('platform')"
               :label="$t('test_track.issue.platform')"
-              prop="platform">
+              prop="platform"
+            >
             </ms-table-column>
             <!-- <ms-table-column
                     :field="item"
@@ -88,11 +108,12 @@
             <ms-table-column
               :field="item"
               :fields-width="fieldsWidth"
-              :filters="getFilterOptions('assigneeName')" 
+              :filters="getFilterOptions('assigneeName')"
               sortable
               min-width="130px"
               :label="$t('test_track.issue.handler')"
-              prop="assigneeName">
+              prop="assigneeName"
+            >
             </ms-table-column>
             <!-- 缺陷描述 两种方案-->
             <!-- <issue-description-table-item :fields-width="fieldsWidth" :field="item"/> -->
@@ -100,57 +121,76 @@
               :label="$t('test_track.issue.description')"
               prop="description"
               :field="item"
-              :fields-width="fieldsWidth">
+              :fields-width="fieldsWidth"
+            >
               <template v-slot:default="scope">
-                  <el-button slot="reference" type="text" @click="handlePreview(scope.row)">{{ $t('test_track.issue.preview') }}</el-button>
+                <el-button
+                  slot="reference"
+                  type="text"
+                  @click="handlePreview(scope.row)"
+                  >{{ $t("test_track.issue.preview") }}</el-button
+                >
               </template>
-            </ms-table-column>            
+            </ms-table-column>
 
-  <!--          <ms-table-column-->
-  <!--            :field="item"-->
-  <!--            :fields-width="fieldsWidth"-->
-  <!--            :label="$t('test_track.issue.issue_resource')"-->
-  <!--            prop="resourceName">-->
-  <!--            <template v-slot="scope">-->
-  <!--              <el-link v-if="scope.row.resourceName" @click="$router.push('/track/plan/view/' + scope.row.resourceId)">-->
-  <!--                {{ scope.row.resourceName }}-->
-  <!--              </el-link>-->
-  <!--              <span v-else>-->
-  <!--              &#45;&#45;-->
-  <!--            </span>-->
-  <!--            </template>-->
-  <!--          </ms-table-column>-->
+            <!--          <ms-table-column-->
+            <!--            :field="item"-->
+            <!--            :fields-width="fieldsWidth"-->
+            <!--            :label="$t('test_track.issue.issue_resource')"-->
+            <!--            prop="resourceName">-->
+            <!--            <template v-slot="scope">-->
+            <!--              <el-link v-if="scope.row.resourceName" @click="$router.push('/track/plan/view/' + scope.row.resourceId)">-->
+            <!--                {{ scope.row.resourceName }}-->
+            <!--              </el-link>-->
+            <!--              <span v-else>-->
+            <!--              &#45;&#45;-->
+            <!--            </span>-->
+            <!--            </template>-->
+            <!--          </ms-table-column>-->
             <!-- 用例数 -->
             <ms-table-column
               :field="item"
               :fields-width="fieldsWidth"
               :label="$t('test_track.issue.case_number')"
-              prop="caseCount">
-                <template v-slot="scope">
-                  <router-link :to="scope.row.caseCount > 0 ? {name: 'testCase', params: { projectId: 'all', ids: scope.row.caseIds }} : {}">
-                    {{scope.row.caseCount}}
-                  </router-link>
-                </template>
+              prop="caseCount"
+            >
+              <template v-slot="scope">
+                <router-link
+                  :to="
+                    scope.row.caseCount > 0
+                      ? {
+                          name: 'testCase',
+                          params: { projectId: 'all', ids: scope.row.caseIds },
+                        }
+                      : {}
+                  "
+                >
+                  {{ scope.row.caseCount }}
+                </router-link>
+              </template>
             </ms-table-column>
             <!-- 创建时间 -->
-            <ms-table-column prop="createTime"
-                        :field="item"
-                        :fields-width="fieldsWidth"
-                        :label="$t('commons.create_time')"
-                        sortable
-                        min-width="180px">
+            <ms-table-column
+              prop="createTime"
+              :field="item"
+              :fields-width="fieldsWidth"
+              :label="$t('commons.create_time')"
+              sortable
+              min-width="180px"
+            >
               <template v-slot:default="scope">
                 <span>{{ scope.row.createTime | timestampFormatDate }}</span>
               </template>
-            </ms-table-column >
+            </ms-table-column>
             <!-- 缺陷类型 -->
             <ms-table-column
               :field="item"
               :fields-width="fieldsWidth"
               min-width="140px"
-              :filters="getFilterOptions('defectTypeName')" 
+              :filters="getFilterOptions('defectTypeName')"
               :label="$t('test_track.issue.defect_type')"
-              prop="defectTypeName">
+              prop="defectTypeName"
+            >
             </ms-table-column>
             <!-- 优先级 -->
             <ms-table-column
@@ -159,8 +199,14 @@
               sortable
               min-width="130px"
               :label="$t('test_track.issue.priority')"
-              :filters="[{text:'紧急', value: 3}, {text:'高', value: 2}, {text:'中', value: 1}, {text:'低', value: 0}]" 
-              prop="priority">
+              :filters="[
+                { text: '紧急', value: 3 },
+                { text: '高', value: 2 },
+                { text: '中', value: 1 },
+                { text: '低', value: 0 },
+              ]"
+              prop="priority"
+            >
               <template v-slot:default="scope">
                 <span>{{ scope.row.priority | priorityFormat }}</span>
               </template>
@@ -170,8 +216,9 @@
               :field="item"
               :fields-width="fieldsWidth"
               :label="$t('test_track.issue.working_hours')"
-              prop="workingHours">
-               <template v-slot:default="scope">
+              prop="workingHours"
+            >
+              <template v-slot:default="scope">
                 <span>{{ scope.row.workingHours }} 小时</span>
               </template>
             </ms-table-column>
@@ -180,15 +227,17 @@
               :field="item"
               :fields-width="fieldsWidth"
               :label="$t('test_track.issue.iteration')"
-              prop="iterationName">
+              prop="iterationName"
+            >
             </ms-table-column>
             <!-- 工时记录 -->
             <ms-table-column
               :field="item"
               :fields-width="fieldsWidth"
               :label="$t('test_track.issue.working_hours_log')"
-              prop="recordedHours">
-               <template v-slot:default="scope">
+              prop="recordedHours"
+            >
+              <template v-slot:default="scope">
                 <span>{{ scope.row.recordedHours }} 小时</span>
               </template>
             </ms-table-column>
@@ -197,73 +246,87 @@
               :field="item"
               :fields-width="fieldsWidth"
               :label="$t('test_track.issue.followers')"
-              prop="watcherName">
+              prop="watcherName"
+            >
             </ms-table-column>
             <!-- 开始时间 -->
-            <ms-table-column prop="startDate"
-                        :field="item"
-                        :fields-width="fieldsWidth"
-                        :label="$t('test_track.issue.start_date')"
-                        sortable
-                        min-width="180px">
+            <ms-table-column
+              prop="startDate"
+              :field="item"
+              :fields-width="fieldsWidth"
+              :label="$t('test_track.issue.start_date')"
+              sortable
+              min-width="180px"
+            >
               <template v-slot:default="scope">
                 <span>{{ scope.row.startDate | timestampFormatDate }}</span>
               </template>
-            </ms-table-column >
+            </ms-table-column>
             <!-- 截止时间 -->
-            <ms-table-column prop="dueDate"
-                        :field="item"
-                        :fields-width="fieldsWidth"
-                        :label="$t('test_track.issue.due_date')"
-                        sortable
-                        min-width="180px">
+            <ms-table-column
+              prop="dueDate"
+              :field="item"
+              :fields-width="fieldsWidth"
+              :label="$t('test_track.issue.due_date')"
+              sortable
+              min-width="180px"
+            >
               <template v-slot:default="scope">
                 <span>{{ scope.row.dueDate | timestampFormatDate }}</span>
               </template>
-            </ms-table-column >
-             <!-- 创建人 -->
+            </ms-table-column>
+            <!-- 创建人 -->
             <ms-table-column
               :field="item"
               :fields-width="fieldsWidth"
-              :filters="getFilterOptions('creatorName')" 
+              :filters="getFilterOptions('creatorName')"
               :label="$t('test_track.issue.creator')"
-              prop="creatorName">
+              prop="creatorName"
+            >
             </ms-table-column>
             <!-- 关联需求 -->
             <ms-table-column
               :field="item"
               :fields-width="fieldsWidth"
-              :filters="getFilterOptions('requirementName')" 
+              :filters="getFilterOptions('requirementName')"
               min-width="140px"
               :label="$t('test_track.issue.related_requirements')"
-              prop="requirementName">
+              prop="requirementName"
+            >
             </ms-table-column>
             <!-- 模块 -->
             <ms-table-column
               :field="item"
               :fields-width="fieldsWidth"
-              :filters="getFilterOptions('model')" 
+              :filters="getFilterOptions('model')"
               :label="$t('test_track.issue.module')"
-              prop="model">
+              prop="model"
+            >
             </ms-table-column>
-            <ms-table-column v-for="field in issueTemplate.customFields" :key="field.id"
-                            :field="item"
-                            :fields-width="fieldsWidth"
-                            :label="field.name"
-                            :prop="field.name">
-                <template v-slot="scope">
-                  <span v-if="field.name === '状态'">
-                    {{getCustomFieldValue(scope.row, field) ? getCustomFieldValue(scope.row, field) : issueStatusMap[scope.row.status]}}
-                  </span>
-                  <span v-else>
-                    {{getCustomFieldValue(scope.row, field)}}
-                  </span>
-                </template>
+            <ms-table-column
+              v-for="field in issueTemplate.customFields"
+              :key="field.id"
+              :field="item"
+              :fields-width="fieldsWidth"
+              :label="field.name"
+              :prop="field.name"
+            >
+              <template v-slot="scope">
+                <span v-if="field.name === '状态'">
+                  {{
+                    getCustomFieldValue(scope.row, field)
+                      ? getCustomFieldValue(scope.row, field)
+                      : issueStatusMap[scope.row.status]
+                  }}
+                </span>
+                <span v-else>
+                  {{ getCustomFieldValue(scope.row, field) }}
+                </span>
+              </template>
             </ms-table-column>
-
           </span>
         </ms-table>
-        
+
         <!-- 删除确认框 -->
         <ms-edit-dialog
           :visible.sync="dialogVisible"
@@ -272,23 +335,32 @@
           :with-footer="true"
           :close-on-click-modal="true"
           @confirm="handleDeLeteConfirm"
-          >
+        >
           <el-form>
             <el-row>
               <el-col :span="24">
-                <el-form-item :label="`请输入删除缺陷的原因, 缺陷ID: ${deleteIssueInfo.num}`">
-                  <el-input size="small" v-model="deleteIssueInfo.remark" placeholder="请输入删除原因"/>
+                <el-form-item
+                  :label="`请输入删除缺陷的原因, 缺陷ID: ${deleteIssueInfo.num}`"
+                >
+                  <el-input
+                    size="small"
+                    v-model="deleteIssueInfo.remark"
+                    placeholder="请输入删除原因"
+                  />
                 </el-form-item>
               </el-col>
             </el-row>
           </el-form>
         </ms-edit-dialog>
-        
-        <ms-table-pagination :change="getIssues" :current-page.sync="page.currentPage" :page-size.sync="page.pageSize"
-                             :total="page.total"/>
 
-        <issue-edit @refresh="getIssues" ref="issueEdit"/>
+        <ms-table-pagination
+          :change="getIssues"
+          :current-page.sync="page.currentPage"
+          :page-size.sync="page.pageSize"
+          :total="page.total"
+        />
 
+        <issue-edit @refresh="getIssues" ref="issueEdit" />
       </el-card>
     </ms-main-container>
   </ms-container>
@@ -304,24 +376,28 @@ import MsEditDialog from "@/business/components/common/components/MsEditDialog";
 import {
   CUSTOM_FIELD_SCENE_OPTION,
   CUSTOM_FIELD_TYPE_OPTION,
-  FIELD_TYPE_MAP, ISSUE_PLATFORM_OPTION,
+  FIELD_TYPE_MAP,
+  ISSUE_PLATFORM_OPTION,
   ISSUE_STATUS_MAP,
-  SYSTEM_FIELD_NAME_MAP
+  SYSTEM_FIELD_NAME_MAP,
 } from "@/common/js/table-constants";
 import MsTableHeader from "@/business/components/common/components/MsTableHeader";
 import IssueDescriptionTableItem from "@/business/components/track/issue/IssueDescriptionTableItem";
 import IssueEdit from "@/business/components/track/issue/IssueEdit";
-import {getIssues, syncIssues} from "@/network/Issue";
+import { getIssues, syncIssues } from "@/network/Issue";
 import {
   getCustomFieldValue,
   getCustomTableWidth,
-  getPageInfo, getTableHeaderWithCustomFields,saveLastTableSortField,getLastTableSortField
+  getPageInfo,
+  getTableHeaderWithCustomFields,
+  saveLastTableSortField,
+  getLastTableSortField,
 } from "@/common/js/tableUtils";
 import MsContainer from "@/business/components/common/components/MsContainer";
 import MsMainContainer from "@/business/components/common/components/MsMainContainer";
-import {getCurrentProjectID} from "@/common/js/utils";
-import {getIssueTemplate} from "@/network/custom-field-template";
-import {getProjectMember} from "@/network/user";
+import { getCurrentProjectID } from "@/common/js/utils";
+import { getIssueTemplate } from "@/network/custom-field-template";
+import { getProjectMember } from "@/network/user";
 
 export default {
   name: "IssueList",
@@ -331,33 +407,44 @@ export default {
     IssueEdit,
     IssueDescriptionTableItem,
     MsTableHeader,
-    MsTablePagination, MsTableButton, MsTableOperators, MsTableColumn, MsTable,
-    MsEditDialog
+    MsTablePagination,
+    MsTableButton,
+    MsTableOperators,
+    MsTableColumn,
+    MsTable,
+    MsEditDialog,
   },
   data() {
     return {
       linkBaseUrl: "https://jira.mudutv.com/browse/",
       page: getPageInfo(),
       fields: [],
-      tableHeaderKey:"ISSUE_LIST",
-      fieldsWidth: getCustomTableWidth('ISSUE_LIST'),
-      screenHeight: 'calc(100vh - 200px)',
+      tableHeaderKey: "ISSUE_LIST",
+      fieldsWidth: getCustomTableWidth("ISSUE_LIST"),
+      screenHeight: "calc(100vh - 200px)",
       operators: [
         {
-          tip: this.$t('commons.edit'), icon: "el-icon-edit",
+          tip: this.$t("commons.edit"),
+          icon: "el-icon-edit",
           exec: this.handleEdit,
           isDisable: this.btnDisable,
-          permissions: ['PROJECT_TRACK_ISSUE:READ+EDIT']
-        }, {
-          tip: this.$t('commons.copy'), icon: "el-icon-copy-document", type: "success",
+          permissions: ["PROJECT_TRACK_ISSUE:READ+EDIT"],
+        },
+        {
+          tip: this.$t("commons.copy"),
+          icon: "el-icon-copy-document",
+          type: "success",
           exec: this.handleCopy,
-          isDisable: this.btnDisable
-        }, {
-          tip: this.$t('commons.delete'), icon: "el-icon-delete", type: "danger",
+          isDisable: this.btnDisable,
+        },
+        {
+          tip: this.$t("commons.delete"),
+          icon: "el-icon-delete",
+          type: "danger",
           exec: this.handleDelete,
           isDisable: this.btnDisable,
-          permissions: ['PROJECT_TRACK_ISSUE:READ+DELETE']
-        }
+          permissions: ["PROJECT_TRACK_ISSUE:READ+DELETE"],
+        },
       ],
       issueTemplate: {},
       members: [],
@@ -365,22 +452,22 @@ export default {
       dialogVisible: false,
       deleteIssueInfo: {
         ids: [],
-        projectId: '',
-        remark:'',
-        num: '',
+        projectId: "",
+        remark: "",
+        num: "",
       },
     };
   },
   filters: {
     priorityFormat(value) {
-      return ['低', '中', '高', '紧急'][parseInt(value)]
-    }
+      return ["低", "中", "高", "紧急"][parseInt(value)];
+    },
   },
   activated() {
     getProjectMember((data) => {
       this.members = data;
     });
-    this.fields = getTableHeaderWithCustomFields('ISSUE_LIST', []);
+    this.fields = getTableHeaderWithCustomFields("ISSUE_LIST", []);
     this.$refs.table.reloadTable();
     // getIssueTemplate()
     //   .then((template) => {
@@ -408,7 +495,7 @@ export default {
       return CUSTOM_FIELD_TYPE_OPTION;
     },
     platformFilters() {
-     return ISSUE_PLATFORM_OPTION;
+      return ISSUE_PLATFORM_OPTION;
     },
     sceneFilters() {
       return CUSTOM_FIELD_SCENE_OPTION;
@@ -424,7 +511,7 @@ export default {
     },
     projectId() {
       return getCurrentProjectID();
-    }
+    },
   },
   methods: {
     getCustomFieldValue(row, field) {
@@ -433,7 +520,7 @@ export default {
     getIssues() {
       this.page.condition.projectId = this.projectId;
       let orderArr = this.getSortField();
-      if(orderArr){
+      if (orderArr) {
         this.page.condition.orders = orderArr;
       }
       console.log(this.page);
@@ -443,35 +530,35 @@ export default {
       // 传了row(data)和index 只用到了data
       console.log(data);
       data = {
-          "id": data.id,
-          "issueId": data.num,
-          "title": "默认",
-          "descriptions": {
-              "preconditions": "缺陷内容",
-              "operatingSteps": "操作步骤",
-              "expectedResult": "预期结果",
-              "actualResult": "实际结果"
-          },
-          "creator": "0852",
-          "fields": {
-              "defectTypeId": 30801759,
-              "priority": 1,
-              "workingHours": "12",
-              "iterationCode": 91,
-              "assigneeName": "0852",
-              "requirementCode": 190,
-              "moduleId": "",
-              "startDate": "2022-02-28T16:00:00.000Z",
-              "dueDate": "2022-03-01T16:00:00.000Z"
-          },
-          "environment": "dev",
-          "repetitionFrequency": "must",
-          "projectId": "648d74c1-4973-4d1c-8c22-a68a0357d6c4",
-          "organizationId": "d1ab2464-0a3d-11ec-b53d-0c42a1eda428",
-          "testCaseIds": []
-      }
-      data.drawerTitle = '编辑缺陷'
-      data.isEdit = true
+        id: data.id,
+        issueId: data.num,
+        title: "默认",
+        descriptions: {
+          preconditions: "缺陷内容",
+          operatingSteps: "操作步骤",
+          expectedResult: "预期结果",
+          actualResult: "实际结果",
+        },
+        creator: "0852",
+        fields: {
+          defectTypeId: 30801759,
+          priority: 1,
+          workingHours: "12",
+          iterationCode: 91,
+          assigneeName: "0852",
+          requirementCode: 190,
+          moduleId: "",
+          startDate: "2022-02-28T16:00:00.000Z",
+          dueDate: "2022-03-01T16:00:00.000Z",
+        },
+        environment: "dev",
+        repetitionFrequency: "must",
+        projectId: "648d74c1-4973-4d1c-8c22-a68a0357d6c4",
+        organizationId: "d1ab2464-0a3d-11ec-b53d-0c42a1eda428",
+        testCaseIds: [],
+      };
+      data.drawerTitle = "编辑缺陷";
+      data.isEdit = true;
       this.$refs.issueEdit.open(data);
     },
     handleCreate() {
@@ -479,66 +566,66 @@ export default {
     },
     handleCopy(data) {
       data = {
-          "title": "默认",
-          "descriptions": {
-              "preconditions": "缺陷内容",
-              "operatingSteps": "操作步骤",
-              "expectedResult": "预期结果",
-              "actualResult": "实际结果"
-          },
-          "creator": "0852",
-          "fields": {
-              "defectTypeId": 30801759,
-              "priority": 1,
-              "workingHours": "12",
-              "iterationCode": 91,
-              "assigneeName": "0852",
-              "requirementCode": 190,
-              "moduleId": "",
-              "startDate": "2022-02-28T16:00:00.000Z",
-              "dueDate": "2022-03-01T16:00:00.000Z"
-          },
-          "environment": "dev",
-          "repetitionFrequency": "must",
-          "projectId": "648d74c1-4973-4d1c-8c22-a68a0357d6c4",
-          "organizationId": "d1ab2464-0a3d-11ec-b53d-0c42a1eda428",
-          "testCaseIds": []
-      }      
+        title: "默认",
+        descriptions: {
+          preconditions: "缺陷内容",
+          operatingSteps: "操作步骤",
+          expectedResult: "预期结果",
+          actualResult: "实际结果",
+        },
+        creator: "0852",
+        fields: {
+          defectTypeId: 30801759,
+          priority: 1,
+          workingHours: "12",
+          iterationCode: 91,
+          assigneeName: "0852",
+          requirementCode: 190,
+          moduleId: "",
+          startDate: "2022-02-28T16:00:00.000Z",
+          dueDate: "2022-03-01T16:00:00.000Z",
+        },
+        environment: "dev",
+        repetitionFrequency: "must",
+        projectId: "648d74c1-4973-4d1c-8c22-a68a0357d6c4",
+        organizationId: "d1ab2464-0a3d-11ec-b53d-0c42a1eda428",
+        testCaseIds: [],
+      };
       let copyData = {};
       Object.assign(copyData, data);
       copyData.id = null;
-      copyData.isCreateTitle = true
-      copyData.drawerTitle = '复制缺陷'
+      copyData.isCreateTitle = true;
+      copyData.drawerTitle = "复制缺陷";
       this.$refs.issueEdit.open(copyData);
-    },    
+    },
     // 显示删除确认框
     handleDelete(data) {
-      this.deleteIssueInfo.num = data.num
-      this.deleteIssueInfo.ids = [data.id]
-      this.deleteIssueInfo.projectId = data.projectId
-      this.openDialog()
+      this.deleteIssueInfo.num = data.num;
+      this.deleteIssueInfo.ids = [data.id];
+      this.deleteIssueInfo.projectId = data.projectId;
+      this.openDialog();
     },
     btnDisable(row) {
-      if (row.platform === 'Local') {
+      if (row.platform === "Local") {
         return false;
       }
       return true;
     },
-    saveSortField(key,orders){
-      saveLastTableSortField(key,JSON.stringify(orders));
+    saveSortField(key, orders) {
+      saveLastTableSortField(key, JSON.stringify(orders));
     },
     syncIssues() {
       this.page.result = syncIssues(() => {
         this.getIssues();
       });
     },
-    getSortField(){
+    getSortField() {
       let orderJsonStr = getLastTableSortField(this.tableHeaderKey);
       let returnObj = null;
-      if(orderJsonStr){
+      if (orderJsonStr) {
         try {
           returnObj = JSON.parse(orderJsonStr);
-        }catch (e){
+        } catch (e) {
           return null;
         }
       }
@@ -547,66 +634,69 @@ export default {
     // 打开缺陷删除对话框
     openDialog() {
       this.dialogVisible = true;
-      this.deleteIssueInfo.remark = ''
+      this.deleteIssueInfo.remark = "";
     },
     // 确认提交
     handleDeLeteConfirm() {
-      this.page.result = this.$post('issue/delete/', this.deleteIssueInfo, () => {
-        this.$success(this.$t('commons.delete_success'));
-        this.getIssues();
-      });
+      this.page.result = this.$post(
+        "issue/delete/",
+        this.deleteIssueInfo,
+        () => {
+          this.$success(this.$t("commons.delete_success"));
+          this.getIssues();
+        }
+      );
       this.dialogVisible = false;
-      this.deleteIssueInfo.remark = ''
+      this.deleteIssueInfo.remark = "";
     },
     // 根据属性获取筛选列表
     getFilterOptions(prop) {
-      const options = []
-      const hasExist = {}
-      if(this.page.data) {
-        this.page.data.forEach(item => {
-          let value = item[prop]
-          if(!!value && hasExist[value] === undefined) {
-            options.push({text: value, value})
-            hasExist[value] = true
+      const options = [];
+      const hasExist = {};
+      if (this.page.data) {
+        this.page.data.forEach((item) => {
+          let value = item[prop];
+          if (!!value && hasExist[value] === undefined) {
+            options.push({ text: value, value });
+            hasExist[value] = true;
           }
-        })
-
+        });
       }
-      return options
+      return options;
     },
     // 打开预览
     handlePreview(data) {
-      console.log(data)
+      console.log(data);
       data = {
-          "title": "默认",
-          "descriptions": {
-              "preconditions": "缺陷内容",
-              "operatingSteps": "操作步骤",
-              "expectedResult": "预期结果",
-              "actualResult": "实际结果"
-          },
-          "creator": "0852",
-          "fields": {
-              "defectTypeId": 30801759,
-              "priority": 1,
-              "workingHours": "12",
-              "iterationCode": 91,
-              "assigneeName": "0852",
-              "requirementCode": 190,
-              "moduleId": "",
-              "startDate": "2022-02-28T16:00:00.000Z",
-              "dueDate": "2022-03-01T16:00:00.000Z"
-          },
-          "environment": "dev",
-          "repetitionFrequency": "must",
-          "projectId": "648d74c1-4973-4d1c-8c22-a68a0357d6c4",
-          "organizationId": "d1ab2464-0a3d-11ec-b53d-0c42a1eda428",
-          "testCaseIds": []
-      } 
-      data.isOnlyRead = true
+        title: "默认",
+        descriptions: {
+          preconditions: "缺陷内容",
+          operatingSteps: "操作步骤",
+          expectedResult: "预期结果",
+          actualResult: "实际结果",
+        },
+        creator: "0852",
+        fields: {
+          defectTypeId: 30801759,
+          priority: 1,
+          workingHours: "12",
+          iterationCode: 91,
+          assigneeName: "0852",
+          requirementCode: 190,
+          moduleId: "",
+          startDate: "2022-02-28T16:00:00.000Z",
+          dueDate: "2022-03-01T16:00:00.000Z",
+        },
+        environment: "dev",
+        repetitionFrequency: "must",
+        projectId: "648d74c1-4973-4d1c-8c22-a68a0357d6c4",
+        organizationId: "d1ab2464-0a3d-11ec-b53d-0c42a1eda428",
+        testCaseIds: [],
+      };
+      data.isOnlyRead = true;
       this.$refs.issueEdit.open(data);
-    }
-  }
+    },
+  },
 };
 </script>
 
