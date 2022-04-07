@@ -3,7 +3,7 @@
     <template>
       <el-table row-key="id" :data="defectList">
         <el-table-column
-          :prop="defectList.id ? 'id' : 'num'"
+          :prop="isIterationReport ? 'num' : 'id'"
           :label="$t('commons.id')"
           show-overflow-tooltip
         >
@@ -34,7 +34,7 @@
           </template>
         </el-table-column>
         <el-table-column
-          :prop="defectList.model ? 'model' : 'module'"
+          :prop="isIterationReport ? 'module' : 'model'"
           :label="$t('test_track.module.module')"
           show-overflow-tooltip
         >
@@ -47,13 +47,13 @@
         >
         </el-table-column>
         <el-table-column
-          :prop="defectList.platformStatus ? 'platformStatus' : 'status'"
+          :prop="isIterationReport ? 'status' : 'platformStatus'"
           :label="$t('test_track.module.status')"
           show-overflow-tooltip
         >
         </el-table-column>
         <el-table-column
-          :prop="defectList.lastmodify ? 'lastmodify' : 'handler'"
+          :prop="isIterationReport ? 'handler' : 'lastmodify'"
           :label="$t('test_track.module.current_owner')"
           show-overflow-tooltip
         >
@@ -105,6 +105,10 @@ export default {
           },
         ];
       },
+    },
+    isIterationReport: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {

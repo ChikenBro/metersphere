@@ -24,7 +24,7 @@ export default {
         title: {
           text: this.text,
           subtext: this.subtext,
-          left: "52%",
+          left: "center",
         },
         tooltip: {
           trigger: "item",
@@ -42,7 +42,7 @@ export default {
             name: this.name,
             type: "pie",
             radius: ["25%", "50%"],
-            center: ["60%", "50%"],
+            center: ["55%", "50%"],
             // roseType: 'angle',
             data: this.data,
             animation: false,

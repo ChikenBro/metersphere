@@ -9,8 +9,12 @@
         style="width: 100%"
       >
         <el-table-column
-          prop="testPlanName"
-          label="测试计划名称"
+          :prop="isIterationReport ? 'testPlanName' : 'projectName'"
+          :label="
+            isIterationReport
+              ? '测试计划名称'
+              : $t('test_track.module.project_name')
+          "
           show-overflow-tooltip
         >
         </el-table-column>
@@ -76,6 +80,10 @@ export default {
   name: "TestResultComponent",
   components: { CommonComponent },
   props: {
+    isIterationReport: {
+      type: Boolean,
+      default: false,
+    },
     testResults: {
       type: Array,
       default() {

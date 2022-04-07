@@ -12,7 +12,7 @@
       <rich-text-component :preview="preview" v-if="preview.type != 'system'" />
     </div>
 
-    <!--报告-->
+    <!--迭代报告-->
     <div v-if="isIterationReport">
       <base-info-component
         id="baseInfoComponent"
@@ -22,6 +22,7 @@
       <test-result-component
         id="testResultComponent"
         :test-results="iterationReport.testResult"
+        :is-iteration-report="true"
         v-if="preview.id == 2"
       />
       <test-result-advance-chart-component
@@ -38,15 +39,15 @@
         :planId="planId"
         v-if="preview.id == 3"
       />
-      <!--<failure-result-component id="failureResultComponent" :failure-test-cases="metric.failureTestCases" v-if="preview.id == 4"/>-->
-      <failure-result-advance-component
+      <failure-test-cases-list
         id="failureResultComponent"
-        :failure-test-cases="failureTestCases"
+        :failure-test-cases="iterationReport.failureTestCases"
         v-if="preview.id == 4"
       />
       <defect-list-component
         id="defectListComponent"
         :defect-list="iterationReport.issues"
+        :is-iteration-report="true"
         v-if="preview.id == 5"
       />
       <rich-text-component
@@ -56,9 +57,9 @@
         v-if="preview.type != 'system'"
       />
     </div>
-    <!--报告-->
+    <!--测试报告-->
     <div v-else-if="metric">
-      <base-info-component
+      <old-base-info-component
         id="baseInfoComponent"
         :report-info="metric"
         v-if="preview.id == 1"
@@ -69,7 +70,7 @@
         v-if="preview.id == 2"
       />
       <!--<test-result-chart-component id="resultChartComponent" :execute-result="metric.executeResult" v-if="preview.id == 3"/>-->
-      <test-result-advance-chart-component
+      <old-test-result-advance-chart-component
         id="resultChartComponent"
         :execute-result="metric.executeResult"
         :source="source"
@@ -99,6 +100,8 @@
 
 <script>
 import BaseInfoComponent from "./BaseInfoComponent";
+import OldBaseInfoComponent from "./OldBaseInfoComponent";
+import FailureTestCasesList from "./component/FailureTestCasesList";
 import TestResultComponent from "./TestResultComponent";
 import TestResultChartComponent from "./TestResultChartComponent";
 import RichTextComponent from "./RichTextComponent";
@@ -106,6 +109,7 @@ import FailureResultComponent from "./FailureResultComponent";
 import DefectListComponent from "./DefectListComponent";
 import html2canvas from "html2canvas";
 import TestResultAdvanceChartComponent from "./TestResultAdvanceChartComponent";
+import OldTestResultAdvanceChartComponent from "./OldTestResultAdvanceChartComponent";
 import FailureResultAdvanceComponent from "./FailureResultAdvanceComponent";
 import ExecutiveConditionAdvanceChartComponent from "./ExecutiveConditionAdvanceChartComponent";
 
@@ -114,25 +118,22 @@ export default {
   components: {
     FailureResultAdvanceComponent,
     TestResultAdvanceChartComponent,
+    OldTestResultAdvanceChartComponent,
     FailureResultComponent,
     DefectListComponent,
     RichTextComponent,
     TestResultChartComponent,
     TestResultComponent,
     BaseInfoComponent,
+    OldBaseInfoComponent,
     ExecutiveConditionAdvanceChartComponent,
+    FailureTestCasesList,
   },
   data() {
     return {
       iterationReport: null,
       testResult: [],
       caseExecutiveCondition: [],
-      failureTestCases: {
-        functionalTestCases: [],
-        apiTestCases: [],
-        scenarioTestCases: [],
-        loadTestCases: [],
-      },
     };
   },
   props: {
@@ -160,6 +161,11 @@ export default {
       type: Boolean,
       default: false,
     },
+  },
+  created() {
+    if (this.isIterationReport) {
+      this.getIterationReport();
+    }
   },
   watch: {
     planId() {
@@ -232,75 +238,71 @@ export default {
         ],
         caseExecutiveCondition: [
           {
-            testPlanId: "1",
-            testPlanName: "测试用例",
-            executerTestList: [
+            testPlanId: "45b38c46-b305-4626-afc8-eb90b5575d33",
+            testPlanName: "11135125",
+            executorTestList: [
               {
-                executor: "1",
-                executorName: "zerf",
-                caseCount: 2,
-                passCount: 2,
-                failureCount: 3,
-                blockingCount: 4,
-                skipCount: 4,
-                underwayCount: 6,
-                prepareCount: 2,
-              },
-              {
-                executor: "2",
-                executorName: "coder",
-                caseCount: 2,
-                passCount: 3,
-                failureCount: 4,
-                blockingCount: 1,
-                skipCount: 4,
-                underwayCount: 3,
-                prepareCount: 2,
-              },
-            ],
-          },
-          {
-            testPlanId: "2",
-            testPlanName: "测试用例2",
-            executerTestList: [
-              {
-                executor: "3",
-                executorName: "zzzzzrf",
-                caseCount: 2,
-                passCount: 3,
-                failureCount: 4,
-                blockingCount: 4,
-                skipCount: 4,
-                underwayCount: 1,
-                prepareCount: 2,
-              },
-              {
-                executor: "3",
-                executorName: "coding",
-                caseCount: 2,
-                passCount: 3,
-                failureCount: 3,
+                executor: "admin",
+                executorName: "Admin",
+                caseCount: 5,
+                passCount: 1,
+                failureCount: 1,
                 blockingCount: 1,
                 skipCount: 1,
-                underwayCount: 6,
+                underwayCount: 1,
+                prepareCount: 0,
+              },
+              {
+                executor: "0792",
+                executorName: "杨格格",
+                caseCount: 2,
+                passCount: 0,
+                failureCount: 0,
+                blockingCount: 0,
+                skipCount: 0,
+                underwayCount: 0,
                 prepareCount: 2,
+              },
+              {
+                executor: "0780",
+                executorName: "沈磊",
+                caseCount: 1,
+                passCount: 0,
+                failureCount: 0,
+                blockingCount: 0,
+                skipCount: 0,
+                underwayCount: 0,
+                prepareCount: 1,
               },
             ],
           },
         ],
         failureTestCases: [
           {
-            id: "1",
-            num: "1",
-            name: "失败名称",
-            testPlanName: "所属计划",
-            module: "所属模块",
+            id: "39bdea0c-6db9-4408-a429-7cced724a465",
+            num: null,
+            name: "demo",
+            testPlanName: "11135125",
+            module: "/webSDK",
             priority: "P0",
-            type: "api",
+            type: "functional",
             testMode: "manual",
-            executor: "zrf",
-            executeResult: "Pass",
-            updateTime: "2022-02-01",
+            executor: "admin",
+            executeResult: "Failure",
+            updateTime: "2022-04-07 09:51:58",
+          },
+          {
+            id: "8e1e491c-b023-46ce-8353-f3590e964e39",
+            num: null,
+            name: "会畅深度定制",
+            testPlanName: "11135125",
+            module: "/定制用户",
+            priority: "P0",
+            type: "functional",
+            testMode: "manual",
+            executor: "admin",
+            executeResult: "Blocking",
+            updateTime: "2022-04-07 09:52:00",
           },
         ],
         issues: [
@@ -333,7 +335,7 @@ export default {
         this.iterationReport.caseExecutiveCondition.map((item) => {
           return {
             title: item.testPlanName,
-            executerTestList: item.executerTestList.map((ele) => {
+            executerTestList: item.executorTestList.map((ele) => {
               return {
                 executorName: ele.executorName,
                 dataList: [
@@ -348,8 +350,6 @@ export default {
             }),
           };
         });
-      this.failureTestCases.functionalTestCases =
-        this.iterationReport.failureTestCases;
     },
   },
 };
