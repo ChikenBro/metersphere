@@ -13,18 +13,17 @@
     </div>
 
     <!--报告-->
-    <div v-if="metric">
+    <div v-if="isIterationReport">
       <base-info-component
         id="baseInfoComponent"
-        :report-info="iterationReport || metric"
+        :report-info="iterationReport"
         v-if="preview.id == 1"
       />
       <test-result-component
         id="testResultComponent"
-        :test-results="iterationReport.testResult || metric.moduleExecuteResult"
+        :test-results="iterationReport.testResult"
         v-if="preview.id == 2"
       />
-      <!--<test-result-chart-component id="resultChartComponent" :execute-result="metric.executeResult" v-if="preview.id == 3"/>-->
       <test-result-advance-chart-component
         id="resultChartComponent"
         :execute-result="testResult"
@@ -42,12 +41,50 @@
       <!--<failure-result-component id="failureResultComponent" :failure-test-cases="metric.failureTestCases" v-if="preview.id == 4"/>-->
       <failure-result-advance-component
         id="failureResultComponent"
-        :failure-test-cases="failureTestCases || metric.failureTestCases"
+        :failure-test-cases="failureTestCases"
         v-if="preview.id == 4"
       />
       <defect-list-component
         id="defectListComponent"
-        :defect-list="iterationReport.issues || metric.issues"
+        :defect-list="iterationReport.issues"
+        v-if="preview.id == 5"
+      />
+      <rich-text-component
+        id="richTextComponent"
+        :is-report-view="isReportView"
+        :preview="preview"
+        v-if="preview.type != 'system'"
+      />
+    </div>
+    <!--报告-->
+    <div v-else-if="metric">
+      <base-info-component
+        id="baseInfoComponent"
+        :report-info="metric"
+        v-if="preview.id == 1"
+      />
+      <test-result-component
+        id="testResultComponent"
+        :test-results="metric.moduleExecuteResult"
+        v-if="preview.id == 2"
+      />
+      <!--<test-result-chart-component id="resultChartComponent" :execute-result="metric.executeResult" v-if="preview.id == 3"/>-->
+      <test-result-advance-chart-component
+        id="resultChartComponent"
+        :execute-result="metric.executeResult"
+        :source="source"
+        :planId="planId"
+        v-if="preview.id == 3"
+      />
+      <!--<failure-result-component id="failureResultComponent" :failure-test-cases="metric.failureTestCases" v-if="preview.id == 4"/>-->
+      <failure-result-advance-component
+        id="failureResultComponent"
+        :failure-test-cases="metric.failureTestCases"
+        v-if="preview.id == 4"
+      />
+      <defect-list-component
+        id="defectListComponent"
+        :defect-list="metric.issues"
         v-if="preview.id == 5"
       />
       <rich-text-component
@@ -119,9 +156,17 @@ export default {
       type: Number,
       default: 0,
     },
+    isIterationReport: {
+      type: Boolean,
+      default: false,
+    },
   },
-  created() {
-    this.getIterationReport();
+  watch: {
+    planId() {
+      if (this.isIterationReport) {
+        this.getIterationReport();
+      }
+    },
   },
   methods: {
     getComponentId() {

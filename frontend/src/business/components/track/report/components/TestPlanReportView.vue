@@ -57,6 +57,7 @@
               <template-component
                 :source="source"
                 :isReportView="true"
+                :is-iteration-report="true"
                 :metric="metric"
                 :planId="planId"
                 :preview="item"
