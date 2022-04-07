@@ -1,24 +1,21 @@
 <template>
   <ms-container>
-
     <ms-main-container>
-      <test-plan-report-list
-        ref="testPlanReportList"/>
+      <test-plan-report-list ref="testPlanReportList" />
     </ms-main-container>
   </ms-container>
 </template>
 
 <script>
-
-import TestPlanReportList from './components/TestPlanReportList';
+import TestPlanReportList from "./components/TestPlanReportList";
 import MsContainer from "../../common/components/MsContainer";
 import MsMainContainer from "../../common/components/MsMainContainer";
 
 export default {
   name: "TestPlanReport",
-  components: {MsMainContainer, MsContainer, TestPlanReportList},
+  components: { MsMainContainer, MsContainer, TestPlanReportList },
   data() {
-    return {}
+    return {};
   },
   activated() {
     this.refreshTestPlanList();
@@ -27,18 +24,15 @@ export default {
     this.refreshTestPlanList();
   },
   watch: {
-    '$route'(to, from) {
-    }
+    $route(to, from) {},
   },
   methods: {
     refreshTestPlanList() {
       this.$refs.testPlanReportList.condition = {};
       this.$refs.testPlanReportList.initTableData();
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>
