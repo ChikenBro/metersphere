@@ -457,11 +457,6 @@ export default {
             //     item.createUser = name;
             //   });
             // }
-
-            // mock新添加的字段
-            item.iterationId = Math.random().toFixed(2);
-            item.iterationName = "Ver 1.1.0";
-            item.iterationStatus = "未完成";
           });
         }
       );

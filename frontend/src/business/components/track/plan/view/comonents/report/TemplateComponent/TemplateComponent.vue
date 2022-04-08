@@ -1,17 +1,5 @@
 <template>
   <div>
-    <!--模版-->
-    <div v-if="!metric">
-      <base-info-component :is-report="false" v-if="preview.id == 1" />
-      <test-result-component v-if="preview.id == 2" />
-      <!--<test-result-chart-component v-if="preview.id == 3"/>-->
-      <test-result-advance-chart-component v-if="preview.id == 3" />
-      <!--<failure-result-component v-if="preview.id == 4"/>-->
-      <failure-result-advance-component v-if="preview.id == 4" />
-      <defect-list-component v-if="preview.id == 5" />
-      <rich-text-component :preview="preview" v-if="preview.type != 'system'" />
-    </div>
-
     <!--迭代报告-->
     <div v-if="iterationReport">
       <base-info-component
@@ -30,7 +18,7 @@
         :execute-result="iterationReport.handledTestResult"
         :source="source"
         :planId="planId"
-        v-if="preview.id == 3"
+        v-if="preview.id == 2"
       />
       <executive-condition-advance-chart-component
         id="executiveConditionChartComponent"
@@ -49,12 +37,6 @@
         :defect-list="iterationReport.issues"
         :is-iteration-report="true"
         v-if="preview.id == 5"
-      />
-      <rich-text-component
-        id="richTextComponent"
-        :is-report-view="isReportView"
-        :preview="preview"
-        v-if="preview.type != 'system'"
       />
     </div>
 
@@ -95,6 +77,18 @@
         :preview="preview"
         v-if="preview.type != 'system'"
       />
+    </div>
+
+    <!--模版-->
+    <div v-else>
+      <base-info-component :is-report="false" v-if="preview.id == 1" />
+      <test-result-component v-if="preview.id == 2" />
+      <!--<test-result-chart-component v-if="preview.id == 3"/>-->
+      <test-result-advance-chart-component v-if="preview.id == 3" />
+      <!--<failure-result-component v-if="preview.id == 4"/>-->
+      <failure-result-advance-component v-if="preview.id == 4" />
+      <defect-list-component v-if="preview.id == 5" />
+      <rich-text-component :preview="preview" v-if="preview.type != 'system'" />
     </div>
   </div>
 </template>

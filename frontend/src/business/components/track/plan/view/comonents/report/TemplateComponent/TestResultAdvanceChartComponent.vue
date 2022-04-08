@@ -173,6 +173,10 @@ export default {
   margin: 0 auto;
 }
 
+.char-item {
+  display: inline-block;
+}
+
 .char-component {
   text-align: center;
 }

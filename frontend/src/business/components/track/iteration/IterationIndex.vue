@@ -132,6 +132,10 @@
       <iteration-requirements-drawer
         ref="requirementsDrawer"
       ></iteration-requirements-drawer>
+      <iteration-report-view
+        ref="iterationReportView"
+        @refresh="initTableData"
+      />
     </ms-main-container>
   </ms-container>
 </template>
@@ -146,7 +150,7 @@ import MsTableButton from "@/business/components/common/components/MsTableButton
 import MsTablePagination from "@/business/components/common/pagination/TablePagination";
 import MsTableHeader from "@/business/components/common/components/MsTableHeader";
 import IterationRequirementsDrawer from "./IterationRequirementsDrawer";
-
+import IterationReportView from "./IterationReportView";
 import {
   getCustomTableWidth,
   getPageInfo,
@@ -174,6 +178,7 @@ export default {
     MsTableColumn,
     MsTable,
     IterationRequirementsDrawer,
+    IterationReportView,
   },
   data() {
     return {
@@ -214,6 +219,12 @@ export default {
     showRequirementList(row) {
       this.$refs.requirementsDrawer.open(row);
     },
+    handleEdit({ id, projectId }) {
+      if (id && projectId) {
+        this.$refs.iterationReportView.open(id, projectId);
+      }
+    },
+    initTableData() {},
   },
 };
 </script>

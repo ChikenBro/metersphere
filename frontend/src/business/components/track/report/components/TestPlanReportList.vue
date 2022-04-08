@@ -55,11 +55,6 @@
         show-overflow-tooltip
       ></el-table-column>
       <el-table-column
-        prop="iterationName"
-        label="所属迭代"
-        show-overflow-tooltip
-      ></el-table-column>
-      <el-table-column
         prop="creator"
         :label="$t('test_track.report.list.creator')"
         show-overflow-tooltip
