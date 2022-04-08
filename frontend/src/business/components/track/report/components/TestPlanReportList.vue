@@ -1,5 +1,5 @@
 <template>
-  <el-card class="table-card" v-loading="result.loading">
+  <el-card v-loading="result.loading" class="table-card">
     <template v-slot:header>
       <ms-table-header
         :condition.sync="condition"

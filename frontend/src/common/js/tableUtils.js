@@ -1,9 +1,23 @@
-import {getCurrentProjectID, getCurrentUser, humpToLine} from "@/common/js/utils";
-import {CUSTOM_TABLE_HEADER} from "@/common/js/default-table-header";
-import {updateCustomFieldTemplate} from "@/network/custom-field-template";
+import {
+  getCurrentProjectID,
+  getCurrentUser,
+  humpToLine,
+} from "@/common/js/utils";
+import {
+  CUSTOM_TABLE_HEADER
+} from "@/common/js/default-table-header";
+import {
+  updateCustomFieldTemplate
+} from "@/network/custom-field-template";
 import i18n from "@/i18n/i18n";
 
-export function _handleSelectAll(component, selection, tableData, selectRows, condition) {
+export function _handleSelectAll(
+  component,
+  selection,
+  tableData,
+  selectRows,
+  condition
+) {
   if (selection.length > 0) {
     if (selection.length === 1) {
       selection.hashTree = [];
@@ -20,7 +34,7 @@ export function _handleSelectAll(component, selection, tableData, selectRows, co
     }
   } else {
     selectRows.clear();
-    tableData.forEach(item => {
+    tableData.forEach((item) => {
       component.$set(item, "showMore", false);
     });
     if (condition) {
@@ -39,15 +53,15 @@ export function _handleSelect(component, selection, row, selectRows) {
     selectRows.add(row);
   }
   let arr = Array.from(selectRows);
-  arr.forEach(row => {
+  arr.forEach((row) => {
     component.$set(row, "showMore", true);
   });
 }
 
 // 设置 unSelectIds 查询条件，返回当前选中的条数
 export function setUnSelectIds(tableData, condition, selectRows) {
-  let ids = Array.from(selectRows).map(o => o.id);
-  let allIDs = tableData.map(o => o.id);
+  let ids = Array.from(selectRows).map((o) => o.id);
+  let allIDs = tableData.map((o) => o.id);
   let thisUnSelectIds = allIDs.filter(function (val) {
     return ids.indexOf(val) === -1;
   });
@@ -60,7 +74,7 @@ export function setUnSelectIds(tableData, condition, selectRows) {
     let needPushIds = thisUnSelectIds.filter(function (val) {
       return condition.unSelectIds.indexOf(val) === -1;
     });
-    needPushIds.forEach(id => {
+    needPushIds.forEach((id) => {
       condition.unSelectIds.push(id);
     });
   }
@@ -83,11 +97,17 @@ export function toggleAllSelection(table, tableData, selectRows) {
 }
 
 //检查表格每一行是否应该选择(使用场景：全选数据时进行翻页操作)
-export function checkTableRowIsSelect(component, condition, tableData, table, selectRows) {
+export function checkTableRowIsSelect(
+  component,
+  condition,
+  tableData,
+  table,
+  selectRows
+) {
   //如果默认全选的话，则选中应该选中的行
   if (condition.selectAll) {
     let unSelectIds = condition.unSelectIds;
-    tableData.forEach(row => {
+    tableData.forEach((row) => {
       if (unSelectIds.indexOf(row.id) < 0) {
         table.toggleRowSelection(row, true);
 
@@ -135,27 +155,32 @@ export function _filter(filters, condition) {
 
 //表格数据排序
 export function _sort(column, condition) {
-  let field = humpToLine(column.column.columnKey ? column.column.columnKey : column.prop);
-  if (column.order === 'descending') {
-    column.order = 'desc';
+  let field = humpToLine(
+    column.column.columnKey ? column.column.columnKey : column.prop
+  );
+  if (column.order === "descending") {
+    column.order = "desc";
   } else {
-    column.order = 'asc';
+    column.order = "asc";
   }
   if (!condition.orders) {
     condition.orders = [];
   }
   let hasProp = false;
-  condition.orders.forEach(order => {
+  condition.orders.forEach((order) => {
     if (order.name === field) {
       order.type = column.order;
       hasProp = true;
     }
   });
- /* if (column.prop === 'case_passing_rate' || column.prop === 'case_total') {
+  /* if (column.prop === 'case_passing_rate' || column.prop === 'case_total') {
     hasProp = true;
   }*/
   if (!hasProp) {
-    condition.orders.push({name: field, type: column.order});
+    condition.orders.push({
+      name: field,
+      type: column.order
+    });
   }
 }
 
@@ -170,28 +195,31 @@ export function getLabel(vueObj, type) {
   let param = {};
   param.userId = getCurrentUser().id;
   param.type = type;
-  vueObj.result = vueObj.$post('/system/header/info', param, response => {
+  vueObj.result = vueObj.$post("/system/header/info", param, (response) => {
     if (response.data != null) {
       vueObj.tableLabel = eval(response.data.props);
     } else {
       let param = {};
       param.type = type;
-      vueObj.result = vueObj.$post('/system/system/header', param, response => {
-        if (response.data != null) {
-          vueObj.tableLabel = eval(response.data.props);
+      vueObj.result = vueObj.$post(
+        "/system/system/header",
+        param,
+        (response) => {
+          if (response.data != null) {
+            vueObj.tableLabel = eval(response.data.props);
+          }
         }
-        // 该接口需多返回一个{label: '所属迭代', id: 'iterationId'}数据, 以下是mock的
-        vueObj.tableLabel.splice(7,0,{label: '所属迭代', id: 'iterationId'})
-      });
+      );
     }
   });
 }
 
-
 export function buildBatchParam(vueObj, selectIds) {
   let param = {};
   if (vueObj.selectRows) {
-    param.ids = selectIds ? selectIds: Array.from(vueObj.selectRows).map(row => row.id);
+    param.ids = selectIds ?
+      selectIds :
+      Array.from(vueObj.selectRows).map((row) => row.id);
   } else {
     param.ids = selectIds;
   }
@@ -202,12 +230,12 @@ export function buildBatchParam(vueObj, selectIds) {
 
 // 深拷贝
 export function deepClone(source) {
-  if (!source && typeof source !== 'object') {
-    throw new Error('error arguments', 'deepClone');
+  if (!source && typeof source !== "object") {
+    throw new Error("error arguments", "deepClone");
   }
   const targetObj = source.constructor === Array ? [] : {};
-  Object.keys(source).forEach(keys => {
-    if (source[keys] && typeof source[keys] === 'object') {
+  Object.keys(source).forEach((keys) => {
+    if (source[keys] && typeof source[keys] === "object") {
       targetObj[keys] = deepClone(source[keys]);
     } else {
       targetObj[keys] = source[keys];
@@ -224,7 +252,7 @@ export function getPageInfo(condition) {
     result: {},
     data: [],
     condition: condition ? condition : {},
-  }
+  };
 }
 
 export function buildPagePath(path, page) {
@@ -282,18 +310,21 @@ function getCustomTableHeaderByFiledSetting(key, fieldSetting) {
 export function getTableHeaderWithCustomFields(key, customFields) {
   let fieldSetting = [...CUSTOM_TABLE_HEADER[key]]; // 复制
   let keys = getCustomFieldsKeys(customFields);
-  customFields.forEach(item => {
+  customFields.forEach((item) => {
     if (!item.key) {
       // 兼容旧版，更新key
       item.key = generateTableHeaderKey(keys, customFields);
-      updateCustomFieldTemplate({id: item.id, key: item.key});
+      updateCustomFieldTemplate({
+        id: item.id,
+        key: item.key
+      });
     }
     let field = {
       id: item.name,
       key: item.key,
       label: item.name,
-      isCustom: true
-    }
+      isCustom: true,
+    };
     fieldSetting.push(field);
   });
   return getCustomTableHeaderByFiledSetting(key, fieldSetting);
@@ -308,13 +339,13 @@ export function getTableHeaderWithCustomFields(key, customFields) {
 export function getAllFieldWithCustomFields(key, customFields) {
   let fieldSetting = [...CUSTOM_TABLE_HEADER[key]];
   if (customFields) {
-    customFields.forEach(item => {
+    customFields.forEach((item) => {
       let field = {
         id: item.name,
         key: item.key,
         label: item.name,
-        isCustom: true
-      }
+        isCustom: true,
+      };
       fieldSetting.push(field);
     });
   }
@@ -322,21 +353,21 @@ export function getAllFieldWithCustomFields(key, customFields) {
 }
 
 export function generateTableHeaderKey(keys) {
-  let customFieldKeys = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  let customFieldKeys = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   for (let i = 0; i < customFieldKeys.length; i++) {
-    let key =  customFieldKeys[i];
+    let key = customFieldKeys[i];
     if (keys.has(key)) {
       continue;
     }
     keys.add(key);
     return key;
   }
-  return '';
+  return "";
 }
 
 export function getCustomFieldsKeys(customFields) {
   let keys = new Set();
-  customFields.forEach(item => {
+  customFields.forEach((item) => {
     if (item.key) {
       keys.add(item.key);
     }
@@ -351,9 +382,9 @@ export function getCustomFieldsKeys(customFields) {
  * @param fields
  */
 export function saveCustomTableHeader(key, fields) {
-  let result = '';
+  let result = "";
   if (fields) {
-    fields.forEach(item => {
+    fields.forEach((item) => {
       result += item.key;
     });
   }
@@ -366,14 +397,13 @@ export function saveCustomTableHeader(key, fields) {
  */
 export function saveLastTableSortField(key, field) {
   let result = field;
-  localStorage.setItem(key+"_SORT", result);
+  localStorage.setItem(key + "_SORT", result);
 }
 
 export function getLastTableSortField(key) {
-  let fieldStr = localStorage.getItem(key+"_SORT");
+  let fieldStr = localStorage.getItem(key + "_SORT");
   return fieldStr;
 }
-
 
 /**
  * 获取对应表格的列宽
@@ -381,7 +411,7 @@ export function getLastTableSortField(key) {
  * @returns {{}|any}
  */
 export function getCustomTableWidth(key) {
-  let fieldStr = localStorage.getItem(key + '_WITH');
+  let fieldStr = localStorage.getItem(key + "_WITH");
   if (fieldStr !== null) {
     let fields = JSON.parse(fieldStr);
     return fields;
@@ -397,8 +427,8 @@ export function getCustomTableWidth(key) {
  */
 export function saveCustomTableWidth(key, fieldKey, colWith) {
   let fields = getCustomTableWidth(key);
-  fields[fieldKey] = colWith + '';
-  localStorage.setItem(key + '_WITH', JSON.stringify(fields));
+  fields[fieldKey] = colWith + "";
+  localStorage.setItem(key + "_WITH", JSON.stringify(fields));
 }
 
 /**
@@ -413,14 +443,18 @@ export function getCustomFieldValue(row, field, members) {
     for (let i = 0; i < row.customFields.length; i++) {
       let item = row.customFields[i];
       if (item.name === field.name) {
-        if (field.type === 'member' || field.type === 'multipleMember') {
+        if (field.type === "member" || field.type === "multipleMember") {
           for (let j = 0; j < members.length; j++) {
             let member = members[j];
             if (member.id === item.value) {
               return member.name;
             }
           }
-        } else if (['radio', 'select', 'multipleSelect', 'checkbox'].indexOf(field.type) > -1) {
+        } else if (
+          ["radio", "select", "multipleSelect", "checkbox"].indexOf(
+            field.type
+          ) > -1
+        ) {
           for (let j = 0; j < field.options.length; j++) {
             let option = field.options[j];
             if (option.value === item.value) {
@@ -441,29 +475,33 @@ export function getCustomFieldValue(row, field, members) {
  * @param valueArr
  * @param members
  */
-export function getCustomFieldBatchEditOption(customFields, typeArr, valueArr, members) {
-
-  customFields.forEach(item => {
+export function getCustomFieldBatchEditOption(
+  customFields,
+  typeArr,
+  valueArr,
+  members
+) {
+  customFields.forEach((item) => {
     if (item.options) {
       typeArr.push({
         id: item.name,
         name: item.name,
-        uuid: item.id
+        uuid: item.id,
       });
 
       let options = [];
-      if (['multipleMember', 'member'].indexOf(item.type) > -1) {
-        members.forEach(member => {
+      if (["multipleMember", "member"].indexOf(item.type) > -1) {
+        members.forEach((member) => {
           options.push({
             id: member.id,
-            name: member.name
+            name: member.name,
           });
         });
       } else {
         item.options.forEach((option) => {
           options.push({
             id: option.value,
-            name: option.system ? i18n.t(option.text) : option.text
+            name: option.system ? i18n.t(option.text) : option.text,
           });
         });
       }

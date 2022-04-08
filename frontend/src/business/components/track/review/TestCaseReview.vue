@@ -1,15 +1,17 @@
 <template>
   <ms-container>
-
     <ms-main-container>
       <test-case-review-list
+        ref="caseReviewList"
         @openCaseReviewEditDialog="openCaseReviewEditDialog"
         @caseReviewEdit="openCaseReviewEditDialog"
-        ref="caseReviewList"/>
+      />
     </ms-main-container>
 
-    <test-case-review-edit ref="caseReviewEditDialog" @refresh="refreshCaseReviewList"/>
-
+    <test-case-review-edit
+      ref="caseReviewEditDialog"
+      @refresh="refreshCaseReviewList"
+    />
   </ms-container>
 </template>
 
@@ -18,7 +20,7 @@ import TestCaseReviewList from "./components/TestCaseReviewList";
 import TestCaseReviewEdit from "./components/TestCaseReviewEdit";
 import MsMainContainer from "../../common/components/MsMainContainer";
 import MsContainer from "../../common/components/MsContainer";
-import {getCurrentProjectID} from "@/common/js/utils";
+import { getCurrentProjectID } from "@/common/js/utils";
 
 export default {
   name: "TestCaseReview",
@@ -26,34 +28,32 @@ export default {
     MsMainContainer,
     MsContainer,
     TestCaseReviewList,
-    TestCaseReviewEdit
+    TestCaseReviewEdit,
   },
   data() {
-    return {
-
-    }
+    return {};
   },
   computed: {
     projectId() {
       return getCurrentProjectID();
     },
   },
-  mounted() {
-    if (this.$route.path.indexOf("/track/review/create") >= 0){
-      this.openCaseReviewEditDialog();
-      this.$router.push('/track/review/all');
-    }
-  },
   watch: {
-    '$route'(to) {
-      if (to.path.indexOf("/track/review/create") >= 0){
+    $route(to) {
+      if (to.path.indexOf("/track/review/create") >= 0) {
         if (!this.projectId) {
-          this.$warning(this.$t('commons.check_project_tip'));
+          this.$warning(this.$t("commons.check_project_tip"));
           return;
         }
         this.openCaseReviewEditDialog();
-        this.$router.push('/track/review/all');
+        this.$router.push("/track/review/all");
       }
+    },
+  },
+  mounted() {
+    if (this.$route.path.indexOf("/track/review/create") >= 0) {
+      this.openCaseReviewEditDialog();
+      this.$router.push("/track/review/all");
     }
   },
   methods: {
@@ -63,11 +63,9 @@ export default {
     refreshCaseReviewList() {
       this.$refs.caseReviewList.condition = {};
       this.$refs.caseReviewList.initTableData();
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

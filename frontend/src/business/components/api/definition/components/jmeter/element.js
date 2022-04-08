@@ -1,4 +1,4 @@
-import {uuid} from "@/common/js/utils";
+import { uuid } from "@/common/js/utils";
 
 /**
  * options: JXM转换的JSON对象(xml2json)
@@ -7,7 +7,7 @@ export default class Element {
   constructor(options = {}) {
     this.id = uuid();
     this.type = options.type || "element";
-    this.name = options.name
+    this.name = options.name;
 
     if (options.attributes) {
       this.attributes = options.attributes;
@@ -43,8 +43,3 @@ export default class Element {
     return json;
   }
 }
-
-
-
-
-

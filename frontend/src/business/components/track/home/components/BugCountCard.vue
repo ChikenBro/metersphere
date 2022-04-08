@@ -1,8 +1,12 @@
 <template>
-  <el-card class="table-card" v-loading="result.loading" body-style="padding:10px;">
+  <el-card
+    v-loading="result.loading"
+    class="table-card"
+    body-style="padding:10px;"
+  >
     <div slot="header">
       <span class="title">
-        {{ $t('test_track.home.bug_count') }}
+        {{ $t("test_track.home.bug_count") }}
       </span>
     </div>
     <el-container>
@@ -11,23 +15,41 @@
           <span class="count-number">
             {{ bugTotalSize }}
           </span>
-          <span style="color: #6C317C;">
-            {{ $t('api_test.home_page.unit_of_measurement') }}
+          <span style="color: #6c317c">
+            {{ $t("api_test.home_page.unit_of_measurement") }}
           </span>
           <div>
-            {{ $t('test_track.home.percentage') }}
+            {{ $t("test_track.home.percentage") }}
             <span class="rage">
-              {{rage}}
+              {{ rage }}
             </span>
           </div>
         </div>
       </el-aside>
-      <el-table border :data="tableData" class="adjust-table table-content" height="300">
-        <el-table-column prop="index" :label="$t('test_track.home.serial_number')"
-                         width="60" show-overflow-tooltip/>
-        <el-table-column prop="planName" :label="$t('test_track.home.test_plan_name')"
-                         width="130" show-overflow-tooltip/>
-        <el-table-column prop="createTime" :label="$t('commons.create_time')" width="180" show-overflow-tooltip>
+      <el-table
+        border
+        :data="tableData"
+        class="adjust-table table-content"
+        height="300"
+      >
+        <el-table-column
+          prop="index"
+          :label="$t('test_track.home.serial_number')"
+          width="60"
+          show-overflow-tooltip
+        />
+        <el-table-column
+          prop="planName"
+          :label="$t('test_track.home.test_plan_name')"
+          width="130"
+          show-overflow-tooltip
+        />
+        <el-table-column
+          prop="createTime"
+          :label="$t('commons.create_time')"
+          width="180"
+          show-overflow-tooltip
+        >
           <template v-slot:default="scope">
             <span>{{ scope.row.createTime | timestampFormatDate }}</span>
           </template>
@@ -37,64 +59,79 @@
           column-key="status"
           :label="$t('test_track.plan.plan_status')"
           width="100"
-          show-overflow-tooltip>
+          show-overflow-tooltip
+        >
           <template v-slot:default="scope">
-          <span @click.stop="clickt = 'stop'">
-            <plan-status-table-item :value="scope.row.status"/>
-          </span>
+            <span @click.stop="clickt = 'stop'">
+              <plan-status-table-item :value="scope.row.status" />
+            </span>
           </template>
         </el-table-column>
-        <el-table-column prop="caseSize" :label="$t('test_track.home.case_size')"
-                         width="80" show-overflow-tooltip/>
-        <el-table-column prop="bugSize" :label="$t('test_track.home.bug_size')"
-                         width="80" show-overflow-tooltip/>
-        <el-table-column prop="passRage" :label="$t('test_track.home.passing_rate')"
-                         width="80" show-overflow-tooltip/>
+        <el-table-column
+          prop="caseSize"
+          :label="$t('test_track.home.case_size')"
+          width="80"
+          show-overflow-tooltip
+        />
+        <el-table-column
+          prop="bugSize"
+          :label="$t('test_track.home.bug_size')"
+          width="80"
+          show-overflow-tooltip
+        />
+        <el-table-column
+          prop="passRage"
+          :label="$t('test_track.home.passing_rate')"
+          width="80"
+          show-overflow-tooltip
+        />
       </el-table>
     </el-container>
   </el-card>
 </template>
 
 <script>
-import {getCurrentProjectID} from "@/common/js/utils";
+import { getCurrentProjectID } from "@/common/js/utils";
 import PlanStatusTableItem from "@/business/components/track/common/tableItems/plan/PlanStatusTableItem";
 
 export default {
   name: "BugCountCard",
   components: {
-    PlanStatusTableItem
+    PlanStatusTableItem,
   },
   data() {
     return {
       tableData: [],
       result: {},
       bugTotalSize: 0,
-      rage: '0%'
-    }
+      rage: "0%",
+    };
+  },
+  created() {
+    this.init();
+  },
+  activated() {
+    this.init();
   },
   methods: {
     init() {
-      this.result = this.$get("/track/bug/count/" + getCurrentProjectID(), res => {
-        let data = res.data;
-        this.tableData = data.list;
-        this.bugTotalSize = data.bugTotalSize;
-        this.rage = data.rage;
-      })
-    }
+      this.result = this.$get(
+        "/track/bug/count/" + getCurrentProjectID(),
+        (res) => {
+          let data = res.data;
+          this.tableData = data.list;
+          this.bugTotalSize = data.bugTotalSize;
+          this.rage = data.rage;
+        }
+      );
+    },
   },
-  created() {
-    this.init()
-  },
-  activated() {
-    this.init()
-  }
-}
+};
 </script>
 
 <style scoped>
-
 .el-card /deep/ .el-card__header {
-  border-bottom: 0px solid #EBEEF5;
+  border-bottom: 0px solid #ebeef5;
 }
 
 .el-aside {
@@ -104,13 +141,13 @@ export default {
 }
 
 .count-number {
-  font-family: 'ArialMT', 'Arial', sans-serif;
+  font-family: "ArialMT", "Arial", sans-serif;
   font-size: 33px;
   color: var(--count_number);
 }
 
 .rage {
-  font-family: 'ArialMT', 'Arial', sans-serif;
+  font-family: "ArialMT", "Arial", sans-serif;
   font-size: 18px;
   color: var(--count_number);
 }
@@ -122,7 +159,6 @@ export default {
   border-width: 7px;
   border-color: var(--count_number_shallow);
   border-radius: 50%;
-
 }
 
 .count-number-show {

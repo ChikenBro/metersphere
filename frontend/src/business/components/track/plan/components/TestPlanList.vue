@@ -1,59 +1,59 @@
 <template>
-  <el-card class="table-card" v-loading="cardResult.loading">
+  <el-card v-loading="cardResult.loading" class="table-card">
     <template v-slot:header>
       <ms-table-header
         :create-permission="['PROJECT_TRACK_PLAN:READ+CREATE']"
         :condition.sync="condition"
+        :create-tip="$t('test_track.plan.create_plan')"
         @search="initTableData"
         @create="testPlanCreate"
-        :create-tip="$t('test_track.plan.create_plan')"
       />
     </template>
 
     <el-table
+      v-loading="result.loading"
       border
       class="adjust-table"
       :data="tableData"
+      :height="screenHeight"
       @filter-change="filter"
       @sort-change="sort"
-      :height="screenHeight"
-      v-loading="result.loading"
       @row-click="intoPlan"
     >
       <template v-for="(item, index) in tableLabel">
         <el-table-column
           v-if="item.id == 'name'"
+          :key="index"
           prop="name"
           :label="$t('commons.name')"
           show-overflow-tooltip
-          :key="index"
         >
         </el-table-column>
         <el-table-column
           v-if="item.id == 'userName'"
+          :key="index"
           prop="userName"
           :label="$t('test_track.plan.plan_principal')"
           show-overflow-tooltip
-          :key="index"
         >
         </el-table-column>
         <el-table-column
           v-if="item.id == 'createUser'"
+          :key="index"
           prop="createUser"
           :label="$t('commons.create_user')"
           show-overflow-tooltip
-          :key="index"
         >
         </el-table-column>
         <el-table-column
           v-if="item.id == 'status'"
+          :key="index"
           prop="status"
           column-key="status"
           :filters="statusFilters"
           :label="$t('test_track.plan.plan_status')"
           show-overflow-tooltip
           :min-width="100"
-          :key="index"
         >
           <template v-slot:default="scope">
             <span @click.stop="clickt = 'stop'">
@@ -93,13 +93,13 @@
         </el-table-column>
         <el-table-column
           v-if="item.id == 'stage'"
+          :key="index"
           prop="stage"
           column-key="stage"
           :filters="stageFilters"
           :label="$t('test_track.plan.plan_stage')"
           show-overflow-tooltip
           :min-width="110"
-          :key="index"
         >
           <template v-slot:default="scope">
             <plan-stage-table-item :stage="scope.row.stage" />
@@ -107,11 +107,11 @@
         </el-table-column>
         <el-table-column
           v-if="item.id == 'testRate'"
+          :key="index"
           prop="testRate"
           :label="$t('test_track.home.test_rate')"
           min-width="100"
           show-overflow-tooltip
-          :key="index"
         >
           <template v-slot:default="scope">
             <el-progress :percentage="scope.row.testRate"></el-progress>
@@ -119,14 +119,14 @@
         </el-table-column>
         <el-table-column
           v-if="item.id == 'projectName'"
+          :key="index"
           prop="projectName"
           :label="$t('test_track.plan.plan_project')"
           show-overflow-tooltip
-          :key="index"
         >
         </el-table-column>
         <el-table-column
-          v-if="item.id == 'iterationId'"
+          v-if="item.id == 'iterationName'"
           prop="iterationName"
           :label="$t('test_track.issue.iteration')"
           show-overflow-tooltip
@@ -152,29 +152,29 @@
         </el-table-column>
         <el-table-column
           v-if="item.id == 'executionTimes'"
+          :key="index"
           prop="executionTimes"
           :label="$t('commons.execution_times')"
           show-overflow-tooltip
           :min-width="100"
-          :key="index"
         >
         </el-table-column>
         <el-table-column
           v-if="item.id == 'passRate'"
+          :key="index"
           prop="passRate"
           :label="$t('commons.pass_rate')"
           show-overflow-tooltip
-          :key="index"
         >
         </el-table-column>
         <el-table-column
           v-if="item.id == 'plannedStartTime'"
+          :key="index"
           sortable
           prop="plannedStartTime"
           :label="$t('test_track.plan.planned_start_time')"
           show-overflow-tooltip
           :min-width="110"
-          :key="index"
         >
           <template v-slot:default="scope">
             <span>{{ scope.row.plannedStartTime | timestampFormatDate }}</span>
@@ -182,12 +182,12 @@
         </el-table-column>
         <el-table-column
           v-if="item.id == 'plannedEndTime'"
+          :key="index"
           sortable
           prop="plannedEndTime"
           :label="$t('test_track.plan.planned_end_time')"
           show-overflow-tooltip
           :min-width="110"
-          :key="index"
         >
           <template v-slot:default="scope">
             <span>{{ scope.row.plannedEndTime | timestampFormatDate }}</span>
@@ -195,12 +195,12 @@
         </el-table-column>
         <el-table-column
           v-if="item.id == 'actualStartTime'"
+          :key="index"
           sortable
           prop="actualStartTime"
           :min-width="110"
           :label="$t('test_track.plan.actual_start_time')"
           show-overflow-tooltip
-          :key="index"
         >
           <template v-slot:default="scope">
             <span>{{ scope.row.actualStartTime | timestampFormatDate }}</span>
@@ -208,12 +208,12 @@
         </el-table-column>
         <el-table-column
           v-if="item.id == 'actualEndTime'"
+          :key="index"
           sortable
           :min-width="110"
           prop="actualEndTime"
           :label="$t('test_track.plan.actual_end_time')"
           show-overflow-tooltip
-          :key="index"
         >
           <template v-slot:default="scope">
             <span>{{ scope.row.actualEndTime | timestampFormatDate }}</span>
@@ -234,8 +234,8 @@
             >
               <template v-slot:middle>
                 <ms-table-operator-button
-                  v-permission="['PROJECT_TRACK_PLAN:READ+EDIT']"
                   v-if="!scope.row.reportId"
+                  v-permission="['PROJECT_TRACK_PLAN:READ+EDIT']"
                   :tip="$t('test_track.plan_view.create_report')"
                   icon="el-icon-s-data"
                   @exec="openTestReportTemplate(scope.row)"
@@ -250,18 +250,18 @@
               </template>
             </ms-table-operator>
             <ms-table-operator-button
-              class="schedule-btn"
-              v-permission="['PROJECT_TRACK_PLAN:READ+SCHEDULE']"
               v-if="!scope.row.scheduleOpen"
+              v-permission="['PROJECT_TRACK_PLAN:READ+SCHEDULE']"
+              class="schedule-btn"
               type="text"
               :tip="$t('commons.trigger_mode.schedule')"
               icon="el-icon-time"
               @exec="scheduleTask(scope.row)"
             />
             <ms-table-operator-button
-              class="schedule-btn"
-              v-permission="['PROJECT_TRACK_PLAN:READ+SCHEDULE']"
               v-if="scope.row.scheduleOpen"
+              v-permission="['PROJECT_TRACK_PLAN:READ+SCHEDULE']"
+              class="schedule-btn"
               type="text"
               :tip="$t('commons.trigger_mode.schedule')"
               icon="el-icon-time"
@@ -273,8 +273,8 @@
     </el-table>
     <header-custom
       ref="headerCustom"
-      :initTableData="inite"
-      :optionalFields="headerItems"
+      :init-table-data="inite"
+      :optional-fields="headerItems"
       :type="type"
     ></header-custom>
 
@@ -285,15 +285,15 @@
       :total="total"
     />
     <test-report-template-list
-      @openReport="openReport"
       ref="testReportTemplateList"
+      @openReport="openReport"
     />
-    <test-case-report-view @refresh="initTableData" ref="testCaseReportView" />
+    <test-case-report-view ref="testCaseReportView" @refresh="initTableData" />
     <ms-delete-confirm
-      :title="$t('test_track.plan.plan_delete')"
-      @delete="_handleDelete"
       ref="deleteConfirm"
+      :title="$t('test_track.plan.plan_delete')"
       :with-tip="enableDeleteTip"
+      @delete="_handleDelete"
     >
       {{ $t("test_track.plan.plan_delete_tip") }}
     </ms-delete-confirm>

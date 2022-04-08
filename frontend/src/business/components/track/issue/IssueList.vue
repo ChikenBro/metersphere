@@ -28,22 +28,22 @@
         </template>
 
         <ms-table
+          ref="table"
           v-loading="page.result.loading"
           :data="page.data"
-          :enableSelection="false"
+          :enable-selection="false"
           :condition="page.condition"
           :total="page.total"
           :page-size.sync="page.pageSize"
           :operators="operators"
           :show-select-all="false"
           :screen-height="screenHeight"
-          @handlePageChange="getIssues"
           :fields.sync="fields"
           :field-key="tableHeaderKey"
+          :custom-fields="issueTemplate.customFields"
+          @handlePageChange="getIssues"
           @saveSortField="saveSortField"
           @refresh="getIssues"
-          :custom-fields="[]"
-          ref="table"
         >
           <span v-for="item in fields" :key="item.key">
             <!-- 缺陷id -->

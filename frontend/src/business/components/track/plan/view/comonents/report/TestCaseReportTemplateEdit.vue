@@ -1,12 +1,12 @@
 <template>
   <el-drawer
+    ref="drawer"
+    v-loading="result.loading"
     :before-close="handleClose"
     :visible.sync="showDialog"
     :with-header="false"
     size="100%"
     :modal-append-to-body="false"
-    ref="drawer"
-    v-loading="result.loading"
   >
     <template v-slot:default="scope">
       <template-component-edit-header
@@ -194,7 +194,6 @@ export default {
           this.components.push(key);
         }
       });
-
       this.template.content.components.forEach((item) => {
         let preview = this.componentMap.get(item);
         if (preview && preview.type != "custom") {

@@ -1,18 +1,19 @@
 <template>
   <ms-table-header
-      :condition="condition"
-      @search="$emit('refresh')"
-      :show-create="false"
-      :tip="$t('commons.search_by_id_name_tag')">
-    <template v-slot:title>
-      场景用例
-    </template>
+    :condition="condition"
+    :show-create="false"
+    :tip="$t('commons.search_by_id_name_tag')"
+    @search="$emit('refresh')"
+  >
+    <template v-slot:title> 场景用例 </template>
     <template v-slot:button>
-      <ms-table-button v-permission="['PROJECT_TRACK_PLAN:READ+RELEVANCE_OR_CANCEL']" icon="el-icon-connection"
-                       :content="$t('test_track.plan_view.relevance_test_case')"
-                       @click="$emit('relevanceCase')"/>
+      <ms-table-button
+        v-permission="['PROJECT_TRACK_PLAN:READ+RELEVANCE_OR_CANCEL']"
+        icon="el-icon-connection"
+        :content="$t('test_track.plan_view.relevance_test_case')"
+        @click="$emit('relevanceCase')"
+      />
     </template>
-
   </ms-table-header>
 </template>
 
@@ -23,16 +24,14 @@ import MsEnvironmentSelect from "../../../../../api/definition/components/case/M
 
 export default {
   name: "TestPlanScenarioListHeader",
-  components: {MsEnvironmentSelect, MsTableButton, MsTableHeader},
-  props: ['condition', 'isReadOnly'],
-  methods: {}
+  components: { MsEnvironmentSelect, MsTableButton, MsTableHeader },
+  props: ["condition", "isReadOnly"],
+  methods: {},
 };
 </script>
 
 <style scoped>
-
 /deep/ .environment-select {
   margin-right: 10px;
 }
-
 </style>

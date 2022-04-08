@@ -1,22 +1,23 @@
 <template>
   <test-case-relevance-base
+    ref="baseRelevance"
     @setProject="setProject"
     @save="saveCaseRelevance"
-    ref="baseRelevance"
   >
     <template v-slot:aside>
       <ms-api-module
+        ref="nodeTree"
         :relevance-project-id="projectId"
+        :is-read-only="true"
         @nodeSelectEvent="nodeChange"
         @protocolChange="handleProtocolChange"
         @refreshTable="refresh"
         @setModuleOptions="setModuleOptions"
-        :is-read-only="true"
-        ref="nodeTree"
       />
     </template>
     <review-relevance-api-list
       v-if="isApiListEnable"
+      ref="apiList"
       :current-protocol="currentProtocol"
       :select-node-ids="selectNodeIds"
       :is-api-list-enable="isApiListEnable"
@@ -24,10 +25,11 @@
       :is-test-plan="true"
       :review_id="reviewId"
       @isApiListEnableChange="isApiListEnableChange"
-      ref="apiList"/>
+    />
 
     <review-relevance-case-list
       v-if="!isApiListEnable"
+      ref="apiCaseList"
       :current-protocol="currentProtocol"
       :select-node-ids="selectNodeIds"
       :is-api-list-enable="isApiListEnable"
@@ -35,9 +37,7 @@
       :is-test-plan="true"
       :review-id="reviewId"
       @isApiListEnableChange="isApiListEnableChange"
-      ref="apiCaseList"/>
-
-
+    />
   </test-case-relevance-base>
 </template>
 
@@ -49,7 +49,17 @@ import ReviewRelevanceCaseList from "@/business/components/track/review/view/com
 
 export default {
   name: "TestReviewRelevanceApi",
-  components: {ReviewRelevanceCaseList, ReviewRelevanceApiList, MsApiModule, TestCaseRelevanceBase},
+  components: {
+    ReviewRelevanceCaseList,
+    ReviewRelevanceApiList,
+    MsApiModule,
+    TestCaseRelevanceBase,
+  },
+  props: {
+    reviewId: {
+      type: String,
+    },
+  },
   data() {
     return {
       showCasePage: true,
@@ -61,13 +71,8 @@ export default {
       isApiListEnable: true,
       condition: {},
       currentRow: {},
-      projectId: ""
+      projectId: "",
     };
-  },
-  props: {
-    reviewId: {
-      type: String
-    }
   },
   watch: {
     reviewId() {
@@ -116,21 +121,25 @@ export default {
     },
     saveCaseRelevance() {
       let param = {};
-      let url = '';
+      let url = "";
       let environmentId = undefined;
       let selectIds = [];
       if (this.isApiListEnable) {
-        url = '/api/definition/relevance/review';
+        url = "/api/definition/relevance/review";
         environmentId = this.$refs.apiList.environmentId;
-        selectIds = Array.from(this.$refs.apiList.selectRows).map(row => row.id);
+        selectIds = Array.from(this.$refs.apiList.selectRows).map(
+          (row) => row.id
+        );
       } else {
-        url = '/api/testcase/relevance/review';
+        url = "/api/testcase/relevance/review";
         environmentId = this.$refs.apiCaseList.environmentId;
-        selectIds = Array.from(this.$refs.apiCaseList.selectRows).map(row => row.id);
+        selectIds = Array.from(this.$refs.apiCaseList.selectRows).map(
+          (row) => row.id
+        );
       }
 
       if (!environmentId) {
-        this.$warning(this.$t('api_test.environment.select_environment'));
+        this.$warning(this.$t("api_test.environment.select_environment"));
         return;
       }
 
@@ -139,15 +148,14 @@ export default {
       param.environmentId = environmentId;
 
       this.result = this.$post(url, param, () => {
-        this.$success(this.$t('commons.save_success'));
-        this.$emit('refresh');
+        this.$success(this.$t("commons.save_success"));
+        this.$emit("refresh");
         this.refresh();
         this.$refs.baseRelevance.close();
       });
     },
-
-  }
-}
+  },
+};
 </script>
 
 <style scoped>

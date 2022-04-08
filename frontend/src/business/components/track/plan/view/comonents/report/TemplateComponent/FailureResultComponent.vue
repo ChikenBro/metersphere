@@ -3,8 +3,8 @@
     <template>
       <el-table
         row-key="id"
-        @row-click="goFailureTestCase"
         :data="failureTestCases"
+        @row-click="goFailureTestCase"
       >
         <el-table-column
           prop="num"

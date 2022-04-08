@@ -1,67 +1,73 @@
-
-const TestTrack = () => import('@/business/components/track/TestTrack')
-const TrackHome = () => import('@/business/components/track/home/TrackHome')
-const TestCase = () => import('@/business/components/track/case/TestCase')
-const TestPlan = () => import('@/business/components/track/plan/TestPlan')
-const TestCaseReview = () => import('@/business/components/track/review/TestCaseReview')
-const TestCaseReviewView = () => import('@/business/components/track/review/view/TestCaseReviewView')
-const TestPlanView = () => import('@/business/components/track/plan/view/TestPlanView')
-const reportListView = () => import('@/business/components/track/report/TestPlanReport')
-const issueList = () => import('@/business/components/track/issue/IssueList.vue')
+const TestTrack = () => import("@/business/components/track/TestTrack");
+const TrackHome = () => import("@/business/components/track/home/TrackHome");
+const TestCase = () => import("@/business/components/track/case/TestCase");
+const TestPlan = () => import("@/business/components/track/plan/TestPlan");
+const TestCaseReview = () =>
+  import("@/business/components/track/review/TestCaseReview");
+const TestCaseReviewView = () =>
+  import("@/business/components/track/review/view/TestCaseReviewView");
+const TestPlanView = () =>
+  import("@/business/components/track/plan/view/TestPlanView");
+const reportListView = () =>
+  import("@/business/components/track/report/TestPlanReport");
+const issueList = () =>
+  import("@/business/components/track/issue/IssueList.vue");
 // const reportListView = () => import('@/business/components/track/plan/TestPlan')
+const IterationView = () =>
+  import("@/business/components/track/iteration/IterationIndex.vue");
 
 export default {
   path: "/track",
   name: "track",
   redirect: "/track/home",
   components: {
-    content: TestTrack
+    content: TestTrack,
   },
   children: [
     {
-      path: 'home',
-      name: 'trackHome',
+      path: "home",
+      name: "trackHome",
       component: TrackHome,
     },
     {
-      path: 'case/create',
-      name: 'testCaseCreate',
+      path: "case/create",
+      name: "testCaseCreate",
       component: TestCase,
     },
     {
-      path: 'case/:projectId',
-      name: 'testCase',
+      path: "case/:projectId",
+      name: "testCase",
       component: TestCase,
     },
     {
-      path: 'case/edit/:caseId',
-      name: 'testCaseEdit',
+      path: "case/edit/:caseId",
+      name: "testCaseEdit",
       component: TestCase,
     },
     {
-      path: 'testPlan/reportList',
-      name: 'testPlanReportList',
+      path: "testPlan/reportList",
+      name: "testPlanReportList",
       component: reportListView,
     },
     {
-      path: 'issue',
-      name: 'issueManagement',
+      path: "issue",
+      name: "issueManagement",
       component: issueList,
     },
     {
       path: "plan/:type",
       name: "testPlan",
-      component: TestPlan
+      component: TestPlan,
     },
     {
       path: "plan/view/:planId",
       name: "planView",
-      component: TestPlanView
+      component: TestPlanView,
     },
     {
       path: "plan/view/edit/:caseId",
       name: "planViewEdit",
-      component: TestPlanView
+      component: TestPlanView,
     },
     // {
     //   path: "project/:type",
@@ -71,12 +77,17 @@ export default {
     {
       path: "review/:type",
       name: "testCaseReview",
-      component: TestCaseReview
+      component: TestCaseReview,
     },
     {
       path: "review/view/:reviewId",
       name: "testCaseReviewView",
-      component: TestCaseReviewView
+      component: TestCaseReviewView,
     },
-  ]
-}
+    {
+      path: "iteration",
+      name: "iterationView",
+      component: IterationView,
+    },
+  ],
+};

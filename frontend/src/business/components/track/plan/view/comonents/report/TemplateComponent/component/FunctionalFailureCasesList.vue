@@ -6,8 +6,8 @@
 
     <el-table
       row-key="id"
-      @row-click="goFailureTestCase"
       :data="functionalTestCases"
+      @row-click="goFailureTestCase"
     >
       <el-table-column
         prop="customNum"

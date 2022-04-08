@@ -2,29 +2,31 @@
   <ms-test-plan-common-component>
     <template v-slot:aside>
       <node-tree
-        class="node-tree"
+        ref="nodeTree"
         v-loading="result.loading"
-        @nodeSelectEvent="nodeChange"
+        class="node-tree"
         :tree-nodes="treeNodes"
-        ref="nodeTree"/>
+        @nodeSelectEvent="nodeChange"
+      />
     </template>
     <template v-slot:main>
       <test-plan-load-case-list
+        ref="testPlanLoadCaseList"
         class="table-list"
-        @refresh="refresh"
         :review-id="reviewId"
-        :clickType="clickType"
+        :click-type="clickType"
         :select-project-id="selectProjectId"
         :select-parent-nodes="selectParentNodes"
+        @refresh="refresh"
         @relevanceCase="openTestCaseRelevanceDialog"
-        ref="testPlanLoadCaseList"/>
+      />
     </template>
     <test-case-load-relevance
-      @refresh="refresh"
+      ref="testCaseLoadRelevance"
       :review-id="reviewId"
-      ref="testCaseLoadRelevance"/>
+      @refresh="refresh"
+    />
   </ms-test-plan-common-component>
-
 </template>
 
 <script>
@@ -40,6 +42,7 @@ export default {
     TestPlanLoadCaseList,
     TestCaseLoadRelevance,
   },
+  props: ["reviewId", "redirectCharType", "clickType"],
   data() {
     return {
       result: {},
@@ -47,24 +50,19 @@ export default {
       selectParentNodes: [],
       selectProjectId: "",
       treeNodes: [],
-    }
+    };
   },
-  props: [
-    'reviewId',
-    'redirectCharType',
-    'clickType'
-  ],
   watch: {
     planId() {
       this.initData();
-    }
+    },
   },
   mounted() {
     this.initData();
   },
   methods: {
     refresh() {
-      this.selectProjectId = '';
+      this.selectProjectId = "";
       this.selectParentNodes = [];
       this.$refs.testPlanLoadCaseList.initTable();
       this.getNodeTreeByPlanId();
@@ -83,17 +81,18 @@ export default {
     },
     getNodeTreeByPlanId() {
       if (this.planId) {
-        this.result = this.$get("/case/node/list/plan/" + this.planId, response => {
-          this.treeNodes = response.data;
-          // 性能测试与模块无关，过滤项目下模块
-          this.treeNodes.map(node => node.children = null);
-        });
+        this.result = this.$get(
+          "/case/node/list/plan/" + this.planId,
+          (response) => {
+            this.treeNodes = response.data;
+            // 性能测试与模块无关，过滤项目下模块
+            this.treeNodes.map((node) => (node.children = null));
+          }
+        );
       }
     },
-  }
-}
+  },
+};
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

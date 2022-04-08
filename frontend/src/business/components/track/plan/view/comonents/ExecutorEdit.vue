@@ -1,72 +1,82 @@
 <template>
-
-  <el-dialog :title="$t('test_track.plan_view.change_executor')"
-             :visible.sync="executorEditVisible"
-             width="20%">
-    <el-select v-model="executor" :placeholder="$t('test_track.plan_view.select_executor')">
-      <el-option v-for="item in executorOptions" :key="item.id"
-                 :label="item.name" :value="item.id"></el-option>
+  <el-dialog
+    :title="$t('test_track.plan_view.change_executor')"
+    :visible.sync="executorEditVisible"
+    width="20%"
+  >
+    <el-select
+      v-model="executor"
+      :placeholder="$t('test_track.plan_view.select_executor')"
+    >
+      <el-option
+        v-for="item in executorOptions"
+        :key="item.id"
+        :label="item.name"
+        :value="item.id"
+      ></el-option>
     </el-select>
 
     <template v-slot:footer>
       <ms-dialog-footer
         @cancel="executorEditVisible = false"
-        @confirm="saveExecutor"/>
+        @confirm="saveExecutor"
+      />
     </template>
   </el-dialog>
-
 </template>
 
 <script>
-    import {WORKSPACE_ID} from '../../../../../../common/js/constants'
-    import MsDialogFooter from '../../../../common/components/MsDialogFooter'
-    import {getCurrentProjectID} from "@/common/js/utils";
+import { WORKSPACE_ID } from "../../../../../../common/js/constants";
+import MsDialogFooter from "../../../../common/components/MsDialogFooter";
+import { getCurrentProjectID } from "@/common/js/utils";
 
-    export default {
-      name: "executorEdit",
-      components: {MsDialogFooter},
-      data() {
-        return {
-          executorEditVisible: false,
-          executor: '',
-          executorOptions: []
+export default {
+  name: "ExecutorEdit",
+  components: { MsDialogFooter },
+  props: {
+    selectIds: {
+      type: Set,
+    },
+  },
+  data() {
+    return {
+      executorEditVisible: false,
+      executor: "",
+      executorOptions: [],
+    };
+  },
+  methods: {
+    setMaintainerOptions() {
+      this.$post(
+        "/user/project/member/tester/list",
+        { projectId: getCurrentProjectID() },
+        (response) => {
+          this.executorOptions = response.data;
         }
-      },
-      props: {
-        selectIds: {
-          type: Set
-        }
-      },
-      methods: {
-        setMaintainerOptions() {
-          this.$post('/user/project/member/tester/list', {projectId: getCurrentProjectID()}, response => {
-            this.executorOptions = response.data;
-          });
-        },
-        saveExecutor() {
-          let param = {};
-          param.executor = this.executor;
-          if (this.executor === '') {
-            this.$message.warning(this.$t('test_track.plan_view.select_executor'));
-            return;
-          }
-          param.ids = [...this.selectIds];
-          this.$post('/test/plan/case/batch/edit' , param, () => {
-            this.executor = '';
-            this.selectIds.clear();
-            this.$success(this.$t('commons.save_success'));
-            this.executorEditVisible = false;
-            this.$emit('refresh');
-          });
-        },
-        openExecutorEdit() {
-          this.executorEditVisible = true;
-          this.setMaintainerOptions();
-        }
+      );
+    },
+    saveExecutor() {
+      let param = {};
+      param.executor = this.executor;
+      if (this.executor === "") {
+        this.$message.warning(this.$t("test_track.plan_view.select_executor"));
+        return;
       }
-    }
+      param.ids = [...this.selectIds];
+      this.$post("/test/plan/case/batch/edit", param, () => {
+        this.executor = "";
+        this.selectIds.clear();
+        this.$success(this.$t("commons.save_success"));
+        this.executorEditVisible = false;
+        this.$emit("refresh");
+      });
+    },
+    openExecutorEdit() {
+      this.executorEditVisible = true;
+      this.setMaintainerOptions();
+    },
+  },
+};
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

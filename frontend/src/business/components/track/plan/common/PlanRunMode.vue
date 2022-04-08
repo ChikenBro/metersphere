@@ -12,48 +12,66 @@
         <el-radio label="parallel">{{ $t("run_mode.parallel") }}</el-radio>
       </el-radio-group>
     </div>
-    <div class="ms-mode-div" v-if="runConfig.mode === 'serial'">
+    <div v-if="runConfig.mode === 'serial'" class="ms-mode-div">
       <el-row>
         <el-col :span="6">
           <span class="ms-mode-span">{{ $t("run_mode.other_config") }}：</span>
         </el-col>
         <el-col :span="18">
           <div>
-            <el-checkbox v-model="runConfig.onSampleError">失败停止</el-checkbox>
+            <el-checkbox v-model="runConfig.onSampleError"
+              >失败停止</el-checkbox
+            >
           </div>
           <div v-if="testType === 'API'" style="padding-top: 10px">
-            <el-checkbox v-model="runConfig.runWithinResourcePool" style="padding-right: 10px;">
-              {{ $t('run_mode.run_with_resource_pool') }}
+            <el-checkbox
+              v-model="runConfig.runWithinResourcePool"
+              style="padding-right: 10px"
+            >
+              {{ $t("run_mode.run_with_resource_pool") }}
             </el-checkbox>
-            <el-select :disabled="!runConfig.runWithinResourcePool" v-model="runConfig.resourcePoolId" size="mini">
+            <el-select
+              v-model="runConfig.resourcePoolId"
+              :disabled="!runConfig.runWithinResourcePool"
+              size="mini"
+            >
               <el-option
                 v-for="item in resourcePools"
                 :key="item.id"
                 :label="item.name"
-                :value="item.id">
+                :value="item.id"
+              >
               </el-option>
             </el-select>
           </div>
         </el-col>
       </el-row>
     </div>
-    <div class="ms-mode-div" v-if="runConfig.mode === 'parallel'">
+    <div v-if="runConfig.mode === 'parallel'" class="ms-mode-div">
       <el-row>
         <el-col :span="6">
           <span class="ms-mode-span">{{ $t("run_mode.other_config") }}：</span>
         </el-col>
         <el-col :span="18">
           <div v-if="testType === 'API'">
-            <el-checkbox v-model="runConfig.runWithinResourcePool" style="padding-right: 10px;">
-              {{ $t('run_mode.run_with_resource_pool') }}
+            <el-checkbox
+              v-model="runConfig.runWithinResourcePool"
+              style="padding-right: 10px"
+            >
+              {{ $t("run_mode.run_with_resource_pool") }}
             </el-checkbox>
-            <el-select :disabled="!runConfig.runWithinResourcePool" v-model="runConfig.resourcePoolId" size="mini">
+            <el-select
+              v-model="runConfig.resourcePoolId"
+              :disabled="!runConfig.runWithinResourcePool"
+              size="mini"
+            >
               <el-option
                 v-for="item in resourcePools"
                 :key="item.id"
                 :label="item.name"
                 :disabled="!item.api"
-                :value="item.id">
+                :value="item.id"
+              >
               </el-option>
             </el-select>
           </div>
@@ -61,7 +79,7 @@
       </el-row>
     </div>
     <template v-slot:footer>
-      <ms-dialog-footer @cancel="close" @confirm="handleRunBatch"/>
+      <ms-dialog-footer @cancel="close" @confirm="handleRunBatch" />
     </template>
   </el-dialog>
 </template>
@@ -71,7 +89,7 @@ import MsDialogFooter from "@/business/components/common/components/MsDialogFoot
 
 export default {
   name: "MsPlanRunMode",
-  components: {MsDialogFooter},
+  components: { MsDialogFooter },
   data() {
     return {
       runModeVisible: false,
@@ -112,9 +130,12 @@ export default {
       this.close();
     },
     getResourcePools() {
-      this.result = this.$get('/testresourcepool/list/quota/valid', response => {
-        this.resourcePools = response.data;
-      });
+      this.result = this.$get(
+        "/testresourcepool/list/quota/valid",
+        (response) => {
+          this.resourcePools = response.data;
+        }
+      );
     },
   },
 };

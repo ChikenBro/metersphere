@@ -1,12 +1,12 @@
 <template>
   <div>
     <el-drawer
+      ref="drawer"
+      v-loading="result.loading"
       :visible.sync="showDialog"
       :with-header="false"
       :modal-append-to-body="false"
       size="100%"
-      ref="drawer"
-      v-loading="result.loading"
     >
       <template v-slot:default="scope">
         <el-row type="flex" class="head-bar">
@@ -50,7 +50,7 @@
           </el-col>
         </el-row>
 
-        <div class="container" ref="resume" id="app">
+        <div id="app" ref="resume" class="container">
           <el-main>
             <div v-for="(item, index) in previews" :key="item.id">
               <template-component

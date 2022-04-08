@@ -3,9 +3,10 @@
     class="load-case-report-drawer"
     :visible.sync="drawer"
     direction="ltr"
+    size="80%"
     @close="handleClose"
-    size="80%">
-    <load-case-report-view :report-id="reportId" ref="loadCaseReportView"/>
+  >
+    <load-case-report-view ref="loadCaseReportView" :report-id="reportId" />
   </el-drawer>
 </template>
 
@@ -14,22 +15,22 @@ import LoadCaseReportView from "@/business/components/track/plan/view/comonents/
 
 export default {
   name: "LoadCaseReport",
-  components: {LoadCaseReportView},
+  components: { LoadCaseReportView },
+  props: {
+    reportId: String,
+  },
   data() {
     return {
       drawer: false,
-    }
-  },
-  props: {
-    reportId: String
+    };
   },
   methods: {
     handleClose() {
       this.drawer = false;
-      this.$emit('refresh');
-    }
+      this.$emit("refresh");
+    },
   },
-}
+};
 </script>
 
 <style scoped>

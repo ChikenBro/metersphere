@@ -1,71 +1,112 @@
 <template>
-  <el-dialog :close-on-click-modal="false" :title="$t('test_track.case.create')" :visible.sync="visible"
-             width="45%"
-             :destroy-on-close="true">
-    <el-form :model="testCaseForm" label-position="right" label-width="80px" size="small" :rules="rule"
-             ref="testCaseForm">
+  <el-dialog
+    :close-on-click-modal="false"
+    :title="$t('test_track.case.create')"
+    :visible.sync="visible"
+    width="45%"
+    :destroy-on-close="true"
+  >
+    <el-form
+      ref="testCaseForm"
+      :model="testCaseForm"
+      label-position="right"
+      label-width="80px"
+      size="small"
+      :rules="rule"
+    >
       <el-form-item :label="$t('commons.name')" prop="name">
-        <el-input v-model="testCaseForm.name" autocomplete="off" :placeholder="$t('commons.name')"/>
+        <el-input
+          v-model="testCaseForm.name"
+          autocomplete="off"
+          :placeholder="$t('commons.name')"
+        />
       </el-form-item>
 
-      <el-form-item :label="$t('api_test.automation.scenario.principal')" prop="maintainer">
-        <el-select v-model="testCaseForm.maintainer"
-                   :placeholder="$t('api_test.automation.scenario.principal')" filterable size="small"
-                   style="width: 100%">
+      <el-form-item
+        :label="$t('api_test.automation.scenario.principal')"
+        prop="maintainer"
+      >
+        <el-select
+          v-model="testCaseForm.maintainer"
+          :placeholder="$t('api_test.automation.scenario.principal')"
+          filterable
+          size="small"
+          style="width: 100%"
+        >
           <el-option
             v-for="item in userOptions"
             :key="item.id"
             :label="item.id + ' (' + item.name + ')'"
-            :value="item.id">
+            :value="item.id"
+          >
           </el-option>
         </el-select>
       </el-form-item>
 
-      <el-form-item :label="$t('api_test.automation.scenario.follow_people')" prop="followPeople">
-        <el-select v-model="testCaseForm.followPeople"
-                   :placeholder="$t('api_test.automation.scenario.follow_people')" filterable size="small"
-                   style="width: 100%">
+      <el-form-item
+        :label="$t('api_test.automation.scenario.follow_people')"
+        prop="followPeople"
+      >
+        <el-select
+          v-model="testCaseForm.followPeople"
+          :placeholder="$t('api_test.automation.scenario.follow_people')"
+          filterable
+          size="small"
+          style="width: 100%"
+        >
           <el-option
             v-for="item in userOptions"
             :key="item.id"
             :label="item.id + ' (' + item.name + ')'"
-            :value="item.id">
+            :value="item.id"
+          >
           </el-option>
         </el-select>
       </el-form-item>
 
-      <el-form-item :label="$t('commons.description')" prop="description" style="margin-bottom: 29px">
-        <el-input class="ms-http-textarea" v-model="testCaseForm.description"
-                  type="textarea"
-                  :autosize="{ minRows: 2, maxRows: 10}"
-                  :rows="2" size="small"/>
+      <el-form-item
+        :label="$t('commons.description')"
+        prop="description"
+        style="margin-bottom: 29px"
+      >
+        <el-input
+          v-model="testCaseForm.description"
+          class="ms-http-textarea"
+          type="textarea"
+          :autosize="{ minRows: 2, maxRows: 10 }"
+          :rows="2"
+          size="small"
+        />
       </el-form-item>
     </el-form>
 
     <template v-slot:footer>
       <ms-dialog-footer
-        @cancel="visible = false"
-        :isShow="true"
+        :is-show="true"
         title="编辑详情"
+        @cancel="visible = false"
         @saveAsEdit="saveTestCase(true)"
-        @confirm="saveTestCase">
+        @confirm="saveTestCase"
+      >
       </ms-dialog-footer>
-
     </template>
-
   </el-dialog>
-
 </template>
 
 <script>
-import {getCurrentProjectID, getCurrentUser} from "@/common/js/utils";
-import {WORKSPACE_ID} from "@/common/js/constants";
+import { getCurrentProjectID, getCurrentUser } from "@/common/js/utils";
+import { WORKSPACE_ID } from "@/common/js/constants";
 import MsDialogFooter from "@/business/components/common/components/MsDialogFooter";
-import {buildNodePath} from "@/business/components/api/definition/model/NodeTree";
+import { buildNodePath } from "@/business/components/api/definition/model/NodeTree";
 
 export default {
   name: "TestCaseCreate",
-  components: {MsDialogFooter},
+  components: { MsDialogFooter },
+  props: {
+    treeNodes: {
+      type: Array,
+    },
+  },
   data() {
     return {
       testCaseForm: {},
@@ -74,28 +115,26 @@ export default {
       userOptions: [],
       rule: {
         name: [
-          {required: true, message: this.$t('test_track.case.input_name'), trigger: 'blur'},
-          {max: 100, message: this.$t('test_track.length_less_than') + '100', trigger: 'blur'}
+          {
+            required: true,
+            message: this.$t("test_track.case.input_name"),
+            trigger: "blur",
+          },
+          {
+            max: 100,
+            message: this.$t("test_track.length_less_than") + "100",
+            trigger: "blur",
+          },
         ],
-        maintainer: [{
-          required: true,
-          message: this.$t('api_test.automation.scenario.select_principal'),
-          trigger: 'change'
-        }],
-
-
+        maintainer: [
+          {
+            required: true,
+            message: this.$t("api_test.automation.scenario.select_principal"),
+            trigger: "change",
+          },
+        ],
       },
-    }
-  },
-  props: {
-    treeNodes: {
-      type: Array
-    },
-  },
-  watch: {
-    treeNodes() {
-      this.getModuleOptions();
-    }
+    };
   },
   computed: {
     projectId() {
@@ -103,46 +142,56 @@ export default {
     },
     moduleOptions() {
       return this.$store.state.testCaseModuleOptions;
-    }
+    },
+  },
+  watch: {
+    treeNodes() {
+      this.getModuleOptions();
+    },
   },
   methods: {
     saveTestCase(saveAs) {
-      this.$refs['testCaseForm'].validate((valid) => {
+      this.$refs["testCaseForm"].validate((valid) => {
         if (valid) {
           let path = "/test/case/save";
           this.testCaseForm.projectId = this.projectId;
           this.testCaseForm.type = "";
           this.testCaseForm.priority = "P0";
-          if (this.currentModule && this.currentModule !== 0 && this.currentModule.path && this.currentModule.path !== 0) {
+          if (
+            this.currentModule &&
+            this.currentModule !== 0 &&
+            this.currentModule.path &&
+            this.currentModule.path !== 0
+          ) {
             this.testCaseForm.nodePath = this.currentModule.path;
             this.testCaseForm.nodeId = this.currentModule.id;
           } else {
-            this.testCaseForm.nodePath = "/默认模块"
-            this.testCaseForm.nodeId = "default-module"
+            this.testCaseForm.nodePath = "/默认模块";
+            this.testCaseForm.nodeId = "default-module";
           }
-          this.result = this.$post(path, this.testCaseForm, response => {
-            this.testCaseForm.id = response.data.id
-            this.$success(this.$t('commons.save_success'));
+          this.result = this.$post(path, this.testCaseForm, (response) => {
+            this.testCaseForm.id = response.data.id;
+            this.$success(this.$t("commons.save_success"));
             this.visible = false;
             if (saveAs) {
-              this.$emit('saveAsEdit', this.testCaseForm);
+              this.$emit("saveAsEdit", this.testCaseForm);
             } else {
-              this.$emit('refresh');
-              this.$emit('createCase', this.testCaseForm);
+              this.$emit("refresh");
+              this.$emit("createCase", this.testCaseForm);
             }
-          })
+          });
         } else {
           return false;
         }
-      })
+      });
     },
     getModuleOptions() {
       // let moduleOptions = [];
       // this.treeNodes.forEach(node => {
       //   buildNodePath(node, {path: ''}, moduleOptions);
       // });
-      if(this.currentModule!==undefined){
-        this.moduleOptions.forEach(item => {
+      if (this.currentModule !== undefined) {
+        this.moduleOptions.forEach((item) => {
           if (this.currentModule.id === item.id) {
             this.currentModule.path = item.path;
           }
@@ -151,21 +200,23 @@ export default {
     },
 
     getMaintainerOptions() {
-      this.$post('/user/project/member/tester/list', {projectId: getCurrentProjectID()}, response => {
-        this.userOptions = response.data;
-      });
+      this.$post(
+        "/user/project/member/tester/list",
+        { projectId: getCurrentProjectID() },
+        (response) => {
+          this.userOptions = response.data;
+        }
+      );
     },
     open(currentModule) {
-      this.testCaseForm = {maintainer: getCurrentUser().id};
+      this.testCaseForm = { maintainer: getCurrentUser().id };
       this.currentModule = currentModule;
       this.getMaintainerOptions();
       this.visible = true;
-      this.getModuleOptions()
-    }
-  }
-}
+      this.getModuleOptions();
+    },
+  },
+};
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

@@ -1,79 +1,79 @@
 <template>
-    <test-case-relevance-base
-      @setProject="setProject"
-      @save="save"
-      ref="baseRelevance">
+  <test-case-relevance-base
+    ref="baseRelevance"
+    @setProject="setProject"
+    @save="save"
+  >
+    <template v-slot:aside>
+      <ms-node-tree
+        ref="nodeTree"
+        v-loading="result.loading"
+        class="node-tree"
+        :tree-nodes="treeNodes"
+        @nodeSelectEvent="nodeChange"
+      />
+    </template>
 
-      <template v-slot:aside>
-        <ms-node-tree class="node-tree"
-                   v-loading="result.loading"
-                   @nodeSelectEvent="nodeChange"
-                   :tree-nodes="treeNodes"
-                   ref="nodeTree"/>
-      </template>
+    <el-card>
+      <ms-table-header
+        :condition="condition"
+        title=""
+        :show-create="false"
+        @search="initTableData"
+      />
+      <ms-table
+        ref="table"
+        v-loading="result.loading"
+        :data="tableData"
+        :condition="condition"
+        :total="total"
+        :page-size.sync="pageSize"
+        :show-select-all="false"
+        @handlePageChange="initTableData"
+        @refresh="initTableData"
+      >
+        <ms-table-column :label="$t('commons.id')" prop="num">
+        </ms-table-column>
 
-      <el-card>
+        <ms-table-column :label="$t('commons.name')" prop="name">
+        </ms-table-column>
 
-        <ms-table-header :condition="condition" @search="initTableData" title="" :show-create="false"/>
-        <ms-table
-          v-loading="result.loading"
-          :data="tableData"
-          :condition="condition"
-          :total="total"
-          :page-size.sync="pageSize"
-          :show-select-all="false"
-          @handlePageChange="initTableData"
-          @refresh="initTableData"
-          ref="table">
+        <ms-table-column :label="$t('test_track.case.priority')" prop="name">
+          <template v-slot:default="scope">
+            <priority-table-item ref="priority" :value="scope.row.priority" />
+          </template>
+        </ms-table-column>
 
-          <ms-table-column
-            :label="$t('commons.id')"
-            prop="num">
-          </ms-table-column>
+        <ms-table-column :label="$t('test_track.case.type')" prop="type">
+          <template v-slot:default="scope">
+            <type-table-item :value="scope.row.type" />
+          </template>
+        </ms-table-column>
 
-          <ms-table-column
-            :label="$t('commons.name')"
-            prop="name">
-          </ms-table-column>
+        <ms-table-column :label="$t('test_track.case.module')" prop="nodePath">
+        </ms-table-column>
 
-          <ms-table-column
-            :label="$t('test_track.case.priority')"
-            prop="name">
-            <template v-slot:default="scope">
-              <priority-table-item :value="scope.row.priority" ref="priority"/>
-            </template>
-          </ms-table-column>
+        <ms-table-column
+          :label="$t('test_track.plan.plan_project')"
+          prop="projectName"
+        >
+        </ms-table-column>
+      </ms-table>
 
-          <ms-table-column
-            :label="$t('test_track.case.type')"
-            prop="type">
-            <template v-slot:default="scope">
-              <type-table-item :value="scope.row.type"/>
-            </template>
-          </ms-table-column>
-
-          <ms-table-column
-            :label="$t('test_track.case.module')"
-            prop="nodePath">
-          </ms-table-column>
-
-          <ms-table-column
-            :label="$t('test_track.plan.plan_project')"
-            prop="projectName">
-          </ms-table-column>
-
-        </ms-table>
-
-        <ms-table-pagination :change="initTableData" :current-page.sync="currentPage" :page-size.sync="pageSize" :total="total"/>
-      </el-card>
-
-    </test-case-relevance-base>
+      <ms-table-pagination
+        :change="initTableData"
+        :current-page.sync="currentPage"
+        :page-size.sync="pageSize"
+        :total="total"
+      />
+    </el-card>
+  </test-case-relevance-base>
 </template>
 
 <script>
 import MsTable from "@/business/components/common/components/table/MsTable";
 import MsTableColumn from "@/business/components/common/components/table/MsTableColumn";
-import {CUSTOM_FIELD_LIST} from "@/common/js/default-table-header";
+import { CUSTOM_FIELD_LIST } from "@/common/js/default-table-header";
 import MsTableButton from "@/business/components/common/components/MsTableButton";
 import MsTablePagination from "@/business/components/common/pagination/TablePagination";
 import MsTableHeader from "@/business/components/common/components/MsTableHeader";
@@ -91,7 +91,12 @@ export default {
     TestCaseRelevanceBase,
     MsEditDialog,
     MsTableHeader,
-    MsTablePagination, MsTableButton, MsTableColumn, MsTable},
+    MsTablePagination,
+    MsTableButton,
+    MsTableColumn,
+    MsTable,
+  },
+  props: ["testCaseContainIds"],
   data() {
     return {
       tableData: [],
@@ -100,16 +105,18 @@ export default {
       total: 0,
       pageSize: 10,
       currentPage: 1,
-      projectId: '',
+      projectId: "",
       result: {},
       treeNodes: [],
       projects: [],
       selectNodeIds: [],
     };
   },
-  props: [
-    'testCaseContainIds'
-  ],
+  computed: {
+    fields() {
+      return CUSTOM_FIELD_LIST;
+    },
+  },
   watch: {
     selectNodeIds() {
       this.initTableData();
@@ -118,12 +125,6 @@ export default {
       this.getProjectNode();
       this.initTableData();
     },
-  },
-  computed: {
-    fields() {
-      return CUSTOM_FIELD_LIST;
-    },
-
   },
   methods: {
     initTableData() {
@@ -135,12 +136,16 @@ export default {
       }
       if (this.projectId) {
         this.condition.projectId = this.projectId;
-        this.condition.testCaseContainIds = Array.from(this.testCaseContainIds)
-        this.result = this.$post('/test/case/relate/issue/' + +this.currentPage + '/' + this.pageSize, this.condition, response => {
-          let data = response.data;
-          this.total = data.itemCount;
-          this.tableData = data.listObject;
-        });
+        this.condition.testCaseContainIds = Array.from(this.testCaseContainIds);
+        this.result = this.$post(
+          "/test/case/relate/issue/" + +this.currentPage + "/" + this.pageSize,
+          this.condition,
+          (response) => {
+            let data = response.data;
+            this.total = data.itemCount;
+            this.tableData = data.listObject;
+          }
+        );
       }
     },
     nodeChange(node, nodeIds, nodeNames) {
@@ -151,10 +156,13 @@ export default {
       if (projectId) {
         this.projectId = projectId;
       }
-      this.$refs.nodeTree.result = this.$post("/case/node/list/project",
-        {projectId: this.projectId}, response => {
+      this.$refs.nodeTree.result = this.$post(
+        "/case/node/list/project",
+        { projectId: this.projectId },
+        (response) => {
           this.treeNodes = response.data;
-        });
+        }
+      );
       this.selectNodeIds = [];
     },
     open() {
@@ -162,17 +170,15 @@ export default {
       this.initTableData();
     },
     save() {
-      this.$emit('save', this.$refs.table.selectRows);
+      this.$emit("save", this.$refs.table.selectRows);
       this.$refs.table.clear();
       this.$refs.baseRelevance.close();
     },
     setProject(projectId) {
       this.projectId = projectId;
-    }
-  }
+    },
+  },
 };
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

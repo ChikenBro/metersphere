@@ -1,37 +1,40 @@
 <template>
   <el-dialog :visible.sync="dialogTableVisible">
-
     <div v-loading="result.loading">
-
       <div>
         <el-input
+          v-model="textarea"
           type="textarea"
           :placeholder="$t('test_track.comment.send_comment')"
-          v-model="textarea"
           maxlength="60"
           show-word-limit
           resize="none"
-          :autosize="{ minRows: 4, maxRows: 4}"
-          @keyup.ctrl.enter.native="sendComment"
+          :autosize="{ minRows: 4, maxRows: 4 }"
           :disabled="isReadOnly"
+          @keyup.ctrl.enter.native="sendComment"
         >
         </el-input>
-        <el-button type="primary" size="mini" class="send-btn" @click="sendComment" :disabled="isReadOnly">
-          {{ $t('test_track.comment.send') }}
+        <el-button
+          type="primary"
+          size="mini"
+          class="send-btn"
+          :disabled="isReadOnly"
+          @click="sendComment"
+        >
+          {{ $t("test_track.comment.send") }}
         </el-button>
       </div>
     </div>
-
   </el-dialog>
 </template>
 
 <script>
 import ReviewCommentItem from "@/business/components/track/review/commom/ReviewCommentItem";
-import {getUUID} from "@/common/js/utils";
+import { getUUID } from "@/common/js/utils";
 
 export default {
   name: "TestCaseComment",
-  components: {ReviewCommentItem},
+  components: { ReviewCommentItem },
   props: {
     caseId: String,
     reviewId: String,
@@ -39,38 +42,36 @@ export default {
   data() {
     return {
       result: {},
-      textarea: '',
+      textarea: "",
       isReadOnly: false,
-      dialogTableVisible: false
-    }
+      dialogTableVisible: false,
+    };
   },
-  created() {
-
-  },
+  created() {},
   methods: {
     open() {
-      this.dialogTableVisible = true
+      this.dialogTableVisible = true;
     },
     sendComment() {
       let comment = {};
       comment.caseId = this.caseId;
       comment.description = this.textarea;
       if (!this.textarea) {
-        this.$warning(this.$t('test_track.comment.description_is_null'));
+        this.$warning(this.$t("test_track.comment.description_is_null"));
         return;
       }
-      this.result = this.$post('/test/case/comment/save', comment, () => {
-        this.$success(this.$t('test_track.comment.send_success'));
+      this.result = this.$post("/test/case/comment/save", comment, () => {
+        this.$success(this.$t("test_track.comment.send_success"));
         this.refresh(comment.caseId);
-        this.textarea = '';
-        this.dialogTableVisible = false
+        this.textarea = "";
+        this.dialogTableVisible = false;
       });
     },
     refresh(id) {
-      this.$emit('getComments');
+      this.$emit("getComments");
     },
-  }
-}
+  },
+};
 </script>
 
 <style scoped>
