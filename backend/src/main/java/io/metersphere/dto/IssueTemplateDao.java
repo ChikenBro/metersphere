@@ -8,4 +8,5 @@ import java.util.List;
 @Data
 public class IssueTemplateDao extends IssueTemplate {
     List<CustomFieldDao> customFields;
+    List<CustomFieldList> customFieldListList;
 }

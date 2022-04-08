@@ -91,10 +91,19 @@ public class IssuesService {
         abstractPlatform.testAuth();
     }
 
-    public void addIssues(IssuesUpdateRequest issuesRequest) {
+    public String addIssues(IssuesUpdateRequest issuesRequest) {
         List<AbstractIssuePlatform> platformList = getUpdatePlatforms(issuesRequest);
         platformList.forEach(platform -> {
-            platform.addIssue(issuesRequest);
+//            platform.addIssue(issuesRequest);
+            String message = platform.addIssue(issuesRequest);
+            //coding返回错误信息
+            if (message.contains("Error")) {
+                MSException.throwException(message);
+            } else if (message.contains("平台入库失败")) {
+                MSException.throwException("coding同步成功，平台入库失败，重试终止");
+            } else if ("ms-coding服务异常".equals(message)) {
+                MSException.throwException("ms-coding服务异常");
+            }
         });
         issuesRequest.getTestCaseIds().forEach(l -> {
             try {
@@ -109,6 +118,7 @@ public class IssuesService {
             }
         });
         noticeIssueEven(issuesRequest, "IssuesCreate");
+        return null;
     }
 
     public void noticeIssueEven(IssuesUpdateRequest issuesRequest, String type) {
@@ -120,14 +130,7 @@ public class IssuesService {
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("issuesName", issuesRequest.getTitle());
         paramMap.put("creator", user.getName());
-        NoticeModel noticeModel = NoticeModel.builder()
-                .context(context)
-                .relatedUsers(userIds)
-                .subject(Translator.get("task_defect_notification"))
-                .mailTemplate(type)
-                .paramMap(paramMap)
-                .event(NoticeConstants.Event.CREATE)
-                .build();
+        NoticeModel noticeModel = NoticeModel.builder().context(context).relatedUsers(userIds).subject(Translator.get("task_defect_notification")).mailTemplate(type).paramMap(paramMap).event(NoticeConstants.Event.CREATE).build();
         noticeSendService.send(NoticeConstants.TaskType.DEFECT_TASK, noticeModel);
     }
 
@@ -224,6 +227,7 @@ public class IssuesService {
         boolean tapd = isIntegratedPlatform(orgId, IssuesManagePlatform.Tapd.toString());
         boolean jira = isIntegratedPlatform(orgId, IssuesManagePlatform.Jira.toString());
         boolean zentao = isIntegratedPlatform(orgId, IssuesManagePlatform.Zentao.toString());
+        boolean coding = isIntegratedPlatform(orgId, IssuesManagePlatform.Coding.toString());
 
         List<String> platforms = new ArrayList<>();
         if (tapd) {
@@ -248,6 +252,14 @@ public class IssuesService {
                 platforms.add(IssuesManagePlatform.Zentao.name());
             }
         }
+
+        if (coding) {
+            String codingId = project.getZentaoId();
+            if (StringUtils.isNotBlank(codingId)) {
+                platforms.add(IssuesManagePlatform.Coding.name());
+            }
+        }
+
         return platforms;
     }
 
@@ -322,8 +334,7 @@ public class IssuesService {
     public void delete(String id) {
         issuesMapper.deleteByPrimaryKey(id);
         TestCaseIssuesExample example = new TestCaseIssuesExample();
-        example.createCriteria()
-                .andIssuesIdEqualTo(id);
+        example.createCriteria().andIssuesIdEqualTo(id);
         testCaseIssuesMapper.deleteByExample(example);
     }
 
@@ -344,17 +355,12 @@ public class IssuesService {
         request.setOrders(ServiceUtils.getDefaultOrder(request.getOrders()));
         List<IssuesDao> issues = extIssuesMapper.getIssuesByProjectId(request);
 
-        List<String> ids = issues.stream()
-                .map(IssuesDao::getCreator)
-                .collect(Collectors.toList());
+        List<String> ids = issues.stream().map(IssuesDao::getCreator).collect(Collectors.toList());
         Map<String, User> userMap = ServiceUtils.getUserMap(ids);
-        List<String> resourceIds = issues.stream()
-                .map(IssuesDao::getResourceId)
-                .collect(Collectors.toList());
+        List<String> resourceIds = issues.stream().map(IssuesDao::getResourceId).collect(Collectors.toList());
 
         List<TestPlan> testPlans = testPlanService.getTestPlanByIds(resourceIds);
-        Map<String, String> planMap = testPlans.stream()
-                .collect(Collectors.toMap(TestPlan::getId, TestPlan::getName));
+        Map<String, String> planMap = testPlans.stream().collect(Collectors.toMap(TestPlan::getId, TestPlan::getName));
 
         issues.forEach(item -> {
             User createUser = userMap.get(item.getCreator());
@@ -367,9 +373,7 @@ public class IssuesService {
             TestCaseIssuesExample example = new TestCaseIssuesExample();
             example.createCriteria().andIssuesIdEqualTo(item.getId());
             List<TestCaseIssues> testCaseIssues = testCaseIssuesMapper.selectByExample(example);
-            List<String> caseIds = testCaseIssues.stream()
-                    .map(TestCaseIssues::getTestCaseId)
-                    .collect(Collectors.toList());
+            List<String> caseIds = testCaseIssues.stream().map(TestCaseIssues::getTestCaseId).collect(Collectors.toList());
             item.setCaseIds(caseIds);
             item.setCaseCount(testCaseIssues.size());
         });
@@ -448,15 +452,9 @@ public class IssuesService {
                 return;
             }
 
-            List<IssuesDao> tapdIssues = issues.stream()
-                    .filter(item -> item.getPlatform().equals(IssuesManagePlatform.Tapd.name()))
-                    .collect(Collectors.toList());
-            List<IssuesDao> jiraIssues = issues.stream()
-                    .filter(item -> item.getPlatform().equals(IssuesManagePlatform.Jira.name()))
-                    .collect(Collectors.toList());
-            List<IssuesDao> zentaoIssues = issues.stream()
-                    .filter(item -> item.getPlatform().equals(IssuesManagePlatform.Zentao.name()))
-                    .collect(Collectors.toList());
+            List<IssuesDao> tapdIssues = issues.stream().filter(item -> item.getPlatform().equals(IssuesManagePlatform.Tapd.name())).collect(Collectors.toList());
+            List<IssuesDao> jiraIssues = issues.stream().filter(item -> item.getPlatform().equals(IssuesManagePlatform.Jira.name())).collect(Collectors.toList());
+            List<IssuesDao> zentaoIssues = issues.stream().filter(item -> item.getPlatform().equals(IssuesManagePlatform.Zentao.name())).collect(Collectors.toList());
 
             IssuesRequest issuesRequest = new IssuesRequest();
             issuesRequest.setProjectId(projectId);

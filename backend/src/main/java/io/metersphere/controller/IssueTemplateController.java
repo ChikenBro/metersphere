@@ -57,6 +57,7 @@ public class IssueTemplateController {
 
     @GetMapping("/get/relate/{projectId}")
     public IssueTemplateDao getTemplate(@PathVariable String projectId) {
-        return issueTemplateService.getTemplate(projectId);
+        return issueTemplateService.getCodingIssueTemplate(projectId);
+
     }
 }

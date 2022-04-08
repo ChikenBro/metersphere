@@ -85,7 +85,7 @@ public class TapdPlatform extends AbstractIssuePlatform {
     }
 
     @Override
-    public void addIssue(IssuesUpdateRequest issuesRequest) {
+    public String addIssue(IssuesUpdateRequest issuesRequest) {
         issuesRequest.setPlatform(IssuesManagePlatform.Tapd.toString());
 
         List<CustomFieldItemDTO> customFields = getCustomFields(issuesRequest.getCustomFields());
@@ -131,13 +131,15 @@ public class TapdPlatform extends AbstractIssuePlatform {
 
         // 插入缺陷表
         insertIssues(bug.getId(), issuesRequest);
+        return null;
     }
 
     @Override
-    public void updateIssue(IssuesUpdateRequest request) {
+    public String updateIssue(IssuesUpdateRequest request) {
         // todo 调用接口
         request.setDescription(null);
         handleIssueUpdate(request);
+        return null;
     }
 
     private String msDescription2Tapd(String msDescription) {
@@ -147,7 +149,8 @@ public class TapdPlatform extends AbstractIssuePlatform {
     }
 
     @Override
-    public void deleteIssue(String id) {}
+    public void deleteIssue(String id) {
+    }
 
     @Override
     public void testAuth() {

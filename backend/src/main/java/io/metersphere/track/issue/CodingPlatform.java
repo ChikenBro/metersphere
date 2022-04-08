@@ -31,13 +31,13 @@ public class CodingPlatform extends AbstractIssuePlatform {
     }
 
     @Override
-    public void addIssue(IssuesUpdateRequest issuesRequest) {
-
+    public String addIssue(IssuesUpdateRequest issuesRequest) {
+        return null;
     }
 
     @Override
-    public void updateIssue(IssuesUpdateRequest request) {
-
+    public String updateIssue(IssuesUpdateRequest request) {
+        return null;
     }
 
     @Override

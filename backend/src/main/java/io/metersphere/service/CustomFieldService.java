@@ -9,9 +9,11 @@ import io.metersphere.base.domain.CustomFieldTemplate;
 import io.metersphere.base.mapper.CustomFieldMapper;
 import io.metersphere.base.mapper.ext.ExtCustomFieldMapper;
 import io.metersphere.commons.constants.TemplateConstants;
+import io.metersphere.commons.exception.CodingException;
 import io.metersphere.commons.exception.MSException;
 import io.metersphere.commons.utils.*;
 import io.metersphere.controller.request.QueryCustomFieldRequest;
+import io.metersphere.dto.CodingCustomFieldListDTO;
 import io.metersphere.dto.CustomFieldDao;
 import io.metersphere.i18n.Translator;
 import io.metersphere.log.utils.ReflexObjectUtil;
@@ -112,6 +114,12 @@ public class CustomFieldService {
         return customFieldMapper.selectByExampleWithBLOBs(example);
     }
 
+    /**
+     * jira customField
+     *
+     * @param templateId issue 模板id
+     * @return jira 模板内容
+     */
     public List<CustomFieldDao> getCustomFieldByTemplateId(String templateId) {
         List<CustomFieldTemplate> customFields = customFieldTemplateService.getCustomFields(templateId);
         List<String> fieldIds = customFields.stream()
@@ -134,6 +142,22 @@ public class CustomFieldService {
         }
         return result;
     }
+
+    /**
+     * coding customField
+     *
+     * @param projectId 项目id
+     * @return coding 模板内容
+     */
+    public CodingCustomFieldListDTO getCodingCustomFieldByTemplateId(String projectId) {
+
+        String url = String.format("http://ms-coding.dev.mudu.tv/field/template/issue/get/relate/%s", projectId);
+        LogUtil.info("add issue: " + projectId);
+        String result = CodingException.checkCodingException(url, projectId);
+        CodingCustomFieldListDTO jsonObject = JSON.parseObject(result, CodingCustomFieldListDTO.class);
+        return jsonObject;
+    }
+
 
     public List<CustomField> getFieldByIds(List<String> ids) {
         if (CollectionUtils.isNotEmpty(ids)) {

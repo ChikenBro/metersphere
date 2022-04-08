@@ -112,7 +112,8 @@ public class ZentaoPlatform extends AbstractIssuePlatform {
             if (obj != null) {
                 JSONObject data = obj.getJSONObject("data");
                 String s = JSON.toJSONString(data);
-                Map<String, Object> map = JSONArray.parseObject(s, new TypeReference<Map<String, Object>>(){});
+                Map<String, Object> map = JSONArray.parseObject(s, new TypeReference<Map<String, Object>>() {
+                });
                 Collection<Object> values = map.values();
                 values.forEach(v -> {
                     JSONObject jsonObject = JSONObject.parseObject(JSON.toJSONString(v));
@@ -142,7 +143,7 @@ public class ZentaoPlatform extends AbstractIssuePlatform {
         IssuesDao issues = new IssuesDao();
         issues.setId(bug.getId());
         issues.setPlatformStatus(bug.getStatus());
-        if (StringUtils.equals(bug.getDeleted(),"1")) {
+        if (StringUtils.equals(bug.getDeleted(), "1")) {
             issues.setPlatformStatus(IssuesStatus.DELETE.toString());
             issuesMapper.updateByPrimaryKeySelective(issues);
         }
@@ -153,7 +154,7 @@ public class ZentaoPlatform extends AbstractIssuePlatform {
     }
 
     @Override
-    public void addIssue(IssuesUpdateRequest issuesRequest) {
+    public String addIssue(IssuesUpdateRequest issuesRequest) {
         issuesRequest.setPlatform(IssuesManagePlatform.Zentao.toString());
 
         List<CustomFieldItemDTO> customFields = getCustomFields(issuesRequest.getCustomFields());
@@ -211,14 +212,16 @@ public class ZentaoPlatform extends AbstractIssuePlatform {
                 insertIssues(id, issuesRequest);
             }
         }
+        return null;
 
     }
 
     @Override
-    public void updateIssue(IssuesUpdateRequest request) {
+    public String updateIssue(IssuesUpdateRequest request) {
         // todo 调用接口
         request.setDescription(null);
         handleIssueUpdate(request);
+        return null;
     }
 
     @Override
@@ -275,9 +278,10 @@ public class ZentaoPlatform extends AbstractIssuePlatform {
     @Override
     public List<PlatformUser> getPlatformUser() {
         setConfig();
-        String session = zentaoClient.login();;
+        String session = zentaoClient.login();
+        ;
         HttpHeaders httpHeaders = new HttpHeaders();
-        HttpEntity<MultiValueMap<String,String>> requestEntity = new HttpEntity<>(httpHeaders);
+        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(httpHeaders);
         RestTemplate restTemplate = new RestTemplate();
         String getUser = zentaoClient.requestUrl.getUserGet();
         ResponseEntity<String> responseEntity = restTemplate.exchange(getUser + session,
@@ -313,7 +317,8 @@ public class ZentaoPlatform extends AbstractIssuePlatform {
 
     public List<ZentaoBuild> getBuilds() {
         setConfig();
-        String session = zentaoClient.login();;
+        String session = zentaoClient.login();
+        ;
         String projectId1 = getProjectId(projectId);
         HttpHeaders httpHeaders = new HttpHeaders();
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(httpHeaders);
@@ -327,7 +332,7 @@ public class ZentaoPlatform extends AbstractIssuePlatform {
         LogUtil.info("zentao builds" + obj);
 
         JSONObject data = obj.getJSONObject("data");
-        Map<String,Object> maps = data.getInnerMap();
+        Map<String, Object> maps = data.getInnerMap();
 
         List<ZentaoBuild> list = new ArrayList<>();
         for (Map.Entry<String, Object> map : maps.entrySet()) {
