@@ -156,9 +156,6 @@ public class CustomFieldService {
         return JSON.parseObject(result, CustomFieldList.class);
     }
 
-}
-
-
     public List<CustomField> getFieldByIds(List<String> ids) {
         if (CollectionUtils.isNotEmpty(ids)) {
             CustomFieldExample example = new CustomFieldExample();
