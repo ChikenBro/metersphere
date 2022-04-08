@@ -1,13 +1,13 @@
-import {Message, MessageBox} from 'element-ui';
+import { Message, MessageBox } from "element-ui";
 import axios from "axios";
-import i18n from '../../i18n/i18n';
-import {TokenKey} from "@/common/js/constants";
+import i18n from "../../i18n/i18n";
+import { TokenKey } from "@/common/js/constants";
 
 export function registerRequestHeaders() {
-  axios.interceptors.request.use(config => {
+  axios.interceptors.request.use((config) => {
     let user = JSON.parse(localStorage.getItem(TokenKey));
     if (user && user.csrfToken) {
-      config.headers['CSRF-TOKEN'] = user.csrfToken;
+      config.headers["CSRF-TOKEN"] = user.csrfToken;
     }
     return config;
   });
@@ -15,26 +15,30 @@ export function registerRequestHeaders() {
 
 export function getUploadConfig(url, formData) {
   return {
-    method: 'POST',
+    method: "POST",
     url: url,
     data: formData,
     headers: {
-      'Content-Type': undefined
-    }
+      "Content-Type": undefined,
+    },
   };
 }
 
-
 // 登入请求不重定向
-let unRedirectUrls = new Set(['signin', 'ldap/signin', '/signin', '/ldap/signin']);
+let unRedirectUrls = new Set([
+  "signin",
+  "ldap/signin",
+  "/signin",
+  "/ldap/signin",
+]);
 
 export function login() {
-  MessageBox.alert(i18n.t('commons.tips'), i18n.t('commons.prompt'), {
+  MessageBox.alert(i18n.t("commons.tips"), i18n.t("commons.prompt"), {
     callback: () => {
       axios.get("/signout");
-      localStorage.setItem('Admin-Token', "{}");
+      localStorage.setItem("Admin-Token", "{}");
       window.location.href = "/login";
-    }
+    },
   });
 }
 
@@ -53,11 +57,19 @@ function then(success, response, result) {
 }
 
 function exception(error, result, url) {
-  if (error.response && error.response.status === 401 && !unRedirectUrls.has(url)) {
+  if (
+    error.response &&
+    error.response.status === 401 &&
+    !unRedirectUrls.has(url)
+  ) {
     login();
     return;
   }
-  if (error.response && error.response.status === 403 && !unRedirectUrls.has(url)) {
+  if (
+    error.response &&
+    error.response.status === 403 &&
+    !unRedirectUrls.has(url)
+  ) {
     window.location.href = "/";
     return;
   }
@@ -65,70 +77,87 @@ function exception(error, result, url) {
   window.console.error(error.response || error.message);
   if (error.response && error.response.data) {
     if (error.response.headers["authentication-status"] !== "invalid") {
-      Message.error({message: error.response.data.message || error.response.data, showClose: true});
+      Message.error({
+        message: error.response.data.message || error.response.data,
+        showClose: true,
+      });
     }
   } else {
-    Message.error({message: error.message, showClose: true});
+    Message.error({ message: error.message, showClose: true });
   }
 }
 
 export function get(url, success) {
-  let result = {loading: true};
+  let result = { loading: true };
   if (!success) {
     return axios.get(url);
   } else {
-    axios.get(url).then(response => {
-      then(success, response, result);
-    }).catch(error => {
-      exception(error, result, url);
-    });
+    axios
+      .get(url)
+      .then((response) => {
+        then(success, response, result);
+      })
+      .catch((error) => {
+        exception(error, result, url);
+      });
     return result;
   }
 }
 
 export function post(url, data, success, failure) {
-  let result = {loading: true};
+  let result = { loading: true };
   if (!success) {
     return axios.post(url, data);
   } else {
-    axios.post(url, data).then(response => {
-      then(success, response, result);
-    }).catch(error => {
-      exception(error, result, url);
-      if (failure) {
-        then(failure, error, result);
-      }
-    });
+    axios
+      .post(url, data)
+      .then((response) => {
+        then(success, response, result);
+      })
+      .catch((error) => {
+        exception(error, result, url);
+        if (failure) {
+          then(failure, error, result);
+        }
+      });
     return result;
   }
 }
 
 export function request(axiosRequestConfig, success, failure) {
-  let result = {loading: true};
+  let result = { loading: true };
   if (!success) {
     return axios.request(axiosRequestConfig);
   } else {
-    axios.request(axiosRequestConfig).then(response => {
-      then(success, response, result);
-    }).catch(error => {
-      exception(error, result);
-      if (failure) {
-        then(failure, error, result);
-      }
-    });
+    axios
+      .request(axiosRequestConfig)
+      .then((response) => {
+        then(success, response, result);
+      })
+      .catch((error) => {
+        exception(error, result);
+        if (failure) {
+          then(failure, error, result);
+        }
+      });
     return result;
   }
 }
 
 export function fileDownload(url) {
-  axios.get(url, {responseType: 'blob'})
-    .then(response => {
-      let fileName = window.decodeURI(response.headers['content-disposition'].split('=')[1]);
-      let link = document.createElement("a");
-      link.href = window.URL.createObjectURL(new Blob([response.data], {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8"}));
-      link.download = fileName;
-      link.click();
-    });
+  axios.get(url, { responseType: "blob" }).then((response) => {
+    let fileName = window.decodeURI(
+      response.headers["content-disposition"].split("=")[1]
+    );
+    let link = document.createElement("a");
+    link.href = window.URL.createObjectURL(
+      new Blob([response.data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8",
+      })
+    );
+    link.download = fileName;
+    link.click();
+  });
 }
 
 export function fileUpload(url, file, files, param, success, failure) {
@@ -137,11 +166,14 @@ export function fileUpload(url, file, files, param, success, failure) {
     formData.append("file", file);
   }
   if (files) {
-    files.forEach(f => {
+    files.forEach((f) => {
       formData.append("files", f);
     });
   }
-  formData.append('request', new Blob([JSON.stringify(param)], {type: "application/json"}));
+  formData.append(
+    "request",
+    new Blob([JSON.stringify(param)], { type: "application/json" })
+  );
   let axiosRequestConfig = getUploadConfig(url, formData);
   return request(axiosRequestConfig, success, failure);
 }
@@ -153,14 +185,13 @@ export function all(array, callback) {
 
 export default {
   install(Vue) {
-
     if (!axios) {
-      window.console.error('You have to install axios');
+      window.console.error("You have to install axios");
       return;
     }
 
     if (!Message) {
-      window.console.error('You have to install Message of ElementUI');
+      window.console.error("You have to install Message of ElementUI");
       return;
     }
 
@@ -168,14 +199,17 @@ export default {
 
     axios.defaults.withCredentials = true;
 
-    axios.interceptors.response.use(response => {
-      if (response.headers["authentication-status"] === "invalid") {
-        login();
+    axios.interceptors.response.use(
+      (response) => {
+        if (response.headers["authentication-status"] === "invalid") {
+          login();
+        }
+        return response;
+      },
+      (error) => {
+        return Promise.reject(error);
       }
-      return response;
-    }, error => {
-      return Promise.reject(error);
-    });
+    );
 
     Vue.prototype.$get = get;
 
@@ -188,5 +222,5 @@ export default {
     Vue.prototype.$fileDownload = fileDownload;
 
     Vue.prototype.$fileUpload = fileUpload;
-  }
+  },
 };

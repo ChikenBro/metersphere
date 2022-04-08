@@ -1,5 +1,5 @@
 import Sampler from "../sampler";
-import {Body} from "../../../../../model/ApiTestModel";
+import { Body } from "../../../../../model/ApiTestModel";
 
 const DEFAULT_OPTIONS = {
   options: {
@@ -7,9 +7,9 @@ const DEFAULT_OPTIONS = {
       guiclass: "HttpTestSampleGui",
       testclass: "HTTPSamplerProxy",
       testname: "HTTPSamplerProxy",
-      enabled: "true"
+      enabled: "true",
     },
-  }
+  },
 };
 export default class HTTPSamplerProxy extends Sampler {
   constructor(options = DEFAULT_OPTIONS) {
@@ -42,6 +42,5 @@ export default class HTTPSamplerProxy extends Sampler {
 }
 
 export const schema = {
-  HTTPSamplerProxy: HTTPSamplerProxy
-}
-
+  HTTPSamplerProxy: HTTPSamplerProxy,
+};

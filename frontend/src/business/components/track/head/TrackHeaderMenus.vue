@@ -42,6 +42,9 @@
           >
             {{ $t("test_track.issue.issue_management") }}
           </el-menu-item>
+          <el-menu-item :index="'/track/iteration'" popper-class="submenu">
+            {{ $t("test_track.iteration.iteration_management") }}
+          </el-menu-item>
 
           <el-menu-item
             :index="'/track/testPlan/reportList'"

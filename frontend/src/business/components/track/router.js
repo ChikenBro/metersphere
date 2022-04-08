@@ -13,6 +13,8 @@ const reportListView = () =>
 const issueList = () =>
   import("@/business/components/track/issue/IssueList.vue");
 // const reportListView = () => import('@/business/components/track/plan/TestPlan')
+const IterationView = () =>
+  import("@/business/components/track/iteration/IterationIndex.vue");
 
 export default {
   path: "/track",
@@ -81,6 +83,11 @@ export default {
       path: "review/view/:reviewId",
       name: "testCaseReviewView",
       component: TestCaseReviewView,
+    },
+    {
+      path: "iteration",
+      name: "iterationView",
+      component: IterationView,
     },
   ],
 };

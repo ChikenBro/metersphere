@@ -13,22 +13,22 @@ import {
   ROLE_TEST_USER,
   ROLE_TEST_VIEWER,
   TokenKey,
-  WORKSPACE_ID
+  WORKSPACE_ID,
 } from "./constants";
 import axios from "axios";
-import {jsPDF} from "jspdf";
-import JSEncrypt from 'jsencrypt';
+import { jsPDF } from "jspdf";
+import JSEncrypt from "jsencrypt";
 
 export function hasRole(role) {
   let user = getCurrentUser();
-  let roles = user.roles.map(r => r.id);
+  let roles = user.roles.map((r) => r.id);
   return roles.indexOf(role) > -1;
 }
 
 // 是否含有某个角色
 export function hasRoles(...roles) {
   let user = getCurrentUser();
-  let rs = user.roles.map(r => r.id);
+  let rs = user.roles.map((r) => r.id);
   for (let item of roles) {
     if (rs.indexOf(item) > -1) {
       return true;
@@ -43,7 +43,10 @@ export function hasRolePermission(role) {
     if (role === ur.roleId) {
       if (ur.roleId === ROLE_ADMIN) {
         return true;
-      } else if (ur.roleId === ROLE_ORG_ADMIN && user.lastOrganizationId === ur.sourceId) {
+      } else if (
+        ur.roleId === ROLE_ORG_ADMIN &&
+        user.lastOrganizationId === ur.sourceId
+      ) {
         return true;
       } else if (user.lastWorkspaceId === ur.sourceId) {
         return true;
@@ -56,8 +59,8 @@ export function hasRolePermission(role) {
 export function hasPermission(permission) {
   let user = getCurrentUser();
 
-  user.userGroups.forEach(ug => {
-    user.groupPermissions.forEach(gp => {
+  user.userGroups.forEach((ug) => {
+    user.groupPermissions.forEach((gp) => {
       if (gp.group.id === ug.groupId) {
         ug.userGroupPermissions = gp.userGroupPermissions;
         ug.group = gp.group;
@@ -66,17 +69,18 @@ export function hasPermission(permission) {
   });
 
   // todo 权限验证
-  let currentProjectPermissions = user.userGroups.filter(ug => ug.group.type === 'PROJECT')
-    .filter(ug => ug.sourceId === getCurrentProjectID())
-    .map(ug => ug.userGroupPermissions)
+  let currentProjectPermissions = user.userGroups
+    .filter((ug) => ug.group.type === "PROJECT")
+    .filter((ug) => ug.sourceId === getCurrentProjectID())
+    .map((ug) => ug.userGroupPermissions)
     .reduce((total, current) => {
       return total.concat(current);
     }, [])
-    .map(g => g.permissionId)
+    .map((g) => g.permissionId)
     .reduce((total, current) => {
       total.add(current);
       return total;
-    }, new Set);
+    }, new Set());
 
   for (const p of currentProjectPermissions) {
     if (p === permission) {
@@ -84,17 +88,18 @@ export function hasPermission(permission) {
     }
   }
 
-  let currentWorkspacePermissions = user.userGroups.filter(ug => ug.group.type === 'WORKSPACE')
-    .filter(ug => ug.sourceId === getCurrentWorkspaceId())
-    .map(ug => ug.userGroupPermissions)
+  let currentWorkspacePermissions = user.userGroups
+    .filter((ug) => ug.group.type === "WORKSPACE")
+    .filter((ug) => ug.sourceId === getCurrentWorkspaceId())
+    .map((ug) => ug.userGroupPermissions)
     .reduce((total, current) => {
       return total.concat(current);
     }, [])
-    .map(g => g.permissionId)
+    .map((g) => g.permissionId)
     .reduce((total, current) => {
       total.add(current);
       return total;
-    }, new Set);
+    }, new Set());
 
   for (const p of currentWorkspacePermissions) {
     if (p === permission) {
@@ -102,17 +107,18 @@ export function hasPermission(permission) {
     }
   }
 
-  let currentOrganizationPermissions = user.userGroups.filter(ug => ug.group.type === 'ORGANIZATION')
-    .filter(ug => ug.sourceId === getCurrentOrganizationId())
-    .map(ug => ug.userGroupPermissions)
+  let currentOrganizationPermissions = user.userGroups
+    .filter((ug) => ug.group.type === "ORGANIZATION")
+    .filter((ug) => ug.sourceId === getCurrentOrganizationId())
+    .map((ug) => ug.userGroupPermissions)
     .reduce((total, current) => {
       return total.concat(current);
     }, [])
-    .map(g => g.permissionId)
+    .map((g) => g.permissionId)
     .reduce((total, current) => {
       total.add(current);
       return total;
-    }, new Set);
+    }, new Set());
 
   for (const p of currentOrganizationPermissions) {
     if (p === permission) {
@@ -120,17 +126,18 @@ export function hasPermission(permission) {
     }
   }
 
-  let systemPermissions = user.userGroups.filter(gp => gp.group.type === 'SYSTEM')
-    .filter(ug => ug.sourceId === 'system' || ug.sourceId === 'adminSourceId')
-    .map(ug => ug.userGroupPermissions)
+  let systemPermissions = user.userGroups
+    .filter((gp) => gp.group.type === "SYSTEM")
+    .filter((ug) => ug.sourceId === "system" || ug.sourceId === "adminSourceId")
+    .map((ug) => ug.userGroupPermissions)
     .reduce((total, current) => {
       return total.concat(current);
     }, [])
-    .map(g => g.permissionId)
+    .map((g) => g.permissionId)
     .reduce((total, current) => {
       total.add(current);
       return total;
-    }, new Set);
+    }, new Set());
 
   for (const p of systemPermissions) {
     if (p === permission) {
@@ -143,7 +150,7 @@ export function hasPermission(permission) {
 
 export function hasLicense() {
   let v = localStorage.getItem(LicenseKey);
-  return v === 'valid';
+  return v === "valid";
 }
 
 export function hasRolePermissions(...roles) {
@@ -171,7 +178,11 @@ export function checkoutCurrentOrganization() {
 
 export function checkoutCurrentWorkspace() {
   // 查看当前用户是否是 lastWorkspaceId 的工作空间用户
-  return hasRolePermissions(ROLE_TEST_MANAGER, ROLE_TEST_USER, ROLE_TEST_VIEWER);
+  return hasRolePermissions(
+    ROLE_TEST_MANAGER,
+    ROLE_TEST_USER,
+    ROLE_TEST_VIEWER
+  );
 }
 
 export function checkoutTestManagerOrTestUser() {
@@ -201,8 +212,8 @@ export function getCurrentUserId() {
 
 export function enableModules(...modules) {
   for (let module of modules) {
-    let moduleStatus = localStorage.getItem('module_' + module);
-    if (moduleStatus === 'DISABLE') {
+    let moduleStatus = localStorage.getItem("module_" + module);
+    if (moduleStatus === "DISABLE") {
       return false;
     }
   }
@@ -222,7 +233,7 @@ export function saveLocalStorage(response) {
     sessionStorage.setItem(WORKSPACE_ID, response.data.lastWorkspaceId);
   }
   let rolesArray = response.data.roles;
-  let roles = rolesArray.map(r => r.id);
+  let roles = rolesArray.map((r) => r.id);
   // 保存角色
   localStorage.setItem("roles", roles);
 }
@@ -259,7 +270,7 @@ export function downloadFile(name, content) {
   if ("download" in document.createElement("a")) {
     // 非IE下载
     //  chrome/firefox
-    let aTag = document.createElement('a');
+    let aTag = document.createElement("a");
     aTag.download = name;
     aTag.href = URL.createObjectURL(blob);
     aTag.click();
@@ -274,18 +285,18 @@ export function listenGoBack(callback) {
   //监听浏览器返回操作，关闭该对话框
   if (window.history && window.history.pushState) {
     history.pushState(null, null, document.URL);
-    window.addEventListener('popstate', callback);
+    window.addEventListener("popstate", callback);
   }
 }
 
 export function removeGoBackListener(callback) {
-  window.removeEventListener('popstate', callback);
+  window.removeEventListener("popstate", callback);
 }
 
 export const uuid = function () {
   let d = new Date().getTime();
-  let d2 = (performance && performance.now && (performance.now() * 1000)) || 0;
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+  let d2 = (performance && performance.now && performance.now() * 1000) || 0;
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
     let r = Math.random() * 16;
     if (d > 0) {
       r = (d + r) % 16 | 0;
@@ -294,7 +305,7 @@ export const uuid = function () {
       r = (d2 + r) % 16 | 0;
       d2 = Math.floor(d2 / 16);
     }
-    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+    return (c === "x" ? r : (r & 0x3) | 0x8).toString(16);
   });
 };
 
@@ -303,19 +314,29 @@ export function getUUID() {
     return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
   }
 
-  return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
+  return (
+    S4() +
+    S4() +
+    "-" +
+    S4() +
+    "-" +
+    S4() +
+    "-" +
+    S4() +
+    "-" +
+    S4() +
+    S4() +
+    S4()
+  );
 }
 
-
 export function exportPdf(name, canvasList) {
-
-  let pdf = new jsPDF('', 'pt', 'a4');
+  let pdf = new jsPDF("", "pt", "a4");
 
   // 当前页面的当前高度
   let currentHeight = 0;
   for (let canvas of canvasList) {
     if (canvas) {
-
       let contentWidth = canvas.width;
       let contentHeight = canvas.height;
 
@@ -325,9 +346,9 @@ export function exportPdf(name, canvasList) {
 
       // html页面生成的canvas在pdf中图片的宽高
       let imgWidth = a4Width;
-      let imgHeight = a4Width / contentWidth * contentHeight;
+      let imgHeight = (a4Width / contentWidth) * contentHeight;
 
-      let pageData = canvas.toDataURL('image/jpeg', 1.0);
+      let pageData = canvas.toDataURL("image/jpeg", 1.0);
 
       // 当前图片的剩余高度
       let leftHeight = imgHeight;
@@ -345,7 +366,14 @@ export function exportPdf(name, canvasList) {
         while (leftHeight > 0) {
           // 本次添加占用的高度
           let occupation = a4Height - currentHeight;
-          pdf.addImage(pageData, 'JPEG', 0, position + currentHeight, imgWidth, imgHeight);
+          pdf.addImage(
+            pageData,
+            "JPEG",
+            0,
+            position + currentHeight,
+            imgWidth,
+            imgHeight
+          );
           currentHeight = leftHeight;
           leftHeight -= occupation;
           position -= occupation;
@@ -356,14 +384,13 @@ export function exportPdf(name, canvasList) {
           // }
         }
       } else {
-        pdf.addImage(pageData, 'JPEG', 0, currentHeight, imgWidth, imgHeight);
+        pdf.addImage(pageData, "JPEG", 0, currentHeight, imgWidth, imgHeight);
         currentHeight += imgHeight;
       }
     }
   }
 
-  pdf.save(name.replace(" ", "_") + '.pdf');
-
+  pdf.save(name.replace(" ", "_") + ".pdf");
 }
 
 export function windowPrint(id, zoom) {
@@ -371,12 +398,12 @@ export function windowPrint(id, zoom) {
   let bdhtml = window.document.body.innerHTML;
   let el = document.getElementById(id);
   var jubuData = el.innerHTML;
-  document.getElementsByTagName('body')[0].style.zoom = zoom;
+  document.getElementsByTagName("body")[0].style.zoom = zoom;
   //把获取的 局部div内容赋给body标签, 相当于重置了 body里的内容
   window.document.body.innerHTML = jubuData;
   //调用打印功能
   window.print();
-  window.document.body.innerHTML = bdhtml;//重新给页面内容赋值；
+  window.document.body.innerHTML = bdhtml; //重新给页面内容赋值；
   return false;
 }
 
@@ -385,7 +412,7 @@ export function getBodyUploadFiles(obj, runData) {
   obj.bodyUploadIds = [];
   if (runData) {
     if (runData instanceof Array) {
-      runData.forEach(request => {
+      runData.forEach((request) => {
         obj.requestId = request.id;
         _getBodyUploadFiles(request, bodyUploadFiles, obj);
       });
@@ -399,7 +426,12 @@ export function getBodyUploadFiles(obj, runData) {
 
 export function _getBodyUploadFiles(request, bodyUploadFiles, obj) {
   let body = null;
-  if (request.hashTree && request.hashTree.length > 0 && request.hashTree[0] && request.hashTree[0].body) {
+  if (
+    request.hashTree &&
+    request.hashTree.length > 0 &&
+    request.hashTree[0] &&
+    request.hashTree[0].body
+  ) {
     obj.requestId = request.hashTree[0].id;
     body = request.hashTree[0].body;
   } else if (request.body) {
@@ -408,9 +440,9 @@ export function _getBodyUploadFiles(request, bodyUploadFiles, obj) {
   }
   if (body) {
     if (body.kvs) {
-      body.kvs.forEach(param => {
+      body.kvs.forEach((param) => {
         if (param.files) {
-          param.files.forEach(item => {
+          param.files.forEach((item) => {
             if (item.file) {
               item.name = item.file.name;
               bodyUploadFiles.push(item.file);
@@ -420,9 +452,9 @@ export function _getBodyUploadFiles(request, bodyUploadFiles, obj) {
       });
     }
     if (body.binary) {
-      body.binary.forEach(param => {
+      body.binary.forEach((param) => {
         if (param.files) {
-          param.files.forEach(item => {
+          param.files.forEach((item) => {
             if (item.file) {
               item.name = item.file.name;
               bodyUploadFiles.push(item.file);
@@ -474,22 +506,27 @@ export function objToStrMap(obj) {
 
 export function setColor(a, b, c, d, e) {
   // 顶部菜单背景色
-  document.body.style.setProperty('--color', a);
-  document.body.style.setProperty('--color_shallow', b);
+  document.body.style.setProperty("--color", a);
+  document.body.style.setProperty("--color_shallow", b);
   // 首页颜色
-  document.body.style.setProperty('--count_number', c);
-  document.body.style.setProperty('--count_number_shallow', d);
+  document.body.style.setProperty("--count_number", c);
+  document.body.style.setProperty("--count_number_shallow", d);
   // 主颜色
-  document.body.style.setProperty('--primary_color', e);
+  document.body.style.setProperty("--primary_color", e);
 }
 
 export function setDefaultTheme() {
-  setColor(ORIGIN_COLOR, ORIGIN_COLOR_SHALLOW, COUNT_NUMBER, COUNT_NUMBER_SHALLOW, PRIMARY_COLOR);
+  setColor(
+    ORIGIN_COLOR,
+    ORIGIN_COLOR_SHALLOW,
+    COUNT_NUMBER,
+    COUNT_NUMBER_SHALLOW,
+    PRIMARY_COLOR
+  );
 }
 
 export function publicKeyEncrypt(input, publicKey) {
-
-  let jsencrypt = new JSEncrypt({default_key_size: 1024});
+  let jsencrypt = new JSEncrypt({ default_key_size: 1024 });
   jsencrypt.setPublicKey(publicKey);
 
   return jsencrypt.encrypt(input);
@@ -502,7 +539,7 @@ export function getNodePath(id, moduleOptions) {
       return item.path;
     }
   }
-  return '';
+  return "";
 }
 
 export function getDefaultTableHeight() {

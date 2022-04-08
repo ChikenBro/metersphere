@@ -28,13 +28,13 @@
         </template>
 
         <ms-table
+          ref="table"
           v-loading="page.result.loading"
           :data="page.data"
           :enable-selection="false"
           :condition="page.condition"
           :total="page.total"
           :page-size.sync="page.pageSize"
-          ref="table"
           :operators="operators"
           :show-select-all="false"
           :screen-height="screenHeight"

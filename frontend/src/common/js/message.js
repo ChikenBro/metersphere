@@ -1,10 +1,10 @@
-import {Message} from 'element-ui';
+import { Message } from "element-ui";
 
 export default {
   install(Vue) {
     if (!Message) {
-      window.console.error('You have to install Message of ElementUI');
-      return
+      window.console.error("You have to install Message of ElementUI");
+      return;
     }
 
     Vue.prototype.$success = function (message) {
@@ -12,8 +12,8 @@ export default {
         message: message,
         type: "success",
         showClose: true,
-        duration: 1500
-      })
+        duration: 1500,
+      });
     };
 
     Vue.prototype.$info = function (message, duration) {
@@ -21,8 +21,8 @@ export default {
         message: message,
         type: "info",
         showClose: true,
-        duration: duration || 3000
-      })
+        duration: duration || 3000,
+      });
     };
 
     Vue.prototype.$warning = function (message) {
@@ -30,8 +30,8 @@ export default {
         message: message,
         type: "warning",
         showClose: true,
-        duration: 5000
-      })
+        duration: 5000,
+      });
     };
 
     Vue.prototype.$error = function (message, duration) {
@@ -39,10 +39,8 @@ export default {
         message: message,
         type: "error",
         showClose: true,
-        duration: duration || 10000
-      })
+        duration: duration || 10000,
+      });
     };
-
-
-  }
-}
+  },
+};

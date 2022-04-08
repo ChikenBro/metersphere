@@ -1,6 +1,15 @@
-import Vue from 'vue';
-import {Button, Col, Form, FormItem, Input, Row, RadioGroup, Radio} from 'element-ui';
-import 'element-ui/lib/theme-chalk/index.css';
+import Vue from "vue";
+import {
+  Button,
+  Col,
+  Form,
+  FormItem,
+  Input,
+  Row,
+  RadioGroup,
+  Radio,
+} from "element-ui";
+import "element-ui/lib/theme-chalk/index.css";
 import Login from "./Login.vue";
 import Ajax from "../common/js/ajax";
 import i18n from "../i18n/i18n";
@@ -21,9 +30,8 @@ Vue.use(RadioGroup);
 Vue.use(Radio);
 Vue.use(Ajax);
 
-
 new Vue({
-  el: '#login',
+  el: "#login",
   i18n,
-  render: h => h(Login)
+  render: (h) => h(Login),
 });

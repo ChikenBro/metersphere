@@ -1,12 +1,20 @@
 import Element from "./element";
-import {boolProp, intProp, longProp, stringProp, collectionProp, elementProp, getProps} from "./props";
-import {loadHashTree, loadComponent} from "./components";
+import {
+  boolProp,
+  intProp,
+  longProp,
+  stringProp,
+  collectionProp,
+  elementProp,
+  getProps,
+} from "./props";
+import { loadHashTree, loadComponent } from "./components";
 
 export default class HashTreeElement extends Element {
-  constructor({options: options, hashTree: hashTree}) {
+  constructor({ options: options, hashTree: hashTree }) {
     super(options);
     this.props = getProps(options.elements);
-    this.comments = this.initStringProp('TestPlan.comments');
+    this.comments = this.initStringProp("TestPlan.comments");
 
     if (hashTree) {
       this.hashTree = loadHashTree(hashTree);
@@ -64,7 +72,7 @@ export default class HashTreeElement extends Element {
     let self = super.toJson();
     if (this.props !== undefined) {
       self.elements = [];
-      Object.keys(this.props).forEach(key => {
+      Object.keys(this.props).forEach((key) => {
         let json = this.props[key].toJson();
         if (json !== undefined) {
           self.elements.push(json);
@@ -73,18 +81,18 @@ export default class HashTreeElement extends Element {
     }
 
     let hashTree = {
-      "type": "element",
-      "name": "hashTree",
-    }
+      type: "element",
+      name: "hashTree",
+    };
     if (this.hashTree) {
       let elements = [];
-      this.hashTree.forEach(e => {
+      this.hashTree.forEach((e) => {
         let json = e.toJson();
         elements.push(json.options);
         elements.push(json.hashTree);
-      })
+      });
       hashTree.elements = elements;
     }
-    return {options: self, hashTree: hashTree}
+    return { options: self, hashTree: hashTree };
   }
 }

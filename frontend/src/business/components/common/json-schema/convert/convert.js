@@ -5,16 +5,15 @@ const isNull = require("lodash.isnull");
 const isNumber = require("lodash.isnumber");
 const isObject = require("lodash.isobject");
 const isString = require("lodash.isstring");
-const {post} = require("@/common/js/ajax");
+const { post } = require("@/common/js/ajax");
 const isArray = Array.isArray;
-
 
 class Convert {
   constructor() {
     this._option = {
       $id: "http://example.com/root.json",
       $schema: "http://json-schema.org/draft-07/schema#",
-    }
+    };
     this._object = null;
   }
 
@@ -52,8 +51,8 @@ class Convert {
     let result = this._value2object(this._object, this._option.$id, "", true);
     if (this._object.length > 0) {
       // 创建items对象的基本信息
-      let objectItem = this._object[0]
-      result["items"] = this._value2object(objectItem, `#/items`, 'items');
+      let objectItem = this._object[0];
+      result["items"] = this._value2object(objectItem, `#/items`, "items");
       if (isObject(objectItem) && !isEmpty(objectItem)) {
         // 递归遍历
         let objectItemSchema = this._json2schema(objectItem, `#/items`);
@@ -61,17 +60,22 @@ class Convert {
         result["items"] = Object.assign(result["items"], objectItemSchema);
       }
     }
-    return result
+    return result;
   }
 
   /**
    * 对象类型转换成JSONSCHEMA
    */
   _objectToSchema() {
-    let baseResult = this._value2object(this._object, this._option.$id, "", true)
-    let objectSchema = this._json2schema(this._object)
-    baseResult = Object.assign(baseResult, objectSchema)
-    return baseResult
+    let baseResult = this._value2object(
+      this._object,
+      this._option.$id,
+      "",
+      true
+    );
+    let objectSchema = this._json2schema(this._object);
+    baseResult = Object.assign(baseResult, objectSchema);
+    return baseResult;
   }
 
   /**
@@ -86,7 +90,7 @@ class Convert {
     }
     // 处理当前路径$id
     if (name === "" || name == undefined) {
-      name = "#"
+      name = "#";
     }
     let result = {};
     // 判断传入object是对象还是数组。
@@ -103,27 +107,37 @@ class Convert {
         if (element === undefined) {
           continue;
         }
-        let $id = `${name}/properties/${key}`
+        let $id = `${name}/properties/${key}`;
         // 判断当前 element 的值 是否也是对象，如果是就继续递归，不是就赋值给result
         if (isObject(element)) {
           // 创建当前属性的基本信息
-          result["properties"][key] = this._value2object(element, $id, key)
+          result["properties"][key] = this._value2object(element, $id, key);
           if (isArray(element)) {
             // 针对空数组和有值的数组做不同处理
             if (element.length > 0) {
               // 如果是数组，那么就取第一项
               let elementItem = element[0];
               // 创建items对象的基本信息
-              result["properties"][key]["items"] = this._value2object(elementItem, `${$id}/items`, key + 'items');
+              result["properties"][key]["items"] = this._value2object(
+                elementItem,
+                `${$id}/items`,
+                key + "items"
+              );
               // 判断第一项是否是对象,且对象属性不为空
               if (isObject(elementItem) && !isEmpty(elementItem)) {
                 // 新增的properties才合并进来
-                result["properties"][key]["items"] = Object.assign(result["properties"][key]["items"], this._json2schema(elementItem, `${$id}/items`));
+                result["properties"][key]["items"] = Object.assign(
+                  result["properties"][key]["items"],
+                  this._json2schema(elementItem, `${$id}/items`)
+                );
               }
             }
           } else {
             // 不是数组，递归遍历获取，然后合并对象属性
-            result["properties"][key] = Object.assign(result["properties"][key], this._json2schema(element, $id));
+            result["properties"][key] = Object.assign(
+              result["properties"][key],
+              this._json2schema(element, $id)
+            );
           }
         } else {
           // 一般属性直接获取基本信息
@@ -140,14 +154,14 @@ class Convert {
    * @param {*} $id
    * @param {*} key
    */
-  _value2object(value, $id, key = '', root = false) {
+  _value2object(value, $id, key = "", root = false) {
     let objectTemplate = {
       $id: $id,
       title: `The ${key} Schema`,
       mock: {
-        "mock": value
+        mock: value,
       },
-    }
+    };
 
     // 判断是否为初始化root数据
     if (root) {
@@ -170,7 +184,7 @@ class Convert {
       objectTemplate.type = "array";
       objectTemplate["mock"] = undefined;
     } else if (isObject(value)) {
-      objectTemplate.type = "object"
+      objectTemplate.type = "object";
       objectTemplate["mock"] = undefined;
     }
 
@@ -182,7 +196,7 @@ class Convert {
    * @param callback
    */
   schemaToJsonStr(schema, callback) {
-    post('/api/definition/preview', schema, (response) => {
+    post("/api/definition/preview", schema, (response) => {
       if (callback) {
         callback(response.data);
       }

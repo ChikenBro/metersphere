@@ -1,6 +1,6 @@
 const getters = {
-  isNewVersion: state => state.versionSwitch === 'new',
-  isOldVersion: state => state.versionSwitch === 'old',
+  isNewVersion: (state) => state.versionSwitch === "new",
+  isOldVersion: (state) => state.versionSwitch === "old",
   // getTestCaseNodePath(state, nodeId) {
   //   for (const index in state.moduleOptions) {
   //     let item = state.moduleOptions[index];
@@ -9,6 +9,6 @@ const getters = {
   //     }
   //   }
   // }
-}
+};
 
-export default getters
+export default getters;

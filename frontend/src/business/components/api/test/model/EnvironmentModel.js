@@ -1,9 +1,8 @@
-import {BaseConfig, DatabaseConfig, KeyValue} from "./ScenarioModel";
-import {TCPConfig} from "@/business/components/api/test/model/ScenarioModel";
+import { BaseConfig, DatabaseConfig, KeyValue } from "./ScenarioModel";
+import { TCPConfig } from "@/business/components/api/test/model/ScenarioModel";
 
 export class Environment extends BaseConfig {
   constructor(options = {}) {
-
     super();
 
     this.projectId = undefined;
@@ -26,8 +25,8 @@ export class SSLConfig extends BaseConfig {
     this.entrys = [];
     this.files = [];
     this.set(options);
-    this.sets({files: KeyValue}, options);
-    this.sets({entrys: KeyValue}, options);
+    this.sets({ files: KeyValue }, options);
+    this.sets({ entrys: KeyValue }, options);
   }
 
   initOptions(options = {}) {
@@ -44,7 +43,7 @@ export class Config extends BaseConfig {
     this.tcpConfig = undefined;
     this.sslConfig = {};
     this.set(options);
-    this.sets({databaseConfigs: DatabaseConfig}, options);
+    this.sets({ databaseConfigs: DatabaseConfig }, options);
   }
 
   initOptions(options = {}) {
@@ -65,7 +64,7 @@ export class CommonConfig extends BaseConfig {
     this.hosts = [];
 
     this.set(options);
-    this.sets({variables: KeyValue, hosts: Host}, options);
+    this.sets({ variables: KeyValue, hosts: Host }, options);
   }
 
   initOptions(options = {}) {
@@ -81,13 +80,13 @@ export class HttpConfig extends BaseConfig {
     this.socket = undefined;
     this.domain = undefined;
     this.headers = [];
-    this.protocol = 'https';
+    this.protocol = "https";
     this.port = undefined;
     this.conditions = [];
     this.isMock = false;
     this.set(options);
-    this.sets({headers: KeyValue}, options);
-    this.sets({conditions: KeyValue}, options);
+    this.sets({ headers: KeyValue }, options);
+    this.sets({ conditions: KeyValue }, options);
   }
 
   initOptions(options = {}) {
@@ -109,7 +108,6 @@ export class Host extends BaseConfig {
     this.set(options);
   }
 }
-
 
 /* ---------- Functions ------- */
 

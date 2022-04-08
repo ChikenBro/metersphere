@@ -4,17 +4,22 @@
       <template v-slot:header>
         <div>
           <el-row type="flex" just ify="space-between" align="middle">
-            <span class="title">{{ $t('commons.personal_info') }}</span>
+            <span class="title">{{ $t("commons.personal_info") }}</span>
           </el-row>
         </div>
       </template>
 
       <!--Personal information menu-->
-      <el-table border class="adjust-table" :data="tableData" style="width: 100%">
-        <el-table-column prop="id" label="ID"/>
-        <el-table-column prop="name" :label="$t('commons.username')"/>
-        <el-table-column prop="email" :label="$t('commons.email')"/>
-        <el-table-column prop="phone" :label="$t('commons.phone')"/>
+      <el-table
+        border
+        class="adjust-table"
+        :data="tableData"
+        style="width: 100%"
+      >
+        <el-table-column prop="id" label="ID" />
+        <el-table-column prop="name" :label="$t('commons.username')" />
+        <el-table-column prop="email" :label="$t('commons.email')" />
+        <el-table-column prop="phone" :label="$t('commons.phone')" />
         <el-table-column prop="createTime" :label="$t('commons.create_time')">
           <template v-slot:default="scope">
             <span>{{ scope.row.createTime | timestampFormatDate }}</span>
@@ -23,10 +28,19 @@
         <el-table-column :label="$t('commons.operating')">
           <template v-slot:default="scope">
             <div>
-              <ms-table-operator-button :tip="$t('member.edit_information')" icon="el-icon-edit"
-                                        type="primary" @exec="edit(scope.row)"/>
-              <ms-table-operator-button :tip="$t('member.edit_password')" icon="el-icon-s-tools" v-if="isLocalUser"
-                                        type="success" @exec="editPassword(scope.row)"/>
+              <ms-table-operator-button
+                :tip="$t('member.edit_information')"
+                icon="el-icon-edit"
+                type="primary"
+                @exec="edit(scope.row)"
+              />
+              <ms-table-operator-button
+                v-if="isLocalUser"
+                :tip="$t('member.edit_password')"
+                icon="el-icon-s-tools"
+                type="success"
+                @exec="editPassword(scope.row)"
+              />
             </div>
           </template>
         </el-table-column>
@@ -34,79 +48,151 @@
     </el-card>
 
     <!--Modify personal details-->
-    <el-dialog :close-on-click-modal="false" :title="$t('member.modify_personal_info')" :visible.sync="updateVisible" width="40%"
-               :destroy-on-close="true" @close="handleClose">
-      <el-form :model="form" label-position="right" label-width="100px" size="small" :rules="rule"
-               ref="updateUserForm">
+    <el-dialog
+      :close-on-click-modal="false"
+      :title="$t('member.modify_personal_info')"
+      :visible.sync="updateVisible"
+      width="40%"
+      :destroy-on-close="true"
+      @close="handleClose"
+    >
+      <el-form
+        ref="updateUserForm"
+        :model="form"
+        label-position="right"
+        label-width="100px"
+        size="small"
+        :rules="rule"
+      >
         <el-form-item label="ID" prop="id">
-          <el-input v-model="form.id" autocomplete="off" :disabled="true"/>
+          <el-input v-model="form.id" autocomplete="off" :disabled="true" />
         </el-form-item>
         <el-form-item :label="$t('commons.username')" prop="name">
-          <el-input v-model="form.name" autocomplete="off"/>
+          <el-input v-model="form.name" autocomplete="off" />
         </el-form-item>
         <el-form-item :label="$t('commons.email')" prop="email">
-          <el-input v-model="form.email" autocomplete="off" :disabled="!isLocalUser"/>
+          <el-input
+            v-model="form.email"
+            autocomplete="off"
+            :disabled="!isLocalUser"
+          />
         </el-form-item>
         <el-form-item :label="$t('commons.phone')" prop="phone">
-          <el-input v-model="form.phone" autocomplete="off"/>
+          <el-input v-model="form.phone" autocomplete="off" />
         </el-form-item>
       </el-form>
-      <jira-user-info @auth="handleAuth" v-if="hasJira" :data="currentPlatformInfo"/>
-      <tapd-user-info @auth="handleAuth" v-if="hasTapd" :data="currentPlatformInfo"/>
-      <zentao-user-info @auth="handleAuth" v-if="hasZentao" :data="currentPlatformInfo"/>
+      <coding-user-info
+        :data="currentPlatformInfo"
+        @auth="handleAuth"
+      ></coding-user-info>
+      <!-- <jira-user-info
+        v-if="hasJira"
+        :data="currentPlatformInfo"
+        @auth="handleAuth"
+      />
+      <tapd-user-info
+        v-if="hasTapd"
+        :data="currentPlatformInfo"
+        @auth="handleAuth"
+      />
+      <zentao-user-info
+        v-if="hasZentao"
+        :data="currentPlatformInfo"
+        @auth="handleAuth"
+      /> -->
+
       <template v-slot:footer>
         <ms-dialog-footer
           @cancel="updateVisible = false"
-          @confirm="updateUser('updateUserForm')"/>
+          @confirm="updateUser('updateUserForm')"
+        />
       </template>
     </el-dialog>
 
     <!--Change personal password-->
-    <el-dialog :close-on-click-modal="false" :title="$t('member.edit_password')" :visible.sync="editPasswordVisible" width="35%"
-               :destroy-on-close="true" @close="handleClose" left>
-      <el-form :model="ruleForm" :rules="rules" ref="editPasswordForm" label-width="100px" class="demo-ruleForm">
-        <el-form-item :label="$t('member.old_password')" prop="password" style="margin-bottom: 29px">
-          <el-input v-model="ruleForm.password" autocomplete="off" show-password/>
+    <el-dialog
+      :close-on-click-modal="false"
+      :title="$t('member.edit_password')"
+      :visible.sync="editPasswordVisible"
+      width="35%"
+      :destroy-on-close="true"
+      left
+      @close="handleClose"
+    >
+      <el-form
+        ref="editPasswordForm"
+        :model="ruleForm"
+        :rules="rules"
+        label-width="100px"
+        class="demo-ruleForm"
+      >
+        <el-form-item
+          :label="$t('member.old_password')"
+          prop="password"
+          style="margin-bottom: 29px"
+        >
+          <el-input
+            v-model="ruleForm.password"
+            autocomplete="off"
+            show-password
+          />
         </el-form-item>
         <el-form-item :label="$t('member.new_password')" prop="newpassword">
-          <el-input v-model="ruleForm.newpassword" autocomplete="off" show-password/>
+          <el-input
+            v-model="ruleForm.newpassword"
+            autocomplete="off"
+            show-password
+          />
         </el-form-item>
-        <el-form-item :label="$t('member.repeat_password')" prop="repeatPassword">
-          <el-input v-model="ruleForm.repeatPassword" autocomplete="off" show-password/>
+        <el-form-item
+          :label="$t('member.repeat_password')"
+          prop="repeatPassword"
+        >
+          <el-input
+            v-model="ruleForm.repeatPassword"
+            autocomplete="off"
+            show-password
+          />
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-           <ms-dialog-footer
-             @cancel="editPasswordVisible = false"
-             @confirm="updatePassword('editPasswordForm')"/>
-        </span>
+        <ms-dialog-footer
+          @cancel="editPasswordVisible = false"
+          @confirm="updatePassword('editPasswordForm')"
+        />
+      </span>
     </el-dialog>
-
   </div>
 </template>
 
 <script>
-import {TokenKey, ZEN_TAO} from "../../../../common/js/constants";
+import { TokenKey, ZEN_TAO } from "../../../../common/js/constants";
 import MsDialogFooter from "../../common/components/MsDialogFooter";
 import {
   getCurrentOrganizationId,
   getCurrentUser,
   listenGoBack,
-  removeGoBackListener
+  removeGoBackListener,
 } from "../../../../common/js/utils";
 import MsTableOperatorButton from "../../common/components/MsTableOperatorButton";
-import {EMAIL_REGEX, PHONE_REGEX} from "@/common/js/regex";
+import { EMAIL_REGEX, PHONE_REGEX } from "@/common/js/regex";
 import JiraUserInfo from "@/business/components/settings/personal/JiraUserInfo";
+import CodingUserInfo from "@/business/components/settings/personal/CodingUserInfo";
 import TapdUserInfo from "@/business/components/settings/personal/TapdUserInfo";
-import {getIntegrationService} from "@/network/organization";
+import { getIntegrationService } from "@/network/organization";
 import ZentaoUserInfo from "@/business/components/settings/personal/ZentaoUserInfo";
 
 export default {
   name: "MsPersonSetting",
-  components: {ZentaoUserInfo, TapdUserInfo, JiraUserInfo, MsDialogFooter, MsTableOperatorButton},
-  inject: [
-    'reload'
-  ],
+  components: {
+    ZentaoUserInfo,
+    TapdUserInfo,
+    JiraUserInfo,
+    MsDialogFooter,
+    MsTableOperatorButton,
+    CodingUserInfo,
+  },
+  inject: ["reload"],
   data() {
     return {
       result: {},
@@ -114,15 +200,16 @@ export default {
       updateVisible: false,
       editPasswordVisible: false,
       tableData: [],
-      updatePath: '/user/update/current',
-      updatePasswordPath: '/user/update/password',
-      form: {platformInfo: {}},
+      updatePath: "/user/update/current",
+      updatePasswordPath: "/user/update/password",
+      form: { platformInfo: {} },
       currentPlatformInfo: {
-        jiraAccount: '',
-        jiraPassword: '',
-        tapdUserName: '',
-        zentaoUserName: '',
-        zentaoPassword: ''
+        jiraAccount: "",
+        jiraPassword: "",
+        tapdUserName: "",
+        zentaoUserName: "",
+        zentaoPassword: "",
+        codingToken: "",
       },
       ruleForm: {},
       hasJira: false,
@@ -130,56 +217,81 @@ export default {
       hasZentao: false,
       rule: {
         name: [
-          {required: true, message: this.$t('member.input_name'), trigger: 'blur'},
-          {min: 2, max: 20, message: this.$t('commons.input_limit', [2, 20]), trigger: 'blur'},
+          {
+            required: true,
+            message: this.$t("member.input_name"),
+            trigger: "blur",
+          },
+          {
+            min: 2,
+            max: 20,
+            message: this.$t("commons.input_limit", [2, 20]),
+            trigger: "blur",
+          },
           {
             required: true,
             pattern: /^[\u4e00-\u9fa5_a-zA-Z0-9.·-]+$/,
-            message: this.$t('member.special_characters_are_not_supported'),
-            trigger: 'blur'
-          }
+            message: this.$t("member.special_characters_are_not_supported"),
+            trigger: "blur",
+          },
         ],
         phone: [
           {
             pattern: PHONE_REGEX,
-            message: this.$t('member.mobile_number_format_is_incorrect'),
-            trigger: 'blur'
-          }
+            message: this.$t("member.mobile_number_format_is_incorrect"),
+            trigger: "blur",
+          },
         ],
         email: [
-          {required: true, message: this.$t('member.input_email'), trigger: 'blur'},
+          {
+            required: true,
+            message: this.$t("member.input_email"),
+            trigger: "blur",
+          },
           {
             required: true,
             pattern: EMAIL_REGEX,
-            message: this.$t('member.email_format_is_incorrect'),
-            trigger: 'blur'
-          }
+            message: this.$t("member.email_format_is_incorrect"),
+            trigger: "blur",
+          },
         ],
       },
       rules: {
         password: [
-          {required: true, message: this.$t('user.input_password'), trigger: 'blur'},
+          {
+            required: true,
+            message: this.$t("user.input_password"),
+            trigger: "blur",
+          },
         ],
         newpassword: [
-          {required: true, message: this.$t('user.input_password'), trigger: 'blur'},
+          {
+            required: true,
+            message: this.$t("user.input_password"),
+            trigger: "blur",
+          },
           {
             required: true,
             pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[^]{8,30}$/,
-            message: this.$t('member.password_format_is_incorrect'),
-            trigger: 'blur'
+            message: this.$t("member.password_format_is_incorrect"),
+            trigger: "blur",
           },
         ],
         repeatPassword: [
-          {required: true, message: this.$t('user.input_password'), trigger: 'blur'},
+          {
+            required: true,
+            message: this.$t("user.input_password"),
+            trigger: "blur",
+          },
           {
             required: true,
             pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[^]{8,30}$/,
-            message: this.$t('member.password_format_is_incorrect'),
-            trigger: 'blur'
+            message: this.$t("member.password_format_is_incorrect"),
+            trigger: "blur",
           },
-        ]
-      }
-    }
+        ],
+      },
+    };
   },
 
   activated() {
@@ -207,7 +319,7 @@ export default {
       }
       this.currentPlatformInfo = this.form.platformInfo[orgId];
       this.result = getIntegrationService((data) => {
-        let platforms = data.map(d => d.platform);
+        let platforms = data.map((d) => d.platform);
         if (platforms.indexOf("Tapd") !== -1) {
           this.hasTapd = true;
         }
@@ -234,13 +346,13 @@ export default {
       this.ruleForm.newpassword = "";
     },
     updateUser(updateUserForm) {
-      this.$refs[updateUserForm].validate(valid => {
+      this.$refs[updateUserForm].validate((valid) => {
         if (valid) {
           let param = {};
           Object.assign(param, this.form);
           param.platformInfo = JSON.stringify(this.form.platformInfo);
-          this.result = this.$post(this.updatePath, param, response => {
-            this.$success(this.$t('commons.modify_success'));
+          this.result = this.$post(this.updatePath, param, (response) => {
+            this.$success(this.$t("commons.modify_success"));
             localStorage.setItem(TokenKey, JSON.stringify(response.data));
             this.updateVisible = false;
             this.initTableData();
@@ -249,35 +361,42 @@ export default {
         } else {
           return false;
         }
-      })
+      });
     },
     updatePassword(editPasswordForm) {
-      this.$refs[editPasswordForm].validate(valid => {
+      this.$refs[editPasswordForm].validate((valid) => {
         if (valid) {
           if (this.ruleForm.newpassword !== this.ruleForm.repeatPassword) {
-            this.$warning(this.$t('member.inconsistent_passwords'));
+            this.$warning(this.$t("member.inconsistent_passwords"));
             return;
           }
-          this.result = this.$post(this.updatePasswordPath, this.ruleForm, response => {
-            this.$success(this.$t('commons.modify_success'));
-            this.editPasswordVisible = false;
-            this.initTableData();
-            this.reload();
-          });
+          this.result = this.$post(
+            this.updatePasswordPath,
+            this.ruleForm,
+            (response) => {
+              this.$success(this.$t("commons.modify_success"));
+              this.editPasswordVisible = false;
+              this.initTableData();
+              this.reload();
+            }
+          );
         } else {
           return false;
         }
-      })
+      });
     },
     initTableData() {
-      this.result = this.$get("/user/info/" + encodeURIComponent(this.currentUser().id), response => {
-        let data = response.data;
-        this.isLocalUser = response.data.source === 'LOCAL';
-        let dataList = [];
-        dataList[0] = data;
-        this.tableData = dataList;
-        this.handleRouteOpen();
-      })
+      this.result = this.$get(
+        "/user/info/" + encodeURIComponent(this.currentUser().id),
+        (response) => {
+          let data = response.data;
+          this.isLocalUser = response.data.source === "LOCAL";
+          let dataList = [];
+          dataList[0] = data;
+          this.tableData = dataList;
+          this.handleRouteOpen();
+        }
+      );
     },
     handleRouteOpen() {
       let params = this.$route.params;
@@ -287,11 +406,13 @@ export default {
       }
     },
     handleAuth(type) {
-      let param = {...this.currentPlatformInfo};
+      // let param = { ...this.currentPlatformInfo };
+      let param = {};
+      param.codingToken = this.currentPlatformInfo.codingToken;
       param.orgId = getCurrentOrganizationId();
-      param.platform = type
+      param.platform = type;
       this.$parent.result = this.$post("issues/user/auth", param, () => {
-        this.$success(this.$t('organization.integration.verified'));
+        this.$success(this.$t("organization.integration.verified"));
       });
     },
     handleClose() {
@@ -300,11 +421,9 @@ export default {
       removeGoBackListener(this.handleClose);
       this.editPasswordVisible = false;
       this.updateVisible = false;
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>
