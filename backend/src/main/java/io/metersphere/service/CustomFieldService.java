@@ -14,7 +14,9 @@ import io.metersphere.commons.exception.MSException;
 import io.metersphere.commons.utils.*;
 import io.metersphere.controller.request.QueryCustomFieldRequest;
 import io.metersphere.dto.CodingCustomFieldListDTO;
+import io.metersphere.dto.CodingCustomFieldListRequest;
 import io.metersphere.dto.CustomFieldDao;
+import io.metersphere.dto.CustomFieldList;
 import io.metersphere.i18n.Translator;
 import io.metersphere.log.utils.ReflexObjectUtil;
 import io.metersphere.log.vo.DetailColumn;
@@ -108,9 +110,7 @@ public class CustomFieldService {
 
     public List<CustomField> getGlobalField(String scene) {
         CustomFieldExample example = new CustomFieldExample();
-        example.createCriteria()
-                .andGlobalEqualTo(true)
-                .andSceneEqualTo(scene);
+        example.createCriteria().andGlobalEqualTo(true).andSceneEqualTo(scene);
         return customFieldMapper.selectByExampleWithBLOBs(example);
     }
 
@@ -122,13 +122,10 @@ public class CustomFieldService {
      */
     public List<CustomFieldDao> getCustomFieldByTemplateId(String templateId) {
         List<CustomFieldTemplate> customFields = customFieldTemplateService.getCustomFields(templateId);
-        List<String> fieldIds = customFields.stream()
-                .map(CustomFieldTemplate::getFieldId)
-                .collect(Collectors.toList());
+        List<String> fieldIds = customFields.stream().map(CustomFieldTemplate::getFieldId).collect(Collectors.toList());
 
         List<CustomField> fields = getFieldByIds(fieldIds);
-        Map<String, CustomField> fieldMap = fields.stream()
-                .collect(Collectors.toMap(CustomField::getId, item -> item));
+        Map<String, CustomField> fieldMap = fields.stream().collect(Collectors.toMap(CustomField::getId, item -> item));
 
         List<CustomFieldDao> result = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(customFields)) {
@@ -146,24 +143,26 @@ public class CustomFieldService {
     /**
      * coding customField
      *
-     * @param projectId 项目id
-     * @return coding 模板内容
+     * @param goPage                 当前页数
+     * @param pageSize               1页多少数量
+     * @param customFieldListRequest 项目Id 与类型
+     * @return 需求、迭代、缺陷类型等
      */
-    public CodingCustomFieldListDTO getCodingCustomFieldByTemplateId(String projectId) {
 
-        String url = String.format("http://ms-coding.dev.mudu.tv/field/template/issue/get/relate/%s", projectId);
-        LogUtil.info("add issue: " + projectId);
-        String result = CodingException.checkCodingException(url, projectId);
-        CodingCustomFieldListDTO jsonObject = JSON.parseObject(result, CodingCustomFieldListDTO.class);
-        return jsonObject;
+    public CustomFieldList getCodingCustomFieldByTemplateId(Integer goPage, Integer pageSize, CodingCustomFieldListRequest customFieldListRequest) {
+        String url = String.format("http://ms-coding.dev.mudu.tv/field/template/issue//requirement/list/%s/%s", goPage, pageSize);
+        LogUtil.info("get coding customField: " + customFieldListRequest);
+        String result = CodingException.checkCodingException(url, customFieldListRequest);
+        return JSON.parseObject(result, CustomFieldList.class);
     }
+
+}
 
 
     public List<CustomField> getFieldByIds(List<String> ids) {
         if (CollectionUtils.isNotEmpty(ids)) {
             CustomFieldExample example = new CustomFieldExample();
-            example.createCriteria()
-                    .andIdIn(ids);
+            example.createCriteria().andIdIn(ids);
             return customFieldMapper.selectByExampleWithBLOBs(example);
         }
         return new ArrayList<>();
@@ -175,14 +174,9 @@ public class CustomFieldService {
 
     public List<CustomField> getDefaultField(QueryCustomFieldRequest request) {
         CustomFieldExample example = new CustomFieldExample();
-        example.createCriteria()
-                .andSystemEqualTo(true)
-                .andSceneEqualTo(request.getScene())
-                .andWorkspaceIdEqualTo(request.getWorkspaceId());
+        example.createCriteria().andSystemEqualTo(true).andSceneEqualTo(request.getScene()).andWorkspaceIdEqualTo(request.getWorkspaceId());
         List<CustomField> workspaceSystemFields = customFieldMapper.selectByExampleWithBLOBs(example);
-        Set<String> workspaceSystemFieldNames = workspaceSystemFields.stream()
-                .map(CustomField::getName)
-                .collect(Collectors.toSet());
+        Set<String> workspaceSystemFieldNames = workspaceSystemFields.stream().map(CustomField::getName).collect(Collectors.toSet());
         List<CustomField> globalFields = getGlobalField(request.getScene());
         // 工作空间的系统字段加上全局的字段
         globalFields.forEach(item -> {
@@ -195,9 +189,7 @@ public class CustomFieldService {
 
     public CustomField getGlobalFieldByName(String name) {
         CustomFieldExample example = new CustomFieldExample();
-        example.createCriteria()
-                .andGlobalEqualTo(true)
-                .andNameEqualTo(name);
+        example.createCriteria().andGlobalEqualTo(true).andNameEqualTo(name);
         List<CustomField> customFields = customFieldMapper.selectByExampleWithBLOBs(example);
         if (CollectionUtils.isNotEmpty(customFields)) {
             return customFields.get(0);

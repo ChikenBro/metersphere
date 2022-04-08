@@ -14,9 +14,7 @@ import io.metersphere.commons.utils.ServiceUtils;
 import io.metersphere.commons.utils.SessionUtils;
 import io.metersphere.controller.request.BaseQueryRequest;
 import io.metersphere.controller.request.UpdateIssueTemplateRequest;
-import io.metersphere.dto.CodingCustomFieldListDTO;
-import io.metersphere.dto.CustomFieldDao;
-import io.metersphere.dto.IssueTemplateDao;
+import io.metersphere.dto.*;
 import io.metersphere.i18n.Translator;
 import io.metersphere.log.utils.ReflexObjectUtil;
 import io.metersphere.log.vo.DetailColumn;
@@ -329,17 +327,15 @@ public class IssueTemplateService extends TemplateBaseService {
     /**
      * 获取coding issue template
      *
-     * @param projectId
+     * @param
      * @return
      */
-    public IssueTemplateDao getCodingIssueTemplate(String projectId) {
-        IssueTemplateDao issueTemplateDao = new IssueTemplateDao();
-        IssueTemplate issueTemplate = getIssueTemplateParam(projectId);
-        BeanUtils.copyBean(issueTemplateDao, issueTemplate);
-        CodingCustomFieldListDTO result = customFieldService.getCodingCustomFieldByTemplateId(projectId);
-        issueTemplateDao.setCustomFieldListList(result.getItems());
-        return issueTemplateDao;
+    public CustomFieldList getCodingIssueTemplate(Integer goPage, Integer pageSize, CodingCustomFieldListRequest customFieldListRequest) {
+        CustomFieldList result = customFieldService.getCodingCustomFieldByTemplateId(goPage, pageSize, customFieldListRequest);
+//        issueTemplateDao.setCustomFieldListList(result.getItems());
+        return result;
     }
+
 
 
 

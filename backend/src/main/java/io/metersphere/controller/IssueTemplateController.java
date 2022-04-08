@@ -9,6 +9,8 @@ import io.metersphere.commons.utils.PageUtils;
 import io.metersphere.commons.utils.Pager;
 import io.metersphere.controller.request.BaseQueryRequest;
 import io.metersphere.controller.request.UpdateIssueTemplateRequest;
+import io.metersphere.dto.CodingCustomFieldListRequest;
+import io.metersphere.dto.CustomFieldList;
 import io.metersphere.dto.IssueTemplateDao;
 import io.metersphere.log.annotation.MsAuditLog;
 import io.metersphere.service.IssueTemplateService;
@@ -55,9 +57,14 @@ public class IssueTemplateController {
         return issueTemplateService.getOption(workspaceId);
     }
 
-    @GetMapping("/get/relate/{projectId}")
-    public IssueTemplateDao getTemplate(@PathVariable String projectId) {
-        return issueTemplateService.getCodingIssueTemplate(projectId);
-
+//    @GetMapping("/get/relate/{projectId}")
+//    public IssueTemplateDao getTemplate(@PathVariable String projectId) {
+//        return issueTemplateService.getCodingIssueTemplate(projectId);
+//
+//    }
+    @PostMapping("/templates/list/{goPage}/{pageSize}")
+    public CustomFieldList getIssueTemplate(@PathVariable Integer goPage, @PathVariable Integer pageSize, @RequestBody CodingCustomFieldListRequest codingCustomFieldListRequest) {
+        return issueTemplateService.getCodingIssueTemplate(goPage, pageSize, codingCustomFieldListRequest);
     }
+
 }
