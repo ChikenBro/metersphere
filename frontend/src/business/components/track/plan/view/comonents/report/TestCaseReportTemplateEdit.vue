@@ -269,13 +269,14 @@ export default {
       }
     },
     getTemplateById(id) {
+      // id = "07a3f040-4e09-436d-97cf-3b3cd9282994";
       let url = "/case/report/template/get/";
       if (this.isReport) {
         url = "/case/report/get/";
       }
       this.$get(url + id, (response) => {
         this.template = response.data;
-        this.template.content = JSON.parse(response.data.content);
+        this.template.content = JSON.parse(this.template.content);
         if (this.template.content.customComponent) {
           this.template.content.customComponent = jsonToMap(
             this.template.content.customComponent

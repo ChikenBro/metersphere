@@ -40,14 +40,6 @@
             >
               {{ $t("commons.save") }}
             </el-button>
-            <el-button
-              :disabled="!isTestManagerOrTestUser"
-              plain
-              size="mini"
-              @click="handleEdit"
-            >
-              {{ $t("test_track.plan_view.edit_component") }}
-            </el-button>
           </el-col>
         </el-row>
 

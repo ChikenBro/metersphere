@@ -11,22 +11,14 @@ module.exports = {
     proxy: {
       //1.8需求：增加分享功能，不登陆即可看到文档页面。所以代理设置增加了(?!/document)文档页面的相关信息
       // ['^(?!/login)']: {
-<<<<<<< HEAD
-      ['^((?!/login)(?!/document))']: {
-        // target: 'http://localhost:8081',
-        target: 'http://metersphere.mudutv.com/',
-        // target: 'http://10.20.11.185:8080',
-        ws: true,
-      },
-      
-    }
-=======
       ["^((?!/login)(?!/document))"]: {
-        target: "http://metersphere.mudutv.com/",
+        // target: 'http://localhost:8081',
+        // target: "http://metersphere.mudutv.com/",
+        // target: "http://10.20.11.185:8080",
+        target: "http://metersphere.dev.mudu.tv/",
         ws: true,
       },
     },
->>>>>>> origin/dev-fe
   },
   pages: {
     business: {
