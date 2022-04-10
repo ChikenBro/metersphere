@@ -505,72 +505,72 @@ public class IssuesExample {
         }
 
         public Criteria andLastmodifyIsNull() {
-            addCriterion("lastmodify is null");
+            addCriterion("lastModify is null");
             return (Criteria) this;
         }
 
         public Criteria andLastmodifyIsNotNull() {
-            addCriterion("lastmodify is not null");
+            addCriterion("lastModify is not null");
             return (Criteria) this;
         }
 
         public Criteria andLastmodifyEqualTo(String value) {
-            addCriterion("lastmodify =", value, "lastmodify");
+            addCriterion("lastModify =", value, "lastModify");
             return (Criteria) this;
         }
 
         public Criteria andLastmodifyNotEqualTo(String value) {
-            addCriterion("lastmodify <>", value, "lastmodify");
+            addCriterion("lastModify <>", value, "lastModify");
             return (Criteria) this;
         }
 
         public Criteria andLastmodifyGreaterThan(String value) {
-            addCriterion("lastmodify >", value, "lastmodify");
+            addCriterion("lastModify >", value, "lastModify");
             return (Criteria) this;
         }
 
         public Criteria andLastmodifyGreaterThanOrEqualTo(String value) {
-            addCriterion("lastmodify >=", value, "lastmodify");
+            addCriterion("lastModify >=", value, "lastModify");
             return (Criteria) this;
         }
 
         public Criteria andLastmodifyLessThan(String value) {
-            addCriterion("lastmodify <", value, "lastmodify");
+            addCriterion("lastModify <", value, "lastModify");
             return (Criteria) this;
         }
 
         public Criteria andLastmodifyLessThanOrEqualTo(String value) {
-            addCriterion("lastmodify <=", value, "lastmodify");
+            addCriterion("lastModify <=", value, "lastModify");
             return (Criteria) this;
         }
 
         public Criteria andLastmodifyLike(String value) {
-            addCriterion("lastmodify like", value, "lastmodify");
+            addCriterion("lastModify like", value, "lastModify");
             return (Criteria) this;
         }
 
         public Criteria andLastmodifyNotLike(String value) {
-            addCriterion("lastmodify not like", value, "lastmodify");
+            addCriterion("lastModify not like", value, "lastModify");
             return (Criteria) this;
         }
 
         public Criteria andLastmodifyIn(List<String> values) {
-            addCriterion("lastmodify in", values, "lastmodify");
+            addCriterion("lastModify in", values, "lastModify");
             return (Criteria) this;
         }
 
         public Criteria andLastmodifyNotIn(List<String> values) {
-            addCriterion("lastmodify not in", values, "lastmodify");
+            addCriterion("lastModify not in", values, "lastModify");
             return (Criteria) this;
         }
 
         public Criteria andLastmodifyBetween(String value1, String value2) {
-            addCriterion("lastmodify between", value1, value2, "lastmodify");
+            addCriterion("lastModify between", value1, value2, "lastModify");
             return (Criteria) this;
         }
 
         public Criteria andLastmodifyNotBetween(String value1, String value2) {
-            addCriterion("lastmodify not between", value1, value2, "lastmodify");
+            addCriterion("lastModify not between", value1, value2, "lastModify");
             return (Criteria) this;
         }
 

@@ -17,11 +17,15 @@ import io.metersphere.track.issue.domain.PlatformUser;
 import io.metersphere.track.request.testcase.IssuesRequest;
 import io.metersphere.track.request.testcase.IssuesUpdateRequest;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 
 import java.util.List;
 
 public class CodingPaltform extends AbstractIssuePlatform {
+
+    @Value("${coding.domain}")
+    private String codingDomain;
 
     /**
      * coding account
@@ -81,7 +85,8 @@ public class CodingPaltform extends AbstractIssuePlatform {
 
     @Override
     public String addIssue(IssuesUpdateRequest issuesRequest) {
-        this.url = "http://ms-coding.dev.mudu.tv/issues/add";
+        String prefix_domain = System.setProperty("coding.domain", codingDomain);
+        this.url = String.format("%s/issues/add", prefix_domain);
         LogUtil.info("add issue: " + issuesRequest);
         return CodingException.checkCodingException(this.url, issuesRequest);
 
@@ -89,7 +94,8 @@ public class CodingPaltform extends AbstractIssuePlatform {
 
     @Override
     public String updateIssue(IssuesUpdateRequest request) {
-        this.url = "http://ms-coding.dev.mudu.tv/issues/update";
+        String prefix_domain = System.setProperty("coding.domain", codingDomain);
+        this.url = String.format("%s/issues/update", prefix_domain);
         LogUtil.info("update issue: " + request);
         return CodingException.checkCodingException(this.url, request);
     }

@@ -18,7 +18,7 @@ public class Issues implements Serializable {
 
     private String reporter;
 
-    private String lastmodify;
+    private String lastModify;
 
     private String platform;
 

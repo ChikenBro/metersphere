@@ -15,7 +15,7 @@
         select issues.id, issues.num, ifnull(issues.title, '') as title, issues.project_id, issues.create_time, issues.update_time,
                ifnull(issues.description, '') as description, issues.status, issues.platform, issues.custom_fields, issues.reporter,
                issues.creator,issues.resource_id,issues.platform_status,
-               issues.lastmodify
+               issues.last_modify
         from issues
         <include refid="queryWhereCondition"/>
         and (issues.platform_status != 'delete' or issues.platform_status is NULL)
@@ -27,7 +27,7 @@
     <select id="getRelateIssues" resultType="io.metersphere.base.domain.IssuesDao">
         select issues.id, issues.num, issues.title, issues.project_id, issues.create_time, issues.update_time,
         issues.description, issues.status, issues.platform, issues.custom_fields,test_case_issues.test_case_id,issues.platform_status,
-        issues.lastmodify
+        issues.last_modify
         from issues
         left join
         test_case_issues on issues.id = test_case_issues.issues_id

@@ -24,6 +24,7 @@ import io.metersphere.log.vo.OperatingLogDetails;
 import io.metersphere.log.vo.system.SystemReference;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +36,9 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class CustomFieldService {
+
+    @Value("${coding.domain}")
+    private String codingDomain;
 
     @Resource
     ExtCustomFieldMapper extCustomFieldMapper;
@@ -150,7 +154,8 @@ public class CustomFieldService {
      */
 
     public CustomFieldList getCodingCustomFieldByTemplateId(Integer goPage, Integer pageSize, CodingCustomFieldListRequest customFieldListRequest) {
-        String url = String.format("http://ms-coding.dev.mudu.tv/field/template/issue//requirement/list/%s/%s", goPage, pageSize);
+        String prefix_domain = System.setProperty("coding.domain", codingDomain);
+        String url = String.format("%s/field/template/issue/templates/list/%s/%s", prefix_domain, goPage, pageSize);
         LogUtil.info("get coding customField: " + customFieldListRequest);
         String result = CodingException.checkCodingException(url, customFieldListRequest);
         return JSON.parseObject(result, CustomFieldList.class);

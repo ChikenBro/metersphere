@@ -26,6 +26,6 @@ create table if not exists issues
 	create_time bigint(13) null,
 	update_time bigint(13) null,
 	reporter varchar(50) null comment 'case issues creator',
-	lastmodify varchar(50) null,
+	last_modify varchar(50) null,
 	platform varchar(50) null
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE utf8mb4_general_ci;

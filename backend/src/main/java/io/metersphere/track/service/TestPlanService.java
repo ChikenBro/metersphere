@@ -833,9 +833,9 @@ public class TestPlanService {
                         String des = i.getDescription().replaceAll("<p>", "").replaceAll("</p>", "");
                         i.setDescription(des);
                     }
-                    if (i.getLastmodify() == null || i.getLastmodify() == "") {
+                    if (i.getLastModify() == null || i.getLastModify() == "") {
                         if (i.getReporter() != null || i.getReporter() != "") {
-                            i.setLastmodify(i.getReporter());
+                            i.setLastModify(i.getReporter());
                         }
                     }
                 }

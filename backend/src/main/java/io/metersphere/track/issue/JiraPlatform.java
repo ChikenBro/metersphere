@@ -86,7 +86,7 @@ public class JiraPlatform extends AbstractIssuePlatform {
     }
 
     public void parseIssue(IssuesWithBLOBs item, JiraIssue jiraIssue) {
-        String lastmodify = "";
+        String lastModify = "";
         String status = "";
         JSONObject fields = jiraIssue.getFields();
 
@@ -102,7 +102,7 @@ public class JiraPlatform extends AbstractIssuePlatform {
         description = renderer.render(document);
 
         if (assignee != null) {
-            lastmodify = assignee.getString("displayName");
+            lastModify = assignee.getString("displayName");
         }
         // 自定义assignee
         List<CustomFieldItemDTO> cfs = JSON.parseArray(item.getCustomFields(), CustomFieldItemDTO.class);
@@ -125,7 +125,7 @@ public class JiraPlatform extends AbstractIssuePlatform {
         item.setId(jiraIssue.getKey());
         item.setTitle(fields.getString("summary"));
         item.setCreateTime(fields.getLong("created"));
-        item.setLastmodify(lastmodify);
+        item.setLastModify(lastModify);
         item.setDescription(description);
         item.setPlatformStatus(status);
         item.setPlatform(IssuesManagePlatform.Jira.toString());
