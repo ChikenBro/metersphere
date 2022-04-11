@@ -24,8 +24,8 @@ import java.util.List;
 
 public class CodingPaltform extends AbstractIssuePlatform {
 
-    @Value("${coding.domain}")
-    private String codingDomain;
+//    @Value("${coding.domain}")
+//    private String codingDomain;
 
     /**
      * coding account
@@ -85,7 +85,7 @@ public class CodingPaltform extends AbstractIssuePlatform {
 
     @Override
     public String addIssue(IssuesUpdateRequest issuesRequest) {
-        String prefix_domain = System.setProperty("coding.domain", codingDomain);
+        String prefix_domain = System.getProperty("coding.domain");
         this.url = String.format("%s/issues/add", prefix_domain);
         LogUtil.info("add issue: " + issuesRequest);
         return CodingException.checkCodingException(this.url, issuesRequest);
@@ -94,7 +94,7 @@ public class CodingPaltform extends AbstractIssuePlatform {
 
     @Override
     public String updateIssue(IssuesUpdateRequest request) {
-        String prefix_domain = System.setProperty("coding.domain", codingDomain);
+        String prefix_domain = System.getProperty("coding.domain");
         this.url = String.format("%s/issues/update", prefix_domain);
         LogUtil.info("update issue: " + request);
         return CodingException.checkCodingException(this.url, request);

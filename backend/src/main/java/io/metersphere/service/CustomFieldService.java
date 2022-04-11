@@ -37,8 +37,8 @@ import java.util.stream.Collectors;
 @Transactional(rollbackFor = Exception.class)
 public class CustomFieldService {
 
-    @Value("${coding.domain}")
-    private String codingDomain;
+//    @Value("${coding.domain}")
+//    private String codingDomain;
 
     @Resource
     ExtCustomFieldMapper extCustomFieldMapper;
@@ -154,7 +154,7 @@ public class CustomFieldService {
      */
 
     public CustomFieldList getCodingCustomFieldByTemplateId(Integer goPage, Integer pageSize, CodingCustomFieldListRequest customFieldListRequest) {
-        String prefix_domain = System.setProperty("coding.domain", codingDomain);
+        String prefix_domain = System.getProperty("coding.domain");
         String url = String.format("%s/field/template/issue/templates/list/%s/%s", prefix_domain, goPage, pageSize);
         LogUtil.info("get coding customField: " + customFieldListRequest);
         String result = CodingException.checkCodingException(url, customFieldListRequest);

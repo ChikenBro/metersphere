@@ -38,6 +38,8 @@ public class AppStartListener implements ApplicationListener<ApplicationReadyEve
     private IssuesService issuesService;
     @Value("${jmeter.home}")
     private String jmeterHome;
+    @Value("${coding.domain}")
+    private String codingDomain;
 
     @Override
     public void onApplicationEvent(ApplicationReadyEvent applicationReadyEvent) {
@@ -45,6 +47,7 @@ public class AppStartListener implements ApplicationListener<ApplicationReadyEve
         System.out.println("================= 应用启动 =================");
 
         System.setProperty("jmeter.home", jmeterHome);
+        System.setProperty("coding.domain", codingDomain);
 
         loadJars();
 
