@@ -495,8 +495,6 @@ export default {
     // 获取迭代列表
     getIterationOptions(name = "") {
       const url = "/field/template/issue/templates/list/1/10";
-      // const url =
-      //   "http://yapi.mudutv.com/mock/1451/field/template/issue/templates/list/1/10";
       this.$post(
         url,
         { projectId: getCurrentProjectID(), type: 3, name },
@@ -507,8 +505,7 @@ export default {
     },
     // 获取计划继承列表
     getPlanInheritOptions(iterationId) {
-      // const url = `/test/plan/iteration/${iterationId}`
-      const url = `http://yapi.mudutv.com/mock/1451/test/plan/iteration/${iterationId}`;
+      const url = `/test/plan/iteration/${iterationId}`;
       this.planInheritOptions = [];
       this.$post(url, {}, (response) => {
         response.data.forEach((item) => {

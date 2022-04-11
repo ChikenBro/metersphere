@@ -597,10 +597,10 @@ export default {
       hasZentaoId: false,
       defectList: [], // 缺陷列表
       priorityList: [
-        { label: "紧急", value: 3 },
-        { label: "高", value: 2 },
-        { label: "中", value: 1 },
-        { label: "低", value: 0 },
+        { label: "紧急", value: "3" },
+        { label: "高", value: "2" },
+        { label: "中", value: "1" },
+        { label: "低", value: "0" },
       ], // 优先级列表
       requirementList: [], // 需求列表
       iterationList: [], //迭代列表
@@ -621,7 +621,7 @@ export default {
       ], // 复现频率
       statusList: [
         { label: "待处理", value: 1 },
-        { label: "重新打开", value: "2" },
+        { label: "重新打开", value: 2 },
         { label: "处理中", value: 3 },
         { label: "待验证", value: 4 },
         { label: "已拒绝", value: 5 },
@@ -747,7 +747,7 @@ export default {
           creator: null,
           fields: {
             defectTypeId: "",
-            priority: 1,
+            priority: "1",
             workingHours: undefined,
             iterationCode: undefined,
             assigneeName: "",

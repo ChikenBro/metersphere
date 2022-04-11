@@ -523,76 +523,22 @@ export default {
       if (orderArr) {
         this.page.condition.orders = orderArr;
       }
-      console.log(this.page);
       this.page.result = getIssues(this.page);
     },
     handleEdit(data) {
       // 传了row(data)和index 只用到了data
-      console.log(data);
-      data = {
-        id: data.id,
-        issueId: data.num,
-        title: "默认",
-        descriptions: {
-          preconditions: "缺陷内容",
-          operatingSteps: "操作步骤",
-          expectedResult: "预期结果",
-          actualResult: "实际结果",
-        },
-        creator: "0852",
-        fields: {
-          defectTypeId: 30801759,
-          priority: 1,
-          workingHours: "12",
-          iterationCode: 91,
-          assigneeName: "0852",
-          requirementCode: 190,
-          moduleId: "",
-          startDate: "2022-02-28T16:00:00.000Z",
-          dueDate: "2022-03-01T16:00:00.000Z",
-        },
-        environment: "dev",
-        repetitionFrequency: "must",
-        projectId: "648d74c1-4973-4d1c-8c22-a68a0357d6c4",
-        organizationId: "d1ab2464-0a3d-11ec-b53d-0c42a1eda428",
-        testCaseIds: [],
-      };
-      data.drawerTitle = "编辑缺陷";
-      data.isEdit = true;
-      this.$refs.issueEdit.open(data);
+      let newData = this.handleData(data);
+
+      newData.drawerTitle = "编辑缺陷";
+      newData.isEdit = true;
+      this.$refs.issueEdit.open(newData);
     },
     handleCreate() {
       this.$refs.issueEdit.open();
     },
     handleCopy(data) {
-      data = {
-        title: "默认",
-        descriptions: {
-          preconditions: "缺陷内容",
-          operatingSteps: "操作步骤",
-          expectedResult: "预期结果",
-          actualResult: "实际结果",
-        },
-        creator: "0852",
-        fields: {
-          defectTypeId: 30801759,
-          priority: 1,
-          workingHours: "12",
-          iterationCode: 91,
-          assigneeName: "0852",
-          requirementCode: 190,
-          moduleId: "",
-          startDate: "2022-02-28T16:00:00.000Z",
-          dueDate: "2022-03-01T16:00:00.000Z",
-        },
-        environment: "dev",
-        repetitionFrequency: "must",
-        projectId: "648d74c1-4973-4d1c-8c22-a68a0357d6c4",
-        organizationId: "d1ab2464-0a3d-11ec-b53d-0c42a1eda428",
-        testCaseIds: [],
-      };
       let copyData = {};
-      Object.assign(copyData, data);
+      Object.assign(copyData, this.handleData(data));
       copyData.id = null;
       copyData.isCreateTitle = true;
       copyData.drawerTitle = "复制缺陷";
@@ -606,6 +552,7 @@ export default {
       this.openDialog();
     },
     btnDisable(row) {
+      return false;
       if (row.platform === "Local") {
         return false;
       }
@@ -666,35 +613,34 @@ export default {
     },
     // 打开预览
     handlePreview(data) {
-      console.log(data);
-      data = {
-        title: "默认",
-        descriptions: {
-          preconditions: "缺陷内容",
-          operatingSteps: "操作步骤",
-          expectedResult: "预期结果",
-          actualResult: "实际结果",
-        },
-        creator: "0852",
+      const newData = this.handleData(data);
+      newData.isOnlyRead = true;
+      this.$refs.issueEdit.open(newData);
+    },
+    // 处理数据
+    handleData(data) {
+      let newData = null;
+      const { customFields, description } = data;
+      let descriptions = JSON.parse(description);
+      newData = {
+        id: data.id,
+        issueId: data.num,
+        title: data.title,
+        descriptions: descriptions,
+        creator: data.creator,
         fields: {
-          defectTypeId: 30801759,
-          priority: 1,
-          workingHours: "12",
-          iterationCode: 91,
-          assigneeName: "0852",
-          requirementCode: 190,
-          moduleId: "",
-          startDate: "2022-02-28T16:00:00.000Z",
-          dueDate: "2022-03-01T16:00:00.000Z",
+          ...customFields,
+          model: data.model,
+          workingHours: data.workingHours + "",
         },
         environment: "dev",
         repetitionFrequency: "must",
-        projectId: "648d74c1-4973-4d1c-8c22-a68a0357d6c4",
-        organizationId: "d1ab2464-0a3d-11ec-b53d-0c42a1eda428",
-        testCaseIds: [],
+        projectId: data.projectId,
+        organizationId: data.organizationId,
+        testCaseIds: data.caseIds,
+        statusId: data.status * 1,
       };
-      data.isOnlyRead = true;
-      this.$refs.issueEdit.open(data);
+      return newData;
     },
   },
 };
