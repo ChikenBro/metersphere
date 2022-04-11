@@ -8,7 +8,9 @@
     @datazoom="datazoom"
     :watch-shallow="watchShallow"
     :manual-update="manualUpdate"
-    :autoresize="autoresize"/>
+    :autoresize="autoresize"
+    class="chart"
+  />
 </template>
 
 <script>
@@ -21,33 +23,35 @@ export default {
     group: String,
     autoresize: Boolean,
     watchShallow: Boolean,
-    manualUpdate: Boolean
+    manualUpdate: Boolean,
   },
   data() {
     return {
-      defaultInitOptions: this.initOptions
+      defaultInitOptions: this.initOptions,
     };
   },
   mounted() {
-
     this.defaultInitOptions = this.defaultInitOptions || {};
     // 默认渲染svg
     // BUG: 渲染svg之后 图上的legend 太多会不显示
     // if (!this.defaultInitOptions.renderer) {
-    // this.defaultInitOptions.renderer = 'svg';
+    //   this.defaultInitOptions.renderer = "svg";
     // }
   },
   methods: {
     onClick(params) {
-      this.$emit('onClick', params.data);
+      this.$emit("onClick", params.data);
     },
     datazoom(params) {
-      this.$emit('datazoom', params);
-    }
-  }
+      this.$emit("datazoom", params);
+    },
+  },
 };
 </script>
 
 <style scoped>
-
+.chart {
+  width: 100%;
+  height: 300px;
+}
 </style>

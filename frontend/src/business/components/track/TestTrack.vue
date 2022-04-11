@@ -1,10 +1,10 @@
 <template>
   <el-col>
-    <track-header-menus/>
+    <track-header-menus />
     <div>
       <transition>
         <keep-alive>
-          <router-view :baseUrl="baseUrl"/>
+          <router-view :base-url="baseUrl" />
         </keep-alive>
       </transition>
     </div>
@@ -12,31 +12,26 @@
 </template>
 
 <script>
+import TrackHeaderMenus from "./head/TrackHeaderMenus";
 
-  import TrackHeaderMenus from "./head/TrackHeaderMenus";
-
-  export default {
-    name: "TrackHome",
-    components: {TrackHeaderMenus},
-    data() {
-      return {
-        baseUrl: "track"
-      }
-    },
-    activated() {
-      this.$refs.table.doLayout()
-    }
-  }
+export default {
+  name: "TrackHome",
+  components: { TrackHeaderMenus },
+  data() {
+    return {
+      baseUrl: "track",
+    };
+  },
+  activated() {
+    this.$refs.table.doLayout();
+  },
+};
 </script>
 
-
 <style>
-  .node-tree {
-    margin: 3%;
-  }
+.node-tree {
+  margin: 3%;
+}
 </style>
 
-<style scoped>
-
-
-</style>
+<style scoped></style>

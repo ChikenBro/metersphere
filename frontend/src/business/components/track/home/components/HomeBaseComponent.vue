@@ -17,13 +17,11 @@ export default {
     title: {
       type: String,
       default() {
-        this.$t('commons.title')
-      }
-    }
-  }
-}
+        this.$t("commons.title");
+      },
+    },
+  },
+};
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

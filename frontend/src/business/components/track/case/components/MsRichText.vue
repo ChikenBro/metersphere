@@ -1,71 +1,82 @@
 <template>
-    <ckeditor :disabled="disabled"
-              :editor="editor"
-              v-model="textData"
-              :config="editorConfig"
-              :placeholder="$t('test_track.case.input_prerequisite')"
-              >
-    </ckeditor>
+  <ckeditor
+    v-model="textData"
+    :disabled="disabled"
+    :editor="editor"
+    :config="editorConfig"
+    :placeholder="$t('test_track.case.input_prerequisite')"
+  >
+  </ckeditor>
 </template>
 
 <script>
-  import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
-  export default {
-    name: "MsRichText",
-    computed: {
-      textData: {
-        get: function () {
-          if (this.content) {
-            return this.content;
-          }
-          return '';
-        },
-        set: function (val) {
-          this.$emit('updateRichText', val);
-        }
-      }
+export default {
+  name: "MsRichText",
+  props: {
+    imagePath: {
+      type: String,
+      default: "",
     },
-    data() {
-      return {
-        editor: ClassicEditor,
-        editorConfig: {
-          toolbar: [ 'heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote' ,'insertTable', '|','undo', 'redo'],
-          // ckfinder: {
-          //   uploadUrl: `/image/uploadCkEditor?imgPath=${JSON.stringify(this.imagePath)}`
-          // },
-          // filebrowserImageUploadUrl: '/image/uploadCkEditor'simpleUpload
-        },
-        // shiftEnterMode: window.CKEditor.ENTER_P
-        // startupMode: 'source'
-      };
+    content: {
+      type: String,
+      default: null,
     },
-    props: {
-      imagePath: {
-        type: String,
-        default: ''
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  data() {
+    return {
+      editor: ClassicEditor,
+      editorConfig: {
+        toolbar: [
+          "heading",
+          "|",
+          "bold",
+          "italic",
+          "link",
+          "bulletedList",
+          "numberedList",
+          "blockQuote",
+          "insertTable",
+          "|",
+          "undo",
+          "redo",
+        ],
+        // ckfinder: {
+        //   uploadUrl: `/image/uploadCkEditor?imgPath=${JSON.stringify(this.imagePath)}`
+        // },
+        // filebrowserImageUploadUrl: '/image/uploadCkEditor'simpleUpload
       },
-      content: {
-        type: String,
-        default: null
-      },
-      disabled:
-        {
-          type: Boolean,
-          default: false
+      // shiftEnterMode: window.CKEditor.ENTER_P
+      // startupMode: 'source'
+    };
+  },
+  computed: {
+    textData: {
+      get: function () {
+        if (this.content) {
+          return this.content;
         }
+        return "";
+      },
+      set: function (val) {
+        this.$emit("updateRichText", val);
+      },
     },
-    methods: {
-      // onReady(editor) {
-      //   // 自定义上传图片插件
-      //   editor.plugins.get("FileRepository").createUploadAdapter = loader => {
-      //     return new MyUploadAdapter(loader);
-      //   };
-      // }
-    }
-  };
+  },
+  methods: {
+    // onReady(editor) {
+    //   // 自定义上传图片插件
+    //   editor.plugins.get("FileRepository").createUploadAdapter = loader => {
+    //     return new MyUploadAdapter(loader);
+    //   };
+    // }
+  },
+};
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

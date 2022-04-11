@@ -1,262 +1,183 @@
 <template>
-
   <common-component :title="$t('test_track.plan_view.result_statistics')">
-
     <div class="char-component">
-      <div class="char-item" v-if="showFunctional">
-        <ms-pie-chart v-if="isShow" :text="$t('test_track.functional_test_case')" @onClick="onFuncCharClick"
-                      :name="$t('test_track.plan_view.test_result')" :data="functionalCharData"/>
-      </div>
-
-      <div class="char-item" v-if="showApi">
-        <ms-pie-chart v-if="isShow" :text="$t('test_track.api_test_case')"  @onClick="onApiCharClick"
-                      :name="$t('test_track.plan_view.test_result')" :data="apiCharData"/>
-      </div>
-
-      <div class="char-item"  v-if="showScenario">
-        <ms-pie-chart v-if="isShow" :text="$t('test_track.scenario_test_case')"  @onClick="onScenarioCharClick"
-                      :name="$t('test_track.plan_view.test_result')" :data="scenarioCharData"/>
-      </div>
-
-      <div class="char-item"  v-if="showLoad">
-        <ms-pie-chart v-if="isShow" :text="$t('test_track.performance_test_case')"  @onClick="onLoadCharClick"
-                      :name="$t('test_track.plan_view.test_result')" :data="loadCharData"/>
-      </div>
+      <el-row>
+        <el-col
+          :span="8"
+          v-for="(item, index) in testResultCharData"
+          :key="index"
+        >
+          <ms-pie-chart
+            v-if="isShow"
+            :text="item.title"
+            :is-show-legend="index === 0"
+            @onClick="onTestResultClick"
+            :name="$t('test_track.plan_view.test_result')"
+            :data="item.dataList"
+          />
+        </el-col>
+      </el-row>
     </div>
-
   </common-component>
-
 </template>
 
 <script>
-    import CommonComponent from "./CommonComponent";
-    import MsPieChart from "../../../../../../common/components/MsPieChart";
+import CommonComponent from "./CommonComponent";
+import MsPieChart from "../../../../../../common/components/MsPieChart";
 
-    export default {
-      name: "TestResultAdvanceChartComponent",
-      components: {MsPieChart, CommonComponent},
-      data() {
-        return {
-          dataMap: new Map([
-            ["Pass", {name: this.$t('test_track.plan_view.pass'), itemStyle: {color: '#67C23A'}}],
-            ["Failure", {name: this.$t('test_track.plan_view.failure'), itemStyle: {color: '#F56C6C'}}],
-            ["Blocking", {name: this.$t('test_track.plan_view.blocking'), itemStyle: {color: '#E6A23C'}}],
-            ["Skip", {name: this.$t('test_track.plan_view.skip'), itemStyle: {color: '#909399'}}],
-            ["Underway", {name: this.$t('test_track.plan.plan_status_running'), itemStyle: {color: 'lightskyblue'}}],
-            ["Prepare", {name: this.$t('test_track.plan.plan_status_prepare'), itemStyle: {color: '#DEDE10'}}]
-          ]),
-          functionalCharData: [],
-          apiCharData: [],
-          scenarioCharData: [],
-          loadCharData: [],
-          isShow: true
-        }
+export default {
+  name: "TestResultAdvanceChartComponent",
+  components: { MsPieChart, CommonComponent },
+  data() {
+    return {
+      dataMap: new Map([
+        [
+          "Pass",
+          {
+            name: this.$t("test_track.plan_view.pass"),
+            itemStyle: { color: "#67C23A" },
+          },
+        ],
+        [
+          "Failure",
+          {
+            name: this.$t("test_track.plan_view.failure"),
+            itemStyle: { color: "#F56C6C" },
+          },
+        ],
+        [
+          "Blocking",
+          {
+            name: this.$t("test_track.plan_view.blocking"),
+            itemStyle: { color: "#E6A23C" },
+          },
+        ],
+        [
+          "Skip",
+          {
+            name: this.$t("test_track.plan_view.skip"),
+            itemStyle: { color: "#909399" },
+          },
+        ],
+        [
+          "Underway",
+          {
+            name: this.$t("test_track.plan.plan_status_running"),
+            itemStyle: { color: "lightskyblue" },
+          },
+        ],
+        [
+          "Prepare",
+          {
+            name: this.$t("test_track.plan.plan_status_prepare"),
+            itemStyle: { color: "#DEDE10" },
+          },
+        ],
+      ]),
+      testResultCharData: [],
+      isShow: true,
+    };
+  },
+  props: {
+    planId: String,
+    source: String,
+    executeResult: {
+      type: Array,
+      default() {
+        return [
+          { status: "Pass", count: "1" },
+          { status: "Failure", count: "2" },
+          { status: "Blocking", count: "3" },
+          { status: "Skip", count: "4" },
+          { status: "Underway", count: "5" },
+          { status: "Prepare", count: "6" },
+        ];
       },
-      props: {
-        planId:String,
-        source:String,
-        executeResult: {
-          type: Object,
-          default() {
-            return {
-              functionalResult: [
-                {status: 'Pass', count: '0'},
-                {status: 'Failure', count: '0'},
-                {status: 'Blocking', count: '0'},
-                {status: 'Skip', count: '0'},
-                {status: 'Underway', count: '0'},
-                {status: 'Prepare', count: '0'},
-              ],
-              apiResult: [
-                {status: 'Pass', count: '0'},
-                {status: 'Failure', count: '0'},
-                {status: 'Underway', count: '0'},
-              ],
-              scenarioResult: [
-                {status: 'Pass', count: '0'},
-                {status: 'Failure', count: '0'},
-                {status: 'Underway', count: '0'},
-              ],
-              loadResult: [
-                {status: 'Pass', count: '0'},
-                {status: 'Failure', count: '0'},
-                {status: 'Underway', count: '0'},
-              ],
-            }
-          }
-        },
-      },
-     computed: {
-       showFunctional() {
-         if(this.executeResult.functionalResult){
-           return this.executeResult.functionalResult.length > 0
-             || (this.executeResult.apiResult.length <= 0 && this.executeResult.scenarioResult.length <= 0 && this.executeResult.loadResult.length <= 0);
-         }else {
-           return false;
-         }
-
-       },
-       showApi() {
-         if(this.executeResult.apiResult){
-           return this.executeResult.apiResult.length > 0;
-         }else {
-           return false;
-         }
-
-       },
-       showScenario() {
-
-         if(this.executeResult.scenarioResult){
-           return this.executeResult.scenarioResult.length > 0;
-         }else {
-           return false;
-         }
-       },
-       showLoad() {
-
-         if(this.executeResult.loadResult){
-           return this.executeResult.loadResult.length > 0;
-         }else {
-           return false;
-         }
-       }
-     },
-      watch: {
-        executeResult() {
-          this.getCharData();
-        }
-      },
-      created() {
-        this.getCharData();
-      },
-      methods: {
-        getCharData() {
-          this.getFunctionalCharData();
-          this.getApiCharData();
-          this.getScenarioCharData();
-          this.getLoadCharData();
-          this.reload();
-        },
-        getFunctionalCharData() {
-          this.functionalCharData = [];
-          if (this.executeResult.functionalResult) {
-            this.executeResult.functionalResult.forEach(item => {
-              let data = this.copyData(item.status);
-              data.value = item.count;
-              this.functionalCharData.push(data);
-            });
-          }
-        },
-        getApiCharData() {
-          this.apiCharData = [];
-          if (this.executeResult.apiResult) {
-            this.executeResult.apiResult.forEach(item => {
-              let data = this.copyData(item.status);
-              data.value = item.count;
-              this.apiCharData.push(data);
-            });
-          }
-        },
-        getScenarioCharData() {
-          this.scenarioCharData = [];
-          if (this.executeResult.apiResult) {
-            this.executeResult.scenarioResult.forEach(item => {
-              let data = this.copyData(item.status);
-              data.value = item.count;
-              this.scenarioCharData.push(data);
-            });
-          }
-        },
-        getLoadCharData() {
-          this.loadCharData = [];
-          if (this.executeResult.loadResult) {
-            this.executeResult.loadResult.forEach(item => {
-              let data = this.copyData(item.status);
-              data.value = item.count;
-              this.loadCharData.push(data);
-            });
-          }
-        },
-        copyData(status) {
-          if(this.dataMap.get(status)){
-            return JSON.parse(JSON.stringify(this.dataMap.get(status)))
-          }
-        },
-        reload() {
-          this.isShow = false;
-          this.$nextTick(function () {
-            this.isShow = true;
-          })
-        },
-        onvertDataStatus(status){
-          if(status == this.$t('test_track.plan_view.pass')){
-            status = "Pass";
-          }else if(status == this.$t('test_track.plan_view.failure')){
-            status = "Failure";
-          }else if(status == this.$t('test_track.plan_view.blocking')){
-            status = "Blocking";
-          }else if(status == this.$t('test_track.plan.plan_status_prepare')){
-            status = "Prepare";
-          }else if (status == this.$t('test_track.plan.plan_status_running')){
-            status = "running";
-          }
-          return status;
-        },
-        onFuncCharClick(params){
-          let clickType = params['name'];
-          clickType = this.onvertDataStatus(clickType);
-          this.redirectPage('functional',clickType);
-        },
-        onApiCharClick(params){
-          let clickType = params['name'];
-          clickType = this.onvertDataStatus(clickType);
-          if(clickType=="Failure"){
-            clickType = "error";
-          }else if(clickType=="Pass"){
-            clickType = "success";
-          }
-          this.redirectPage('api',clickType);
-        },
-        onScenarioCharClick(params){
-          let clickType = params['name'];
-          clickType = this.onvertDataStatus(clickType);
-          if(clickType=="Failure"){
-            clickType = "Fail";
-          }else if(clickType=="Pass"){
-            clickType = "Success";
-          }
-          this.redirectPage('scenario',clickType);
-        },
-        onLoadCharClick(params){
-          let clickType = params['name'];
-          clickType = this.onvertDataStatus(clickType);
-          if(clickType=="Failure"){
-            clickType = "error";
-          }
-          this.redirectPage('load',clickType);
-        },
-        redirectPage(charType,clickType){
-          if(this.source == "ReportView"){
-            this.$router.push({name:'planView',params:{planId:this.planId,charType:charType,clickType:clickType}});
-          }
-
-        }
+    },
+  },
+  watch: {
+    executeResult() {
+      this.getCharData();
+    },
+  },
+  created() {
+    this.getCharData();
+  },
+  methods: {
+    getCharData() {
+      this.getTestResultCharData();
+      this.reload();
+    },
+    getTestResultCharData() {
+      if (this.executeResult) {
+        this.executeResult.forEach((obj) => {
+          const arr = [];
+          obj.dataList.forEach((item) => {
+            let data = this.copyData(item.status);
+            data.value = item.count;
+            arr.push(data);
+          });
+          obj.dataList = arr;
+        });
       }
-    }
+      this.testResultCharData = this.executeResult;
+    },
+    copyData(status) {
+      if (this.dataMap.get(status)) {
+        return JSON.parse(JSON.stringify(this.dataMap.get(status)));
+      }
+    },
+    reload() {
+      this.isShow = false;
+      this.$nextTick(function () {
+        this.isShow = true;
+      });
+    },
+    onvertDataStatus(status) {
+      if (status == this.$t("test_track.plan_view.pass")) {
+        status = "Pass";
+      } else if (status == this.$t("test_track.plan_view.failure")) {
+        status = "Failure";
+      } else if (status == this.$t("test_track.plan_view.blocking")) {
+        status = "Blocking";
+      } else if (status == this.$t("test_track.plan.plan_status_prepare")) {
+        status = "Prepare";
+      } else if (status == this.$t("test_track.plan.plan_status_running")) {
+        status = "running";
+      }
+      return status;
+    },
+    onTestResultClick(params) {
+      let clickType = params["name"];
+      clickType = this.onvertDataStatus(clickType);
+      this.redirectPage("functional", clickType);
+    },
+    redirectPage(charType, clickType) {
+      if (this.source == "ReportView") {
+        this.$router.push({
+          name: "planView",
+          params: {
+            planId: this.planId,
+            charType: charType,
+            clickType: clickType,
+          },
+        });
+      }
+    },
+  },
+};
 </script>
 
 <style scoped>
+.echarts {
+  margin: 0 auto;
+}
 
-  .echarts {
-    margin: 0 auto;
-  }
+.char-item {
+  display: inline-block;
+}
 
-  .char-item {
-    display: inline-block;
-  }
-
-  .char-component {
-    text-align: center;
-  }
-
+.char-component {
+  text-align: center;
+}
 </style>

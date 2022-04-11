@@ -1,15 +1,13 @@
 <template>
   <div>
-    <chart/>
+    <chart />
   </div>
 </template>
 
 <script>
-  export default {
-    name: "ExportTestCaseReport"
-  }
+export default {
+  name: "ExportTestCaseReport",
+};
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

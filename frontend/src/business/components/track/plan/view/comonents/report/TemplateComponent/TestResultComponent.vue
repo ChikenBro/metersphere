@@ -1,5 +1,4 @@
 <template>
-
   <common-component :title="$t('test_track.plan_view.test_result')">
     <template>
       <el-table
@@ -7,17 +6,22 @@
         class="adjust-table"
         :data="testResults"
         stripe
-        style="width: 100%">
+        style="width: 100%"
+      >
+        <el-table-column
+          :prop="isIterationReport ? 'testPlanName' : 'projectName'"
+          :label="
+            isIterationReport
+              ? '测试计划名称'
+              : $t('test_track.module.project_name')
+          "
+          show-overflow-tooltip
+        >
+        </el-table-column>
         <el-table-column
           prop="moduleName"
           :label="$t('test_track.module.module')"
-         >
-        </el-table-column>
-        <el-table-column
-          prop="projectName"
-          :label="$t('test_track.module.project_name')"
-          show-overflow-tooltip
-         >
+        >
         </el-table-column>
         <el-table-column
           prop="caseCount"
@@ -52,14 +56,12 @@
         <el-table-column
           prop="prepareCount"
           :label="$t('test_track.plan.plan_status_prepare')"
-          width="102">
-        </el-table-column>
-        <el-table-column
-          prop="passRate"
-          :label="$t('test_track.pass_rate')"
+          width="102"
         >
+        </el-table-column>
+        <el-table-column prop="passRate" :label="$t('test_track.pass_rate')">
           <template v-slot:default="scope">
-            {{scope.row.passRate}}%
+            {{ scope.row.passRate }}%
           </template>
         </el-table-column>
         <el-table-column
@@ -69,64 +71,41 @@
         </el-table-column>
       </el-table>
     </template>
-
   </common-component>
-
 </template>
 
 <script>
-    import CommonComponent from "./CommonComponent";
-    export default {
-      name: "TestResultComponent",
-      components: {CommonComponent},
-      props: {
-        testResults: {
-          type: Array,
-          default() {
-            return [
-              {
-                moduleName: this.$t('test_track.module.module') + '1',
-                caseCount: '14',
-                passRate: 10.8,
-                issuesCount: 3,
-                passCount:0,
-                failureCount:0,
-                blockingCount:0,
-                skipCount:0,
-                underwayCount:0,
-                prepareCount:0
-              },
-              {
-                moduleName: this.$t('test_track.module.module') + '1',
-                caseCount: '14',
-                passRate: 10.8,
-                issuesCount: 3,
-                passCount:0,
-                failureCount:0,
-                blockingCount:0,
-                skipCount:0,
-                underwayCount:0,
-                prepareCount:0
-              },
-              {
-                moduleName: this.$t('test_track.module.module') + '1',
-                caseCount: '14',
-                passRate: 10.8,
-                issuesCount: 3,
-                passCount:0,
-                failureCount:0,
-                blockingCount:0,
-                skipCount:0,
-                underwayCount:0,
-                prepareCount:0
-              }
-            ]
-          }
-        }
-      }
-    }
+import CommonComponent from "./CommonComponent";
+export default {
+  name: "TestResultComponent",
+  components: { CommonComponent },
+  props: {
+    isIterationReport: {
+      type: Boolean,
+      default: false,
+    },
+    testResults: {
+      type: Array,
+      default() {
+        return [
+          {
+            moduleName: this.$t("test_track.module.module") + "1",
+            testPlanName: "测试计划名称",
+            caseCount: "14",
+            passRate: 10.8,
+            issuesCount: 3,
+            passCount: 0,
+            failureCount: 0,
+            blockingCount: 0,
+            skipCount: 0,
+            underwayCount: 0,
+            prepareCount: 0,
+          },
+        ];
+      },
+    },
+  },
+};
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

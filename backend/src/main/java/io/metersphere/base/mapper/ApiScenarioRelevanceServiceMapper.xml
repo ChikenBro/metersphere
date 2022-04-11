@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.metersphere.base.mapper.ApiScenarioRelevanceServiceMapper">
+    <resultMap id="BaseResultMap" type="io.metersphere.base.domain.ApiScenarioRelevance">
+        <id column="id" jdbcType="VARCHAR" property="id"/>
+        <id column="scenario_id" jdbcType="VARCHAR" property="scenarioId"/>
+        <result column="project_id" jdbcType="VARCHAR" property="projectId"/>
+        <result column="method" jdbcType="VARCHAR" property="method"/>
+        <result column="path" jdbcType="VARCHAR" property="path"/>
+        <result column="status" jdbcType="VARCHAR" property="status"/>
+        <result column="create_time" jdbcType="BIGINT" property="createTime"/>
+        <result column="update_time" jdbcType="BIGINT" property="updateTime"/>
+        <result column="delete_time" jdbcType="BIGINT" property="deleteTime"/>
+        <result column="delete_user_id" jdbcType="VARCHAR" property="deleteUserId"/>
+    </resultMap>
+    <insert id="insertList" parameterType="java.util.ArrayList">
+        insert into api_scenario_relevance
+        (id,scenario_id,project_id,method,path,status,create_time,update_time,delete_time,delete_user_id)
+        values
+        <foreach collection="apiScenarioRelevance" item="item" index="index" separator=",">
+            (#{item.id},#{item.scenarioId},#{item.projectId},#{item.method},#{item.path},#{item.status},
+            #{item.createTime},#{item.updateTime},#{item.deleteTime},#{item.deleteUserId})
+        </foreach>
+    </insert>
+
+    <update id="updateList">
+        UPDATE api_scenario_relevance
+        SET STATUS = 1
+        WHERE
+        project_id = #{projectId}
+    </update>
+    <!--<resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="io.metersphere.base.domain.ApiScenarioRelevance-->
+    <!--<result column="description" jdbcType="LONGVARCHAR" property="description"/>-->
+    <!--<result column="request" jdbcType="LONGVARCHAR" property="request"/>-->
+    <!--<result column="response" jdbcType="LONGVARCHAR" property="response"/>-->
+    <!--</resultMap>-->
+    <insert id="insert" parameterType="io.metersphere.base.domain.ApiScenarioRelevance">
+    insert into api_definition (id, project_id, `name`,
+    `method`, module_path, environment_id,
+    schedule, `status`, module_id,
+    user_id, create_time, update_time,
+    protocol, `path`, num,
+    tags, original_state, create_user,
+    case_total, case_status, case_passing_rate,
+    delete_time, delete_user_id, description,
+    request, response)
+    values (#{id,jdbcType=VARCHAR}, #{projectId,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR},
+    #{method,jdbcType=VARCHAR}, #{modulePath,jdbcType=VARCHAR}, #{environmentId,jdbcType=VARCHAR},
+    #{schedule,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{moduleId,jdbcType=VARCHAR},
+    #{userId,jdbcType=VARCHAR}, #{createTime,jdbcType=BIGINT}, #{updateTime,jdbcType=BIGINT},
+    #{protocol,jdbcType=VARCHAR}, #{path,jdbcType=VARCHAR}, #{num,jdbcType=INTEGER},
+    #{tags,jdbcType=VARCHAR}, #{originalState,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR},
+    #{caseTotal,jdbcType=VARCHAR}, #{caseStatus,jdbcType=VARCHAR}, #{casePassingRate,jdbcType=VARCHAR},
+    #{deleteTime,jdbcType=BIGINT}, #{deleteUserId,jdbcType=VARCHAR}, #{description,jdbcType=LONGVARCHAR},
+    #{request,jdbcType=LONGVARCHAR}, #{response,jdbcType=LONGVARCHAR})
+    </insert>
+
+
+</mapper>

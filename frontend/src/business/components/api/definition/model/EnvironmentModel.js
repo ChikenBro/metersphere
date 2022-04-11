@@ -1,9 +1,8 @@
-import {BaseConfig, DatabaseConfig, KeyValue} from "./ApiTestModel";
-import {TCPConfig} from "@/business/components/api/test/model/ScenarioModel";
+import { BaseConfig, DatabaseConfig, KeyValue } from "./ApiTestModel";
+import { TCPConfig } from "@/business/components/api/test/model/ScenarioModel";
 
 export class Environment extends BaseConfig {
   constructor(options = {}) {
-
     super();
 
     this.projectId = undefined;
@@ -30,7 +29,7 @@ export class Config extends BaseConfig {
     this.tcpConfig = undefined;
 
     this.set(options);
-    this.sets({databaseConfigs: DatabaseConfig}, options);
+    this.sets({ databaseConfigs: DatabaseConfig }, options);
   }
 
   initOptions(options = {}) {
@@ -50,7 +49,7 @@ export class CommonConfig extends BaseConfig {
     this.hosts = [];
 
     this.set(options);
-    this.sets({variables: KeyValue, hosts: Host}, options);
+    this.sets({ variables: KeyValue, hosts: Host }, options);
   }
 
   initOptions(options = {}) {
@@ -64,14 +63,14 @@ export class HttpConfig extends BaseConfig {
   constructor(options = {}) {
     super();
 
-    this.socket = '';
-    this.domain = '';
+    this.socket = "";
+    this.domain = "";
     this.headers = [];
-    this.protocol = 'https';
-    this.port = '';
+    this.protocol = "https";
+    this.port = "";
 
     this.set(options);
-    this.sets({headers: KeyValue}, options);
+    this.sets({ headers: KeyValue }, options);
   }
 
   initOptions(options = {}) {
@@ -93,7 +92,6 @@ export class Host extends BaseConfig {
     this.set(options);
   }
 }
-
 
 /* ---------- Functions ------- */
 

@@ -1,16 +1,32 @@
 <template>
-  <el-form-item :disable="true" :label="title" :prop="prop" :label-width="labelWidth">
-    <mavon-editor v-if="active" :editable="!disabled" @imgAdd="imgAdd" :default-open="disabled ? 'preview' : null" class="mavon-editor"
-                  :subfield="disabled ? false : true" :toolbars="toolbars" :toolbarsFlag="disabled ? false : true" @imgDel="imgDel" v-model="data[prop]"  ref="md"/>
+  <el-form-item
+    :disable="true"
+    :label="title"
+    :prop="prefix ? prefix + prop : prop"
+    :label-width="labelWidth"
+  >
+    <mavon-editor
+      v-if="active"
+      :editable="!disabled"
+      @imgAdd="imgAdd"
+      :default-open="disabled ? 'preview' : 'edit'"
+      class="mavon-editor"
+      :subfield="!disabled"
+      :toolbars="toolbars"
+      :toolbarsFlag="disabled ? false : true"
+      @imgDel="imgDel"
+      v-model="data[prop]"
+      ref="md"
+    />
   </el-form-item>
 </template>
 
 <script>
-import {getUUID} from "@/common/js/utils";
+import { getUUID } from "@/common/js/utils";
 export default {
   name: "FormRichTextItem",
   components: {},
-  props: ['data', 'title', 'prop', 'disabled', 'labelWidth'],
+  props: ["data", "title", "prop", "disabled", "labelWidth", "prefix"],
   data() {
     return {
       toolbars: {
@@ -47,42 +63,56 @@ export default {
         /* 2.2.1 */
         subfield: true, // 单双栏模式
         preview: true, // 预览
-      }
-    }
+      },
+    };
   },
   computed: {
     active() {
+      if (
+        this.prop.indexOf(".") !== -1 &&
+        this.data[this.prop.split(".")[this.prop.split(".").lenght - 1]] !==
+          undefined
+      ) {
+        return true;
+      }
       if (this.data[this.prop] !== undefined) {
         return true;
       }
       return false;
-    }
+    },
   },
   methods: {
-    imgAdd(pos, file){
+    imgAdd(pos, file) {
       let param = {
-        id: getUUID().substring(0, 8)
+        id: getUUID().substring(0, 8),
       };
       file.prefix = param.id;
-      this.result = this.$fileUpload('/resource/md/upload', file, null, param, () => {
-        this.$success(this.$t('commons.save_success'));
-        this.$refs.md.$img2Url(pos, '/resource/md/get/'  + param.id + '_' + file.name);
-      });
-      this.$emit('imgAdd', file);
+      this.result = this.$fileUpload(
+        "/resource/md/upload",
+        file,
+        null,
+        param,
+        () => {
+          this.$success(this.$t("commons.save_success"));
+          this.$refs.md.$img2Url(
+            pos,
+            "/resource/md/get/" + param.id + "_" + file.name
+          );
+        }
+      );
+      this.$emit("imgAdd", file);
     },
     imgDel(file) {
       if (file) {
-        this.$get('/resource/md/delete/' + file[1].prefix + "_" + file[1].name);
+        this.$get("/resource/md/delete/" + file[1].prefix + "_" + file[1].name);
       }
     },
-  }
-}
+  },
+};
 </script>
 
 <style scoped>
-
 .mavon-editor {
   min-height: 20px;
 }
-
 </style>

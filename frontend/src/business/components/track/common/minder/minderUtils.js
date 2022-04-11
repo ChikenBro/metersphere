@@ -1,9 +1,9 @@
 import i18n from "@/i18n/i18n";
-import {getTestCasesForMinder} from "@/network/testCase";
+import { getTestCasesForMinder } from "@/network/testCase";
 
 export function listenNodeSelected(callback) {
   let minder = window.minder;
-  minder.on('selectionchange ', function (even) {
+  minder.on("selectionchange ", function (even) {
     if (callback) {
       callback(even);
     }
@@ -12,7 +12,7 @@ export function listenNodeSelected(callback) {
 
 export function listenNodeChange(callback) {
   let minder = window.minder;
-  minder.on('contentchange ', function (even) {
+  minder.on("contentchange ", function (even) {
     if (callback) {
       callback(even);
     }
@@ -21,7 +21,7 @@ export function listenNodeChange(callback) {
 
 export function listenBeforeExecCommand(callback) {
   let minder = window.minder;
-  minder.on('beforeExecCommand ', function (even) {
+  minder.on("beforeExecCommand ", function (even) {
     if (callback) {
       callback(even);
     }
@@ -35,14 +35,14 @@ export function listenBeforeExecCommand(callback) {
  */
 export function loadNode(node, param, getCaseFuc, setParamCallback) {
   let data = node.data;
-  if (!data.loaded && data.type === 'node') {
+  if (!data.loaded && data.type === "node") {
     if (param.result) {
       param.result.loading = true;
     }
     let request = param.request;
     request.nodeId = data.id;
-    if (data.id === 'root') {
-      request.nodeId = '';
+    if (data.id === "root") {
+      request.nodeId = "";
     }
     if (getCaseFuc) {
       getCaseFuc(request, (testCases) => {
@@ -61,18 +61,23 @@ export function loadNode(node, param, getCaseFuc, setParamCallback) {
 export function loadSelectNodes(param, getCaseFuc, setParamCallback) {
   let minder = window.minder;
   let selectNodes = minder.getSelectedNodes();
-  selectNodes.forEach(node => {
+  selectNodes.forEach((node) => {
     loadNode(node, param, getCaseFuc, setParamCallback);
   });
 }
 
-
-export function handleExpandToLevel(level, node, param, getCaseFuc, setParamCallback) {
+export function handleExpandToLevel(
+  level,
+  node,
+  param,
+  getCaseFuc,
+  setParamCallback
+) {
   loadNode(node, param, getCaseFuc, setParamCallback);
   level--;
   if (level > 0) {
     if (node.children) {
-      node.children.forEach(item => {
+      node.children.forEach((item) => {
         handleExpandToLevel(level, item, param, getCaseFuc, setParamCallback);
       });
     }
@@ -80,7 +85,7 @@ export function handleExpandToLevel(level, node, param, getCaseFuc, setParamCall
 }
 
 export function handleTestCaseAdd(pid, data) {
-  window.minder.getRoot().traverse(function(node) {
+  window.minder.getRoot().traverse(function (node) {
     if (node.data.id === pid && node.data.loaded) {
       appendCase(node, data);
       expandNode(node);
@@ -90,7 +95,7 @@ export function handleTestCaseAdd(pid, data) {
 }
 
 export function handTestCaeEdit(data) {
-  window.minder.getRoot().traverse(function(node) {
+  window.minder.getRoot().traverse(function (node) {
     if (node.data.id === data.id) {
       let pNode = node.parent;
       window.minder.removeNode(node);
@@ -106,10 +111,15 @@ export function tagChildren(node, resourceName, distinctTags) {
   if (!children) {
     children = [];
   }
-  if (!resourceName || !/\S/.test(resourceName)) {return;}
+  if (!resourceName || !/\S/.test(resourceName)) {
+    return;
+  }
   children.forEach((item) => {
-    let isCaseNode = item.data.resource && item.data.resource.indexOf(i18n.t('api_test.definition.request.case')) > -1;
-    if (item.data.type === 'node' || isCaseNode) {
+    let isCaseNode =
+      item.data.resource &&
+      item.data.resource.indexOf(i18n.t("api_test.definition.request.case")) >
+        -1;
+    if (item.data.type === "node" || isCaseNode) {
       let origin = item.data.resource;
       if (!origin) {
         origin = [];
@@ -138,13 +148,16 @@ export function tagChildren(node, resourceName, distinctTags) {
   });
 }
 
-
 function modifyParentNodeTag(node, resourceName) {
   let topNode = null;
   while (node.parent) {
     let pNode = node.parent;
     let pResource = pNode.data.resource;
-    if (pResource && pResource.length > 0 && pResource.indexOf(resourceName) < 0) {
+    if (
+      pResource &&
+      pResource.length > 0 &&
+      pResource.indexOf(resourceName) < 0
+    ) {
       pNode.data.resource = [];
       topNode = pNode;
     }
@@ -153,18 +166,18 @@ function modifyParentNodeTag(node, resourceName) {
   return topNode;
 }
 
-
 export function appendCase(parent, item, isDisable, setParamCallback) {
   let caseData = {
     id: item.id,
     text: item.name,
-    priority: Number.parseInt(item.priority.substring(item.priority.length - 1 )) + 1,
-    resource: [i18n.t('api_test.definition.request.case')],
+    priority:
+      Number.parseInt(item.priority.substring(item.priority.length - 1)) + 1,
+    resource: [i18n.t("api_test.definition.request.case")],
     type: item.type,
     method: item.method,
     maintainer: item.maintainer,
-    stepModel: item.stepModel
-  }
+    stepModel: item.stepModel,
+  };
   if (setParamCallback) {
     setParamCallback(caseData, item);
   }
@@ -176,15 +189,28 @@ export function appendCase(parent, item, isDisable, setParamCallback) {
 
   let caseNode = appendChildNode(parent, caseData);
 
-  appendChildNode(caseNode, getNodeData(item.prerequisite, i18n.t('test_track.case.prerequisite'), isDisable));
+  appendChildNode(
+    caseNode,
+    getNodeData(
+      item.prerequisite,
+      i18n.t("test_track.case.prerequisite"),
+      isDisable
+    )
+  );
 
-  appendChildNode(caseNode, getNodeData(item.remark, i18n.t('commons.remark'), isDisable));
+  appendChildNode(
+    caseNode,
+    getNodeData(item.remark, i18n.t("commons.remark"), isDisable)
+  );
 
-  if (item.stepModel === 'TEXT') {
-    let descData =  getNodeData(item.stepDescription, null, isDisable);
+  if (item.stepModel === "TEXT") {
+    let descData = getNodeData(item.stepDescription, null, isDisable);
     let descNode = appendChildNode(caseNode, descData);
     if (descData) {
-      appendChildNode(descNode, getNodeData(item.expectedResult, null, isDisable));
+      appendChildNode(
+        descNode,
+        getNodeData(item.expectedResult, null, isDisable)
+      );
     }
   } else {
     if (item.steps) {
@@ -206,8 +232,8 @@ export function appendCase(parent, item, isDisable, setParamCallback) {
 function getNodeData(text, resource, isDisable) {
   if (text) {
     let data = {
-        text: text,
-        resource: resource ? [resource] : []
+      text: text,
+      resource: resource ? [resource] : [],
     };
     if (isDisable) {
       data.disable = true;
@@ -244,7 +270,7 @@ function clearChildren(node) {
   if (children) {
     for (let i = 0; i < children.length; i++) {
       let item = children[i];
-      if (item.data.type !== 'node') {
+      if (item.data.type !== "node") {
         window.minder.removeNode(item);
         i--;
       }
@@ -271,13 +297,11 @@ function appendChildNode(parent, childData, fresh) {
   return node;
 }
 
-
 function expandNode(node) {
   node.expand();
   node.renderTree();
   window.minder.layout(60);
 }
-
 
 /**
  *  测试计划和评审支持给模块批量打标签
@@ -290,7 +314,7 @@ export function tagBatch(distinctTags) {
     let args = even.commandArgs;
     if (selectNodes) {
       selectNodes.forEach((node) => {
-        if (node.data.type === 'node' && even.commandName === 'resource') {
+        if (node.data.type === "node" && even.commandName === "resource") {
           // let origin = minder.queryCommandValue('resource');
           if (args && args.length > 0) {
             let origin = args[0];
@@ -317,7 +341,7 @@ export function tagEditCheck(resourceName) {
   let selectNodes = minder.getSelectedNodes();
   if (selectNodes && selectNodes.length > 0) {
     let resource = selectNodes[0].getParent().data.resource;
-    if (resource && resource.indexOf('用例') > -1 && resourceName === '用例') {
+    if (resource && resource.indexOf("用例") > -1 && resourceName === "用例") {
       return false;
     }
   }
@@ -329,7 +353,7 @@ export function priorityDisableCheck() {
   let selectNodes = minder.getSelectedNodes();
   if (selectNodes && selectNodes.length > 0) {
     let resource = selectNodes[0].getParent().data.resource;
-    if (resource && resource.indexOf('用例') > -1) {
+    if (resource && resource.indexOf("用例") > -1) {
       return true;
     }
   }
@@ -349,7 +373,7 @@ export function handleAfterSave(pNode, param) {
       if (item.data.changed) {
         item.data.changed = false;
       }
-      if (item.data.type === 'node') {
+      if (item.data.type === "node") {
         handleAfterSave(item, param);
       }
     }

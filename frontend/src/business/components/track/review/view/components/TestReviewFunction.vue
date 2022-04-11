@@ -2,12 +2,13 @@
   <ms-test-plan-common-component>
     <template v-slot:aside>
       <ms-node-tree
+        ref="nodeTree"
+        v-loading="result.loading"
         class="node-tree"
         :all-label="$t('commons.all_label.review')"
-        v-loading="result.loading"
-        @nodeSelectEvent="nodeChange"
         :tree-nodes="treeNodes"
-        ref="nodeTree"/>
+        @nodeSelectEvent="nodeChange"
+      />
     </template>
     <template v-slot:main>
       <ms-tab-button
@@ -16,27 +17,30 @@
         :left-content="$t('test_track.case.list')"
         :right-tip="$t('test_track.case.minder')"
         :right-content="$t('test_track.case.minder')"
-        :middle-button-enable="false">
+        :middle-button-enable="false"
+      >
         <test-review-test-case-list
-          class="table-list"
           v-if="activeDom === 'left'"
+          ref="testPlanTestCaseList"
+          class="table-list"
+          :review-id="reviewId"
+          :click-type="clickType"
           @openTestReviewRelevanceDialog="openTestReviewRelevanceDialog"
           @refresh="refresh"
-          :review-id="reviewId"
-          :clickType="clickType"
-          ref="testPlanTestCaseList"/>
+        />
         <test-review-minder
+          v-if="activeDom === 'right'"
           :tree-nodes="treeNodes"
           :project-id="projectId"
           :review-id="reviewId"
-          v-if="activeDom === 'right'"
         />
       </ms-tab-button>
     </template>
     <test-review-relevance
-      @refresh="refresh"
+      ref="testReviewRelevance"
       :review-id="reviewId"
-      ref="testReviewRelevance"/>
+      @refresh="refresh"
+    />
   </ms-test-plan-common-component>
 </template>
 
@@ -47,7 +51,7 @@ import TestReviewRelevance from "@/business/components/track/review/view/compone
 import TestReviewTestCaseList from "@/business/components/track/review/view/components/TestReviewTestCaseList";
 import MsTabButton from "@/business/components/common/components/MsTabButton";
 import TestReviewMinder from "@/business/components/track/common/minder/TestReviewMinder";
-import {getCurrentProjectID} from "@/common/js/utils";
+import { getCurrentProjectID } from "@/common/js/utils";
 
 export default {
   name: "TestReviewFunction",
@@ -55,8 +59,11 @@ export default {
     TestReviewMinder,
     MsTabButton,
     TestReviewTestCaseList,
-    TestReviewRelevance, MsNodeTree, MsTestPlanCommonComponent
+    TestReviewRelevance,
+    MsNodeTree,
+    MsTestPlanCommonComponent,
   },
+  props: ["reviewId", "redirectCharType", "clickType"],
   data() {
     return {
       result: {},
@@ -66,52 +73,50 @@ export default {
       // selectParentNodes: [],
       treeNodes: [],
       isMenuShow: true,
-      activeDom: 'left',
-    }
-  },
-  props: [
-    'reviewId',
-    'redirectCharType',
-    'clickType',
-  ],
-  mounted() {
-    this.getNodeTreeByReviewId()
-  },
-  activated() {
-    this.getNodeTreeByReviewId()
+      activeDom: "left",
+    };
   },
   computed: {
     projectId() {
       return getCurrentProjectID();
     },
   },
+  mounted() {
+    this.getNodeTreeByReviewId();
+  },
+  activated() {
+    this.getNodeTreeByReviewId();
+  },
   methods: {
     refresh() {
-      this.$store.commit('setTestReviewSelectNode', {});
-      this.$store.commit('setTestReviewSelectNodeIds', []);
+      this.$store.commit("setTestReviewSelectNode", {});
+      this.$store.commit("setTestReviewSelectNodeIds", []);
       this.$refs.testReviewRelevance.search();
       this.getNodeTreeByReviewId();
     },
     nodeChange(node, nodeIds, pNodes) {
-      this.$store.commit('setTestReviewSelectNode', node);
-      this.$store.commit('setTestReviewSelectNodeIds', nodeIds);
+      this.$store.commit("setTestReviewSelectNode", node);
+      this.$store.commit("setTestReviewSelectNodeIds", nodeIds);
     },
     getNodeTreeByReviewId() {
       if (this.reviewId) {
-        this.result = this.$get("/case/node/list/review/" + this.reviewId, response => {
-          this.treeNodes = response.data;
-        });
+        this.result = this.$get(
+          "/case/node/list/review/" + this.reviewId,
+          (response) => {
+            this.treeNodes = response.data;
+          }
+        );
       }
     },
     openTestReviewRelevanceDialog() {
       this.$refs.testReviewRelevance.openTestReviewRelevanceDialog();
     },
-  }
-}
+  },
+};
 </script>
 
 <style scoped>
-/deep/ .el-button-group>.el-button:first-child {
+/deep/ .el-button-group > .el-button:first-child {
   padding: 4px 1px !important;
 }
 </style>

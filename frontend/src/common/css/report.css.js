@@ -56,6 +56,6 @@ span {
   .el-date-editor {
     width: 150px;
   }
-`
+`;
 
 export default ReportStyle;

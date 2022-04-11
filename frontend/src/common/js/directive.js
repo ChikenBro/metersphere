@@ -15,7 +15,7 @@ export const left2RightDrag = {
         document.onmousemove = document.onmouseup = null;
       };
     };
-  }
+  },
 };
 
 export const right2LeftDrag = {
@@ -35,7 +35,7 @@ export const right2LeftDrag = {
         document.onmousemove = document.onmouseup = null;
       };
     };
-  }
+  },
 };
 
 export const bottom2TopDrag = {
@@ -55,5 +55,5 @@ export const bottom2TopDrag = {
         document.onmousemove = document.onmouseup = null;
       };
     };
-  }
+  },
 };

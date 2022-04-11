@@ -57,6 +57,12 @@ export default {
         return null;
       }
     }
+  },
+  methods: {
+    filterHandler(value, row, column) {
+      const property = column['property'];
+      return row[property] === value;
+    }
   }
 };
 </script>

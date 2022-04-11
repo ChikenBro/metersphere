@@ -1,36 +1,46 @@
 <template>
   <test-case-relevance-base
+    ref="baseRelevance"
     @setProject="setProject"
     @save="saveCaseRelevance"
-    ref="baseRelevance">
+  >
     <template v-slot:aside>
       <ms-api-scenario-module
+        ref="nodeTree"
+        :relevance-project-id="projectId"
+        :is-read-only="true"
         @nodeSelectEvent="nodeChange"
         @refreshTable="refresh"
         @setModuleOptions="setModuleOptions"
-        :relevance-project-id="projectId"
-        :is-read-only="true"
-        ref="nodeTree"
       />
     </template>
     <review-relevance-scenario-list
+      ref="apiScenarioList"
       :select-node-ids="selectNodeIds"
       :trash-enable="trashEnable"
       :review-id="reviewId"
       :project-id="projectId"
-      ref="apiScenarioList"/>
+    />
   </test-case-relevance-base>
 </template>
 <script>
 import TestCaseRelevanceBase from "@/business/components/track/plan/view/comonents/base/TestCaseRelevanceBase";
 import MsApiScenarioModule from "@/business/components/api/automation/scenario/ApiScenarioModule";
-import ReviewRelevanceScenarioList
-  from "@/business/components/track/review/view/components/ReviewRelevanceScenarioList";
-import {strMapToObj} from "@/common/js/utils";
+import ReviewRelevanceScenarioList from "@/business/components/track/review/view/components/ReviewRelevanceScenarioList";
+import { strMapToObj } from "@/common/js/utils";
 
 export default {
   name: "TestReviewRelevanceScenario",
-  components: {ReviewRelevanceScenarioList, MsApiScenarioModule, TestCaseRelevanceBase},
+  components: {
+    ReviewRelevanceScenarioList,
+    MsApiScenarioModule,
+    TestCaseRelevanceBase,
+  },
+  props: {
+    reviewId: {
+      type: String,
+    },
+  },
   data() {
     return {
       showCasePage: true,
@@ -41,13 +51,8 @@ export default {
       trashEnable: false,
       condition: {},
       currentRow: {},
-      projectId: ""
+      projectId: "",
     };
-  },
-  props: {
-    reviewId: {
-      type: String
-    },
   },
   watch: {
     reviewId() {
@@ -85,27 +90,26 @@ export default {
         return false;
       }
       let param = {};
-      let url = '/api/automation/relevance/review';
+      let url = "/api/automation/relevance/review";
       let rows = this.$refs.apiScenarioList.selectRows;
       const envMap = this.$refs.apiScenarioList.projectEnvMap;
       let map = new Map();
-      rows.forEach(row => {
+      rows.forEach((row) => {
         map.set(row.id, row.projectIds);
-      })
+      });
       param.reviewId = this.reviewId;
       param.mapping = strMapToObj(map);
       param.envMap = strMapToObj(envMap);
 
       this.result = this.$post(url, param, () => {
-        this.$success(this.$t('commons.save_success'));
-        this.$emit('refresh');
+        this.$success(this.$t("commons.save_success"));
+        this.$emit("refresh");
         this.refresh();
         this.$refs.baseRelevance.close();
       });
     },
-  }
-
-}
+  },
+};
 </script>
 
 <style scoped>
@@ -121,5 +125,4 @@ export default {
 /deep/ .module-input {
   width: 243px;
 }
-
 </style>

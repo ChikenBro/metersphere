@@ -1,27 +1,47 @@
 <template>
   <div v-loading="result.loading">
     <div class="comment-list">
-      <review-comment-item v-for="(comment) in comments" v-bind:key="comment.id"
-                           :comment="comment"
-                           @refresh="refresh"
-                           :review-status="reviewStatus"/>
+      <review-comment-item
+        v-for="comment in comments"
+        :key="comment.id"
+        :comment="comment"
+        :review-status="reviewStatus"
+        @refresh="refresh"
+      />
       <div v-if="comments.length === 0" style="text-align: center">
-        <i class="el-icon-chat-line-square" style="font-size: 15px;color: #8a8b8d;">
-        <span style="font-size: 15px; color: #8a8b8d;">
-          {{ $t('test_track.comment.no_comment') }}
-        </span>
+        <i
+          class="el-icon-chat-line-square"
+          style="font-size: 15px; color: #8a8b8d"
+        >
+          <span style="font-size: 15px; color: #8a8b8d">
+            {{ $t("test_track.comment.no_comment") }}
+          </span>
         </i>
       </div>
     </div>
     <div>
       <div>
-        <mavon-editor v-if="showEditor" @imgAdd="imgAdd" :default-open="'edit'" class="mavon-editor" :imageFilter="imageFilter"
-                      :toolbars="richDataToolbars"  @imgDel="imgDel" v-model="textarea"  ref="md"/>
+        <mavon-editor
+          v-if="showEditor"
+          v-model="textarea"
+          :default-open="'edit'"
+          ref="md"
+          class="mavon-editor"
+          :image-filter="imageFilter"
+          :toolbars="richDataToolbars"
+          @imgAdd="imgAdd"
+          @imgDel="imgDel"
+        />
       </div>
-      <el-button type="primary" size="mini" class="send-btn"
-                 v-permission="['PROJECT_TRACK_REVIEW:READ+COMMENT']"
-                 @click="sendComment" :disabled="isReadOnly">
-        {{ $t('test_track.comment.send') }}
+      <el-button
+        v-permission="['PROJECT_TRACK_REVIEW:READ+COMMENT']"
+        type="primary"
+        size="mini"
+        class="send-btn"
+        :disabled="isReadOnly"
+        @click="sendComment"
+      >
+        {{ $t("test_track.comment.send") }}
       </el-button>
     </div>
   </div>
@@ -30,11 +50,11 @@
 <script>
 import ReviewCommentItem from "./ReviewCommentItem";
 import FormRichTextItem from "@/business/components/track/case/components/FormRichTextItem";
-import {getUUID} from "@/common/js/utils";
+import { getUUID } from "@/common/js/utils";
 
 export default {
   name: "ReviewComment",
-  components: {ReviewCommentItem,FormRichTextItem},
+  components: { ReviewCommentItem, FormRichTextItem },
   props: {
     caseId: String,
     comments: Array,
@@ -44,10 +64,10 @@ export default {
   data() {
     return {
       result: {},
-      textarea: '',
-      loadCommenItem:true,
-      labelWidth: '120px',
-      showEditor:true,
+      textarea: "",
+      loadCommenItem: true,
+      labelWidth: "120px",
+      showEditor: true,
       isReadOnly: false,
       richDataToolbars: {
         bold: false, // 粗体
@@ -83,15 +103,14 @@ export default {
         /* 2.2.1 */
         subfield: false, // 单双栏模式
         preview: false, // 预览
-      }
+      },
     };
+  },
+  watch: {
+    comments() {},
   },
   created() {
     this.isReadOnly = false;
-  },
-  watch:{
-    comments(){
-    }
   },
   methods: {
     sendComment() {
@@ -101,43 +120,57 @@ export default {
       comment.reviewId = this.reviewId;
       comment.status = this.reviewStatus;
       if (!this.textarea) {
-        this.$warning(this.$t('test_track.comment.description_is_null'));
+        this.$warning(this.$t("test_track.comment.description_is_null"));
         return;
       }
-      this.result = this.$post('/test/case/comment/save', comment, () => {
-        this.$success(this.$t('test_track.comment.send_success'));
+      this.result = this.$post("/test/case/comment/save", comment, () => {
+        this.$success(this.$t("test_track.comment.send_success"));
         this.refresh();
-        this.$refs.md.toolbar_left_click('trash');
+        this.$refs.md.toolbar_left_click("trash");
       });
     },
     /* inputLight() {
        this.$refs.md.focus();
      },*/
     refresh() {
-      this.$emit('getComments');
+      this.$emit("getComments");
     },
     //富文本框
     imgAdd(pos, file) {
       let param = {
-        id: getUUID().substring(0, 8)
+        id: getUUID().substring(0, 8),
       };
 
       file.prefix = param.id;
-      this.result = this.$fileUpload('/resource/md/upload', file, null, param, () => {
-        this.$success(this.$t('commons.save_success'));
-        this.$refs.md.$img2Url(pos, '/resource/md/get/'  + param.id+"_"+file.name);
-        this.sendComment();
-      });
-      this.$emit('imgAdd', file);
+      this.result = this.$fileUpload(
+        "/resource/md/upload",
+        file,
+        null,
+        param,
+        () => {
+          this.$success(this.$t("commons.save_success"));
+          this.$refs.md.$img2Url(
+            pos,
+            "/resource/md/get/" + param.id + "_" + file.name
+          );
+          this.sendComment();
+        }
+      );
+      this.$emit("imgAdd", file);
     },
-    imageFilter(file){
+    imageFilter(file) {
       let isImg = false;
-      if(file){
-        if(file.name){
-          if (file.name.indexOf("[")> 0 || file.name.indexOf("]") > 0||file.name.indexOf("([)")> 0 || file.name.indexOf(")") > 0){
+      if (file) {
+        if (file.name) {
+          if (
+            file.name.indexOf("[") > 0 ||
+            file.name.indexOf("]") > 0 ||
+            file.name.indexOf("([)") > 0 ||
+            file.name.indexOf(")") > 0
+          ) {
             this.$error("图片名称不能含有特殊字符");
             isImg = false;
-          }else {
+          } else {
             isImg = true;
           }
         }
@@ -146,13 +179,13 @@ export default {
     },
     imgDel(file) {
       if (file && !this.clearImg) {
-        this.$get('/resource/md/delete/' + file[1].prefix + "_" + file[1].name);
+        this.$get("/resource/md/delete/" + file[1].prefix + "_" + file[1].name);
       }
     },
-    alertComment(){
-      alert(JSON.stringify(this.comments))
-    }
-  }
+    alertComment() {
+      alert(JSON.stringify(this.comments));
+    },
+  },
 };
 </script>
 

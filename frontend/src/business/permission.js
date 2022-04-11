@@ -1,16 +1,16 @@
-import router from './components/common/router/router';
-import {TokenKey} from '@/common/js/constants';
+import router from "./components/common/router/router";
+import { TokenKey } from "@/common/js/constants";
 import {
   enableModules,
   hasLicense,
   hasPermissions,
-  hasRoles
+  hasRoles,
 } from "@/common/js/utils";
-import NProgress from 'nprogress'; // progress bar
-import 'nprogress/nprogress.css'; // progress bar style
-const whiteList = ['/login']; // no redirect whitelist
+import NProgress from "nprogress"; // progress bar
+import "nprogress/nprogress.css"; // progress bar style
+const whiteList = ["/login"]; // no redirect whitelist
 
-NProgress.configure({showSpinner: false}); // NProgress Configuration
+NProgress.configure({ showSpinner: false }); // NProgress Configuration
 
 function checkLicense(el, binding, type) {
   let v = hasLicense();
@@ -21,13 +21,13 @@ function checkLicense(el, binding, type) {
 }
 
 function checkRolePermission(el, binding, type) {
-  const {value} = binding;
+  const { value } = binding;
   if (value && value instanceof Array && value.length > 0) {
     const permissionRoles = value;
     let hasPermission = false;
-    if (type === 'roles') {
+    if (type === "roles") {
       hasPermission = hasRoles(...permissionRoles);
-    } else if (type === 'permission') {
+    } else if (type === "permission") {
       hasPermission = hasPermissions(...permissionRoles);
     }
     if (!hasPermission) {
@@ -37,7 +37,7 @@ function checkRolePermission(el, binding, type) {
 }
 
 function checkModule(el, binding) {
-  const {value} = binding;
+  const { value } = binding;
   if (value && value instanceof Array && value.length > 0) {
     let v = enableModules(...value);
     if (!v) {
@@ -48,26 +48,26 @@ function checkModule(el, binding) {
 
 export const permission = {
   inserted(el, binding) {
-    checkRolePermission(el, binding, 'permission');
-  }
+    checkRolePermission(el, binding, "permission");
+  },
 };
 
 export const roles = {
   inserted(el, binding) {
-    checkRolePermission(el, binding, 'roles');
-  }
+    checkRolePermission(el, binding, "roles");
+  },
 };
 
 export const xpack = {
   inserted(el, binding) {
     checkLicense(el, binding);
-  }
+  },
 };
 
 export const modules = {
   inserted(el, binding) {
     checkModule(el, binding);
-  }
+  },
 };
 
 router.beforeEach(async (to, from, next) => {
@@ -78,8 +78,8 @@ router.beforeEach(async (to, from, next) => {
   const user = JSON.parse(localStorage.getItem(TokenKey));
 
   if (user) {
-    if (to.path === '/login') {
-      next({path: '/'});
+    if (to.path === "/login") {
+      next({ path: "/" });
       NProgress.done(); // hack: https://github.com/PanJiaChen/vue-element-admin/pull/2939
     } else {
       // const roles = user.roles.filter(r => r.id);
