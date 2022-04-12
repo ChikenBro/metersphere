@@ -164,6 +164,11 @@ export default {
         });
       }
     },
+    filterData() {
+      this.testResultCharData = this.testResultCharData.filter((item) => {
+        return item.dataList && item.dataList.length > 0;
+      });
+    },
   },
 };
 </script>

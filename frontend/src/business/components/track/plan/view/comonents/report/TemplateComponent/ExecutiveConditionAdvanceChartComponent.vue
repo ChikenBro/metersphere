@@ -116,6 +116,7 @@ export default {
         });
       }
       this.executerTestList = this.executeResult;
+      this.filterData();
     },
     copyData(status) {
       if (this.dataMap.get(status)) {
@@ -158,6 +159,11 @@ export default {
           },
         });
       }
+    },
+    filterData() {
+      this.executerTestList = this.executerTestList.filter((item) => {
+        return item.executerTestList && item.executerTestList.length > 0;
+      });
     },
   },
 };

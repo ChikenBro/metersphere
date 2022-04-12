@@ -48,7 +48,7 @@
             </ms-table-column>
             <ms-table-column
               label="负责人"
-              prop="assignee"
+              prop="leader"
               :field="item"
               sortable
               :fields-width="fieldsWidth"
@@ -75,7 +75,7 @@
               :fields-width="fieldsWidth"
             >
               <template v-slot:default="scope">
-                <span>{{ scope.row.schedule * 100 + "%" }}</span>
+                <span>{{ (scope.row.schedule / 10000).toFixed(2) + "%" }}</span>
               </template>
             </ms-table-column>
             <ms-table-column
@@ -86,7 +86,7 @@
               :fields-width="fieldsWidth"
             >
               <template v-slot:default="scope">
-                <span>{{ scope.row.startTime | timestampFormatDate }}</span>
+                <span>{{ scope.row.startTime }}</span>
               </template>
             </ms-table-column>
             <ms-table-column
@@ -97,7 +97,7 @@
               :fields-width="fieldsWidth"
             >
               <template v-slot:default="scope">
-                <span>{{ scope.row.endTime | timestampFormatDate }}</span>
+                <span>{{ scope.row.endTime }}</span>
               </template>
             </ms-table-column>
             <ms-table-column
@@ -116,7 +116,7 @@
               :fields-width="fieldsWidth"
             >
               <template v-slot:default="scope">
-                <span>{{ scope.row.schedule * 100 + "%" }}</span>
+                <span>{{ (scope.row.schedule / 10000).toFixed(2) + "%" }}</span>
               </template>
             </ms-table-column>
           </span>
@@ -219,9 +219,9 @@ export default {
     showRequirementList(row) {
       this.$refs.requirementsDrawer.open(row);
     },
-    handleEdit({ id, projectId }) {
-      if (id && projectId) {
-        this.$refs.iterationReportView.open(id, projectId);
+    handleEdit({ code, projectId }) {
+      if (code && projectId) {
+        this.$refs.iterationReportView.open(code, projectId);
       }
     },
     initTableData() {},

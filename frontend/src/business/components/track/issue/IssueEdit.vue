@@ -58,6 +58,7 @@ export default {
       this.isEdit = !!data?.isEdit;
       this.$nextTick(() => {
         this.$refs.issueEditDetail.open(data);
+        this.$refs.issueEditDetail.$el.scrollTop = 0;
       });
     },
     handleClose() {

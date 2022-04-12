@@ -1,6 +1,13 @@
-import { post, get } from "@/common/js/ajax";
-import { getPageDate } from "@/common/js/tableUtils";
-import { getCurrentProjectID } from "@/common/js/utils";
+import {
+  post,
+  get
+} from "@/common/js/ajax";
+import {
+  getPageDate
+} from "@/common/js/tableUtils";
+import {
+  getCurrentProjectID
+} from "@/common/js/utils";
 
 /**
  * @param {string} projectId
@@ -8,10 +15,17 @@ import { getCurrentProjectID } from "@/common/js/utils";
  */
 export function getIterationList(page) {
   return post(
-    "/iteration/list/" + page.currentPage + "/" + page.pageSize,
-    { ...page.condition, projectId: getCurrentProjectID() },
+    "/iteration/list/" + page.currentPage + "/" + page.pageSize, {
+      ...page.condition,
+      projectId: getCurrentProjectID(),
+      iterationName: "",
+      orders: [{
+        name: "start_time",
+        type: "desc"
+      }]
+    },
     (response) => {
-      getPageDate(response, page);
+      getPageDate(response.data, page);
     }
   );
 }
@@ -22,8 +36,9 @@ export function getIterationList(page) {
  */
 export function syncCoding(success) {
   return post(
-    "/iteration/sync/coding",
-    { projectId: getCurrentProjectID() },
+    "/iteration/sync/coding", {
+      projectId: getCurrentProjectID(),
+    },
     (response) => {
       if (success) {
         success(response);
@@ -39,8 +54,10 @@ export function syncCoding(success) {
  */
 export function getIterationRequirements(data, success) {
   return post(
-    `/iteration/requirement`,
-    { projectId: getCurrentProjectID(), ...data },
+    `/iteration/requirement`, {
+      projectId: getCurrentProjectID(),
+      ...data
+    },
     (response) => {
       if (success) {
         success(response);

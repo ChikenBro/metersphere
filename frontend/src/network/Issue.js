@@ -20,25 +20,6 @@ export function buildIssues(page) {
           ...data[i].customFields
         }
       }
-      data[i] = {
-        ...data[i],
-        ...{
-          "assigneeName": "何鹏翀",
-          "defectTypeId": 30801759,
-          "defectTypeName": "功能缺陷",
-          "dueDate": "2022-03-02",
-          "fileIds": [27119519],
-          "iterationCode": 1,
-          "iterationName": "迭代-未开始",
-          "priority": "2",
-          "recordedHours": 3.0,
-          "requirementCode": 3,
-          "requirementName": "需求-已完成",
-          "startDate": "2022-05-20",
-          "watcherName": "何鹏翀",
-          "workingHours": 1.5
-        }
-      }
       // if (data[i].platform !== 'Local') {
       //   page.result = buildPlatformIssue(data[i]);
       // }

@@ -79,7 +79,7 @@
             <ms-table-column
               :field="item"
               :fields-width="fieldsWidth"
-              :filters="getFilterOptions('platformStatus')"
+              :filters="statusOptions"
               :label="$t('test_track.issue.status')"
               min-width="140px"
               prop="platformStatus"
@@ -89,7 +89,6 @@
             <ms-table-column
               :field="item"
               :fields-width="fieldsWidth"
-              :filters="getFilterOptions('platform')"
               :label="$t('test_track.issue.platform')"
               prop="platform"
             >
@@ -108,7 +107,7 @@
             <ms-table-column
               :field="item"
               :fields-width="fieldsWidth"
-              :filters="getFilterOptions('assigneeName')"
+              :filters="handlerOptions"
               sortable
               min-width="130px"
               :label="$t('test_track.issue.handler')"
@@ -187,7 +186,7 @@
               :field="item"
               :fields-width="fieldsWidth"
               min-width="140px"
-              :filters="getFilterOptions('defectTypeName')"
+              :filters="defectTypeOptions"
               :label="$t('test_track.issue.defect_type')"
               prop="defectTypeName"
             >
@@ -219,13 +218,21 @@
               prop="workingHours"
             >
               <template v-slot:default="scope">
-                <span>{{ scope.row.workingHours }} 小时</span>
+                <span
+                  >{{
+                    scope.row.workingHours
+                      ? scope.row.workingHours + "小时"
+                      : ""
+                  }}
+                </span>
               </template>
             </ms-table-column>
             <!-- 所属迭代 -->
             <ms-table-column
               :field="item"
               :fields-width="fieldsWidth"
+              :filters="requirementOptions"
+              min-width="180px"
               :label="$t('test_track.issue.iteration')"
               prop="iterationName"
             >
@@ -259,7 +266,7 @@
               min-width="180px"
             >
               <template v-slot:default="scope">
-                <span>{{ scope.row.startDate | timestampFormatDate }}</span>
+                <span>{{ scope.row.startDate }}</span>
               </template>
             </ms-table-column>
             <!-- 截止时间 -->
@@ -272,14 +279,14 @@
               min-width="180px"
             >
               <template v-slot:default="scope">
-                <span>{{ scope.row.dueDate | timestampFormatDate }}</span>
+                <span>{{ scope.row.dueDate }}</span>
               </template>
             </ms-table-column>
             <!-- 创建人 -->
             <ms-table-column
               :field="item"
               :fields-width="fieldsWidth"
-              :filters="getFilterOptions('creatorName')"
+              :filters="handlerOptions"
               :label="$t('test_track.issue.creator')"
               prop="creatorName"
             >
@@ -288,7 +295,7 @@
             <ms-table-column
               :field="item"
               :fields-width="fieldsWidth"
-              :filters="getFilterOptions('requirementName')"
+              :filters="requirementOptions"
               min-width="140px"
               :label="$t('test_track.issue.related_requirements')"
               prop="requirementName"
@@ -298,7 +305,6 @@
             <ms-table-column
               :field="item"
               :fields-width="fieldsWidth"
-              :filters="getFilterOptions('model')"
               :label="$t('test_track.issue.module')"
               prop="model"
             >
@@ -456,6 +462,18 @@ export default {
         remark: "",
         num: "",
       },
+      statusOptions: [
+        { text: "待处理", value: 1 },
+        { text: "重新打开", value: 2 },
+        { text: "处理中", value: 3 },
+        { text: "待验证", value: 4 },
+        { text: "已拒绝", value: 5 },
+        { text: "已关闭", value: 6 },
+      ],
+      handlerOptions: [],
+      defectTypeOptions: [],
+      requirementOptions: [],
+      iterationOptions: [],
     };
   },
   filters: {
@@ -466,8 +484,13 @@ export default {
   activated() {
     getProjectMember((data) => {
       this.members = data;
+      this.handlerOptions = data.map((item) => ({
+        text: item.name,
+        value: item.id,
+      }));
     });
     this.fields = getTableHeaderWithCustomFields("ISSUE_LIST", []);
+    [1, 2, 3].forEach((type) => this.getOptions(type));
     this.$refs.table.reloadTable();
     // getIssueTemplate()
     //   .then((template) => {
@@ -552,8 +575,7 @@ export default {
       this.openDialog();
     },
     btnDisable(row) {
-      return false;
-      if (row.platform === "Local") {
+      if (row.platform === "Local" || row.platform === "Coding") {
         return false;
       }
       return true;
@@ -586,7 +608,7 @@ export default {
     // 确认提交
     handleDeLeteConfirm() {
       this.page.result = this.$post(
-        "issue/delete/",
+        "issues/delete",
         this.deleteIssueInfo,
         () => {
           this.$success(this.$t("commons.delete_success"));
@@ -596,25 +618,11 @@ export default {
       this.dialogVisible = false;
       this.deleteIssueInfo.remark = "";
     },
-    // 根据属性获取筛选列表
-    getFilterOptions(prop) {
-      const options = [];
-      const hasExist = {};
-      if (this.page.data) {
-        this.page.data.forEach((item) => {
-          let value = item[prop];
-          if (!!value && hasExist[value] === undefined) {
-            options.push({ text: value, value });
-            hasExist[value] = true;
-          }
-        });
-      }
-      return options;
-    },
     // 打开预览
     handlePreview(data) {
       const newData = this.handleData(data);
       newData.isOnlyRead = true;
+      newData.drawerTitle = "浏览缺陷";
       this.$refs.issueEdit.open(newData);
     },
     // 处理数据
@@ -626,21 +634,55 @@ export default {
         id: data.id,
         issueId: data.num,
         title: data.title,
-        descriptions: descriptions,
+        descriptions: descriptions || {
+          preconditions: "",
+          operatingSteps: "",
+          expectedResult: "",
+          actualResult: "",
+        },
         creator: data.creator,
         fields: {
           ...customFields,
           model: data.model,
-          workingHours: data.workingHours + "",
+          workingHours: customFields.workingHours + "" || "",
+          dueDate: customFields.dueDate || "",
+          startDate: customFields.startDate || "",
+          assignee: customFields.assignee || "",
+          environment: data.environment || "",
+          repetitionFrequency: data.repetitionFrequency || "",
         },
-        environment: "dev",
-        repetitionFrequency: "must",
         projectId: data.projectId,
         organizationId: data.organizationId,
-        testCaseIds: data.caseIds,
+        testCaseIds: ["01142f3b-6c77-457d-b7a0-8073ac750316"],
         statusId: data.status * 1,
       };
       return newData;
+    },
+    // 获取过滤器选项
+    getOptions(type, name = "") {
+      let url = "/field/template/issue/templates/list/1/10";
+      this.$post(url, { projectId: this.projectId, type, name }, (res) => {
+        let {
+          data: { options },
+        } = res;
+        switch (type) {
+          case 1:
+            this.defectTypeOptions =
+              options &&
+              options.map((item) => ({ text: item.name, value: item.id }));
+            break;
+          case 2:
+            this.requirementOptions =
+              options &&
+              options.map((item) => ({ text: item.name, value: item.id }));
+            break;
+          case 3:
+            this.iterationOptions =
+              options &&
+              options.map((item) => ({ text: item.name, value: item.id }));
+            break;
+        }
+      });
     },
   },
 };
