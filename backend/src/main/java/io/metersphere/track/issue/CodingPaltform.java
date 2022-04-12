@@ -89,7 +89,6 @@ public class CodingPaltform extends AbstractIssuePlatform {
         this.url = String.format("%s/issues/add", prefix_domain);
         LogUtil.info("add issue: " + issuesRequest);
         return CodingException.checkCodingException(this.url, issuesRequest);
-
     }
 
     @Override

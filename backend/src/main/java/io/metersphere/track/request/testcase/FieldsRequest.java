@@ -15,6 +15,7 @@ public class FieldsRequest {
     private Double recordedHours;
     private Integer iterationCode;
     private String iterationName;
+    private String assignee;
     private String assigneeName;
     private String watcherName;
     /**

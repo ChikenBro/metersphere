@@ -35,4 +35,6 @@ public class IssuesRequest extends BaseQueryRequest {
     private List<String> testCaseIds;
 
     private String requestType;
+    private List<String> ids;
+    private String remark;
 }

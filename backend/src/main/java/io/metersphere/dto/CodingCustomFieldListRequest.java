@@ -6,4 +6,5 @@ import lombok.Data;
 public class CodingCustomFieldListRequest {
     private String projectId;
     private Integer type;
+    private String name;
 }

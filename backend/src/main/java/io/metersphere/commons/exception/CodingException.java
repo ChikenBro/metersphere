@@ -23,4 +23,22 @@ public class CodingException {
         }
         return response;
     }
+
+    /**
+     * 校验coding返回
+     *
+     * @param result 返回内容
+     * @param result 操作类型
+     * @return
+     */
+    public static void checkCodingResult(String result, String operatorType) {
+        //coding返回错误信息
+        if (result.contains("Error")) {
+            MSException.throwException(result);
+        } else if (result.contains(String.format("平台%s失败", operatorType))) {
+            MSException.throwException(String.format("coding%s成功，平台%s失败，重试%s终止", operatorType));
+        } else if ("ms-coding服务异常".equals(result)) {
+            MSException.throwException("ms-coding服务异常");
+        }
+    }
 }

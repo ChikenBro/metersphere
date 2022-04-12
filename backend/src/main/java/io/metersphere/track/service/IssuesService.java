@@ -8,6 +8,7 @@ import io.metersphere.base.mapper.*;
 import io.metersphere.base.mapper.ext.ExtIssuesMapper;
 import io.metersphere.commons.constants.IssuesManagePlatform;
 import io.metersphere.commons.constants.NoticeConstants;
+import io.metersphere.commons.exception.CodingException;
 import io.metersphere.commons.exception.MSException;
 import io.metersphere.commons.user.SessionUser;
 import io.metersphere.commons.utils.BeanUtils;
@@ -83,6 +84,8 @@ public class IssuesService {
     private TestPlanTestCaseService testPlanTestCaseService;
     @Resource
     private SyncJiraIssueTask syncJiraIssueTask;
+    @Resource
+    private UserMapper userMapper;
 
     public void testAuth(String orgId, String platform) {
         IssuesRequest issuesRequest = new IssuesRequest();
@@ -91,19 +94,22 @@ public class IssuesService {
         abstractPlatform.testAuth();
     }
 
-    public String addIssues(IssuesUpdateRequest issuesRequest) {
+    public void addIssues(IssuesUpdateRequest issuesRequest) {
+        //工号替换名称
+        User creatorUser = userMapper.selectByPrimaryKey(issuesRequest.getCreator());
+        if (null != creatorUser) {
+            issuesRequest.setCreatorName(creatorUser.getName());
+//            issuesRequest.set(creatorUser.getName());
+            //todo 更换token秘钥
+        }
+        User assigneeUser = userMapper.selectByPrimaryKey(issuesRequest.getFields().getAssignee());
+        if (null != assigneeUser) {
+            issuesRequest.getFields().setAssigneeName(assigneeUser.getName());
+        }
         List<AbstractIssuePlatform> platformList = getUpdatePlatforms(issuesRequest);
         platformList.forEach(platform -> {
 //            platform.addIssue(issuesRequest);
-            String message = platform.addIssue(issuesRequest);
-            //coding返回错误信息
-            if (message.contains("Error")) {
-                MSException.throwException(message);
-            } else if (message.contains("平台入库失败")) {
-                MSException.throwException("coding同步成功，平台入库失败，重试终止");
-            } else if ("ms-coding服务异常".equals(message)) {
-                MSException.throwException("ms-coding服务异常");
-            }
+            CodingException.checkCodingResult(platform.addIssue(issuesRequest), "新增");
         });
         issuesRequest.getTestCaseIds().forEach(l -> {
             try {
@@ -118,7 +124,6 @@ public class IssuesService {
             }
         });
         noticeIssueEven(issuesRequest, "IssuesCreate");
-        return null;
     }
 
     public void noticeIssueEven(IssuesUpdateRequest issuesRequest, String type) {
@@ -138,7 +143,7 @@ public class IssuesService {
     public void updateIssues(IssuesUpdateRequest issuesRequest) {
         List<AbstractIssuePlatform> platformList = getUpdatePlatforms(issuesRequest);
         platformList.forEach(platform -> {
-            platform.updateIssue(issuesRequest);
+            CodingException.checkCodingResult(platform.updateIssue(issuesRequest), "编辑");
         });
         // todo 缺陷更新事件？
     }
@@ -319,8 +324,12 @@ public class IssuesService {
     }
 
     public void deleteIssue(IssuesRequest request) {
-        issuesMapper.deleteByPrimaryKey(request.getId());
-        deleteIssueRelate(request);
+        String prefix_domain = System.getProperty("coding.domain");
+        String url = String.format("%s/issues/delete", prefix_domain);
+        LogUtil.info("delete issues: " + request);
+        CodingException.checkCodingResult(CodingException.checkCodingException(url, request), "删除");
+//        issuesMapper.deleteByPrimaryKey(request.getId());
+//        deleteIssueRelate(request);
     }
 
     public void deleteIssueRelate(IssuesRequest request) {
