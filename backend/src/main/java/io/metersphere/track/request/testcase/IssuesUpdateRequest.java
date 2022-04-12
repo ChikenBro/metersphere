@@ -30,12 +30,12 @@ public class IssuesUpdateRequest extends IssuesWithBLOBs {
     private List<String> zentaoBuilds;
     private List<String> testCaseIds;
     /**
-     * 缺陷 Code
+     * 缺陷 id
      */
-    private Integer IssueCode;
+    private String issueId;
     /**
      * 	缺陷状态 Id
      */
-    private Integer StatusId;
+    private Integer statusId;
 
 }
