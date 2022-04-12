@@ -51,12 +51,15 @@
                 v-model="form.fields.defectTypeId"
                 placeholder="缺陷类型"
                 remote
+                clearable
+                @clear="getList(1, '')"
                 filterable
                 :remote-method="(query) => getList(1, query)"
               >
                 <el-option
                   v-for="(item, index) in defectList"
                   :key="index"
+                  @change="$forceUpdate()"
                   :label="item.label"
                   :value="item.value"
                 >
@@ -96,6 +99,8 @@
                 v-model="form.fields.requirementCode"
                 placeholder="未关联需求"
                 remote
+                clearable
+                @clear="getList(2, '')"
                 filterable
                 :remote-method="(query) => getList(2, query)"
               >
@@ -119,6 +124,8 @@
               <el-select
                 v-model="form.fields.iterationCode"
                 placeholder="请选择迭代"
+                clearable
+                @clear="getList(3, '')"
                 remote
                 filterable
                 :remote-method="(query) => getList(3, query)"
@@ -137,12 +144,12 @@
           <el-col :span="8">
             <el-form-item
               :label="$t('test_track.issue.handler')"
-              prop="fields.assigneeName"
+              prop="fields.assignee"
               :label-width="formLabelWidth"
             >
               <el-select
                 filterable
-                v-model="form.fields.assigneeName"
+                v-model="form.fields.assignee"
                 placeholder="未指定"
               >
                 <el-option
@@ -162,7 +169,11 @@
               prop="fields.workingHours"
               :label-width="formLabelWidth"
             >
-              <el-input type="number" v-model="form.fields.workingHours">
+              <el-input
+                type="number"
+                v-model="form.fields.workingHours"
+                oninput="if(isNaN(value)) { value = null } if(value.indexOf('.')>0){value=value.slice(0,value.indexOf('.')+3)}"
+              >
                 <i slot="suffix">&emsp;小时</i>
               </el-input>
             </el-form-item>
@@ -192,13 +203,14 @@
 
           <el-col :span="8">
             <el-form-item
-              :label="$t('test_track.issue.start_date')"
+              label="开始日期"
               prop="fields.startDate"
               :label-width="formLabelWidth"
             >
               <el-date-picker
                 v-model="form.fields.startDate"
                 type="date"
+                value-format="yyyy-MM-dd"
                 :picker-options="startDatePicker"
                 placeholder="未指定"
               >
@@ -208,13 +220,14 @@
 
           <el-col :span="8">
             <el-form-item
-              :label="$t('test_track.issue.due_date')"
+              label="截止日期"
               prop="fields.dueDate"
               :label-width="formLabelWidth"
             >
               <el-date-picker
                 v-model="form.fields.dueDate"
                 type="date"
+                value-format="yyyy-MM-dd"
                 :picker-options="endDatePicker"
                 placeholder="未指定"
               >
@@ -225,11 +238,11 @@
           <el-col :span="8">
             <el-form-item
               :label="$t('test_track.issue.repetition_environment')"
-              prop="environment"
+              prop="fields.environment"
               :label-width="formLabelWidth"
             >
               <el-select
-                v-model="form.environment"
+                v-model="form.fields.environment"
                 :placeholder="$t('commons.default')"
               >
                 <el-option
@@ -246,11 +259,11 @@
           <el-col :span="8">
             <el-form-item
               :label="$t('test_track.issue.repetition_frequency')"
-              prop="repetitionFrequency"
+              prop="fields.repetitionFrequency"
               :label-width="formLabelWidth"
             >
               <el-select
-                v-model="form.repetitionFrequency"
+                v-model="form.fields.repetitionFrequency"
                 :placeholder="$t('commons.default')"
               >
                 <el-option
@@ -472,14 +485,14 @@ export default {
           priority: 1,
           workingHours: undefined,
           iterationCode: undefined,
-          assigneeName: "",
+          assignee: "",
           requirementCode: undefined,
           moduleId: "",
           startDate: "",
           dueDate: "",
+          environment: "",
+          repetitionFrequency: "",
         },
-        environment: "",
-        repetitionFrequency: "",
         statusId: undefined,
         issueId: undefined,
       },
@@ -503,7 +516,7 @@ export default {
             trigger: "blur",
           },
         ],
-        "fields.assigneeName": [
+        "fields.assignee": [
           {
             required: true,
             message: this.$t("commons.please_fill_content"),
@@ -538,14 +551,14 @@ export default {
             trigger: "blur",
           },
         ],
-        environment: [
+        "fields.environment": [
           {
             required: true,
             message: this.$t("commons.please_fill_content"),
             trigger: "blur",
           },
         ],
-        repetitionFrequency: [
+        "fields.repetitionFrequency": [
           {
             required: true,
             message: this.$t("commons.please_fill_content"),
@@ -720,6 +733,9 @@ export default {
       this.testCaseContainIds = new Set();
       this.$refs["form"].resetFields();
       if (data) {
+        if (data.testCaseIds) {
+          this.testCaseContainIds = new Set(data.testCaseIds);
+        }
         Object.assign(this.form, data);
         // if (!(data.options instanceof Array)) {
         //   this.form.options = data.options ? JSON.parse(data.options) : [];
@@ -750,14 +766,14 @@ export default {
             priority: "1",
             workingHours: undefined,
             iterationCode: undefined,
-            assigneeName: "",
+            assignee: "",
             requirementCode: undefined,
             moduleId: "",
             startDate: "",
             dueDate: "",
+            environment: "",
+            repetitionFrequency: "",
           },
-          environment: "",
-          repetitionFrequency: "",
         };
         this.url = "issues/add";
         if (!this.form.creator) {
@@ -775,7 +791,7 @@ export default {
     initList() {
       getProjectMember((data) => {
         this.assigneeList = data.map((item) => ({
-          label: `${item.name}(${item.id})`,
+          label: item.name,
           value: item.id,
         }));
       });

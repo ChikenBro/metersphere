@@ -12,10 +12,12 @@ export default {
   components: { MsChart },
   mounted() {
     this.getDataNamesByData();
+    this.filterData();
   },
   watch: {
     data() {
       this.getDataNamesByData();
+      this.filterData();
     },
   },
   data() {
@@ -115,6 +117,13 @@ export default {
     },
     onClick(params) {
       this.$emit("onClick", params);
+    },
+    filterData() {
+      this.data.map((ele) => {
+        if (ele.value === 0) {
+          delete ele.value;
+        }
+      });
     },
   },
 };

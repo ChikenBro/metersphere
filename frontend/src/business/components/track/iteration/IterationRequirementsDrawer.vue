@@ -38,13 +38,14 @@
               </template>
             </el-table-column>
             <el-table-column prop="status" label="状态"> </el-table-column>
+            <el-table-column prop="assignee" label="处理人"> </el-table-column>
             <el-table-column prop="creator" label="创建人"> </el-table-column>
-            <el-table-column label="截止时间" prop="expirationDate" sortable>
+            <el-table-column label="截止日期" prop="dueDate" sortable>
               <!-- <template v-slot:default="scope">
             <span>{{ scope.row.startTime | timestampFormatDate }}</span>
           </template> -->
             </el-table-column>
-            <el-table-column label="创建时间" prop="createTieme" sortable>
+            <el-table-column label="创建时间" prop="createTime" sortable>
               <!-- <template v-slot:default="scope">
             <span>{{ scope.row.startTime | timestampFormatDate }}</span>
           </template> -->
@@ -56,7 +57,7 @@
             </el-table-column>
             <!-- <el-table-column prop="labelIds" label="标签"> </el-table-column> -->
             <el-table-column prop="watcher" label="关注人"> </el-table-column>
-            <el-table-column label="开始时间" prop="startTime" sortable>
+            <el-table-column label="开始日期" prop="startDate" sortable>
               <!-- <template v-slot:default="scope">
             <span>{{ scope.row.startTime | timestampFormatDate }}</span>
           </template> -->
@@ -131,7 +132,7 @@ export default {
       getIterationRequirements(
         { iterationCode: Number(this.iterationRow.code), ...this.condition },
         (res) => {
-          this.tableData = res.data;
+          this.tableData = res?.data?.data;
           this.pagination.total = res.data.length;
         }
       );

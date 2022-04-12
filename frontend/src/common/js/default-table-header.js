@@ -749,7 +749,7 @@ export const CUSTOM_TABLE_HEADER = {
       label: "迭代名称"
     },
     {
-      id: "assignee",
+      id: "leader",
       key: "2",
       label: "负责人"
     },
