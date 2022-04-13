@@ -24,6 +24,7 @@ import io.metersphere.commons.user.SessionUser;
 import io.metersphere.commons.utils.*;
 import io.metersphere.dto.BaseSystemConfigDTO;
 import io.metersphere.i18n.Translator;
+import io.metersphere.iteration.RequirementRequest;
 import io.metersphere.log.utils.ReflexObjectUtil;
 import io.metersphere.log.vo.DetailColumn;
 import io.metersphere.log.vo.OperatingLogDetails;
@@ -138,6 +139,8 @@ public class TestPlanService {
     private TestPlanReportMapper testPlanReportMapper;
     @Resource
     private TestPlanReportService testPlanReportService;
+    @Resource
+    private IterationMapper iterationMapper;
     @Lazy
     @Resource
     private IssuesService issuesService;
@@ -150,6 +153,12 @@ public class TestPlanService {
         testPlan.setCreateTime(System.currentTimeMillis());
         testPlan.setUpdateTime(System.currentTimeMillis());
         testPlan.setCreator(SessionUtils.getUser().getId());
+        if (null != testPlan.getIterationCode()) {
+            Iteration iteration = iterationMapper.getIterationByIterationCode(testPlan.getIterationCode());
+            if (null != iteration) {
+                testPlan.setIterationId(iteration.getId());
+            }
+        }
         if (StringUtils.isBlank(testPlan.getProjectId())) {
             testPlan.setProjectId(SessionUtils.getCurrentProjectId());
         }
@@ -161,23 +170,14 @@ public class TestPlanService {
         User user = userMapper.selectByPrimaryKey(testPlan.getCreator());
         Map<String, Object> paramMap = getTestPlanParamMap(testPlan);
         paramMap.put("creator", user.getName());
-        NoticeModel noticeModel = NoticeModel.builder()
-                .context(context)
-                .relatedUsers(userIds)
-                .subject(Translator.get("test_plan_notification"))
-                .mailTemplate("TestPlanStart")
-                .paramMap(paramMap)
-                .event(NoticeConstants.Event.CREATE)
-                .build();
+        NoticeModel noticeModel = NoticeModel.builder().context(context).relatedUsers(userIds).subject(Translator.get("test_plan_notification")).mailTemplate("TestPlanStart").paramMap(paramMap).event(NoticeConstants.Event.CREATE).build();
         noticeSendService.send(NoticeConstants.TaskType.TEST_PLAN_TASK, noticeModel);
         return testPlan.getId();
     }
 
     public List<TestPlan> getTestPlanByName(String name) {
         TestPlanExample example = new TestPlanExample();
-        example.createCriteria()
-                .andProjectIdEqualTo(SessionUtils.getCurrentProjectId())
-                .andNameEqualTo(name);
+        example.createCriteria().andProjectIdEqualTo(SessionUtils.getCurrentProjectId()).andNameEqualTo(name);
         return testPlanMapper.selectByExample(example);
     }
 
@@ -197,17 +197,14 @@ public class TestPlanService {
                 else if (res.getStatus().equals(TestPlanStatus.Completed.name())) {
                     testPlan.setActualEndTime(null);
                 }   //  已完成->进行中，结束时间置空
-            } else if (!res.getStatus().equals(TestPlanStatus.Prepare.name()) &&
-                    TestPlanStatus.Prepare.name().equals(testPlan.getStatus())) {
+            } else if (!res.getStatus().equals(TestPlanStatus.Prepare.name()) && TestPlanStatus.Prepare.name().equals(testPlan.getStatus())) {
                 testPlan.setActualStartTime(null);
                 testPlan.setActualEndTime(null);
             }   //  非未开始->未开始，时间都置空
-            else if (TestPlanStatus.Completed.name().equals(testPlan.getStatus()) &&
-                    !TestPlanStatus.Completed.name().equals(res.getStatus())) {
+            else if (TestPlanStatus.Completed.name().equals(testPlan.getStatus()) && !TestPlanStatus.Completed.name().equals(res.getStatus())) {
                 //已完成，写入实际完成时间
                 testPlan.setActualEndTime(System.currentTimeMillis());
-            } else if (!res.getStatus().equals(TestPlanStatus.Finished.name()) &&
-                    TestPlanStatus.Finished.name().equals(testPlan.getStatus())) {
+            } else if (!res.getStatus().equals(TestPlanStatus.Finished.name()) && TestPlanStatus.Finished.name().equals(testPlan.getStatus())) {
                 testPlan.setActualEndTime(System.currentTimeMillis());
             }   //  非已结束->已结束，更新结束时间
         }
@@ -228,14 +225,7 @@ public class TestPlanService {
             User user = userMapper.selectByPrimaryKey(testPlans.getCreator());
             Map<String, Object> paramMap = getTestPlanParamMap(testPlans);
             paramMap.put("creator", user.getName());
-            NoticeModel noticeModel = NoticeModel.builder()
-                    .context(context)
-                    .relatedUsers(userIds)
-                    .subject(Translator.get("test_plan_notification"))
-                    .mailTemplate("TestPlanEnd")
-                    .paramMap(paramMap)
-                    .event(NoticeConstants.Event.UPDATE)
-                    .build();
+            NoticeModel noticeModel = NoticeModel.builder().context(context).relatedUsers(userIds).subject(Translator.get("test_plan_notification")).mailTemplate("TestPlanEnd").paramMap(paramMap).event(NoticeConstants.Event.UPDATE).build();
             noticeSendService.send(NoticeConstants.TaskType.TEST_PLAN_TASK, noticeModel);
         }
         return testPlan.getId();
@@ -282,10 +272,7 @@ public class TestPlanService {
     private void checkTestPlanExist(TestPlan testPlan) {
         if (testPlan.getName() != null) {
             TestPlanExample example = new TestPlanExample();
-            example.createCriteria()
-                    .andNameEqualTo(testPlan.getName())
-                    .andWorkspaceIdEqualTo(SessionUtils.getCurrentWorkspaceId())
-                    .andIdNotEqualTo(testPlan.getId());
+            example.createCriteria().andNameEqualTo(testPlan.getName()).andWorkspaceIdEqualTo(SessionUtils.getCurrentWorkspaceId()).andIdNotEqualTo(testPlan.getId());
             if (testPlanMapper.selectByExample(example).size() > 0) {
                 MSException.throwException(Translator.get("plan_name_already_exists"));
             }
@@ -311,14 +298,7 @@ public class TestPlanService {
             User user = userMapper.selectByPrimaryKey(testPlan.getCreator());
             Map<String, Object> paramMap = getTestPlanParamMap(testPlan);
             paramMap.put("creator", user.getName());
-            NoticeModel noticeModel = NoticeModel.builder()
-                    .context(context)
-                    .relatedUsers(relatedUsers)
-                    .subject(Translator.get("test_plan_notification"))
-                    .mailTemplate("TestPlanDelete")
-                    .paramMap(paramMap)
-                    .event(NoticeConstants.Event.DELETE)
-                    .build();
+            NoticeModel noticeModel = NoticeModel.builder().context(context).relatedUsers(relatedUsers).subject(Translator.get("test_plan_notification")).mailTemplate("TestPlanDelete").paramMap(paramMap).event(NoticeConstants.Event.DELETE).build();
             noticeSendService.send(NoticeConstants.TaskType.TEST_PLAN_TASK, noticeModel);
         } catch (Exception e) {
             LogUtil.error(e.getMessage(), e);
@@ -340,8 +320,7 @@ public class TestPlanService {
 
             List<String> functionalExecResults = extTestPlanTestCaseMapper.getExecResultByPlanId(testPlan.getId());
             functionalExecResults.forEach(item -> {
-                if (!StringUtils.equals(item, TestPlanTestCaseStatus.Prepare.name())
-                        && !StringUtils.equals(item, TestPlanTestCaseStatus.Underway.name())) {
+                if (!StringUtils.equals(item, TestPlanTestCaseStatus.Prepare.name()) && !StringUtils.equals(item, TestPlanTestCaseStatus.Underway.name())) {
                     testPlan.setTested(testPlan.getTested() + 1);
                     if (StringUtils.equals(item, TestPlanTestCaseStatus.Pass.name())) {
                         testPlan.setPassed(testPlan.getPassed() + 1);
@@ -395,6 +374,13 @@ public class TestPlanService {
         testPlans.forEach(item -> {
             TestPlanReportExample example = new TestPlanReportExample();
             example.createCriteria().andTestPlanIdEqualTo(item.getId());
+            if (null != item.getIterationId()) {
+                Iteration iteration = iterationMapper.getIterationByIterationId(item.getIterationId());
+                if (null != iteration) {
+                    item.setIterationName(iteration.getName());
+                    item.setIterationCode(iteration.getCode());
+                }
+            }
             item.setExecutionTimes((int) testPlanReportMapper.countByExample(example));
         });
         calcTestPlanRate(testPlans);
@@ -416,9 +402,7 @@ public class TestPlanService {
         }
         int passNum = 0, prepareNum = 0, failNum = 0;
         for (String res : statusList) {
-            if (StringUtils.equals(res, TestPlanTestCaseStatus.Pass.name())
-                    || StringUtils.equals(res, "success")
-                    || StringUtils.equals(res, ScenarioStatus.Success.name())) {
+            if (StringUtils.equals(res, TestPlanTestCaseStatus.Pass.name()) || StringUtils.equals(res, "success") || StringUtils.equals(res, ScenarioStatus.Success.name())) {
                 passNum++;
             } else if (res == null || StringUtils.equals(TestPlanStatus.Prepare.name(), res)) {
                 prepareNum++;
@@ -445,8 +429,7 @@ public class TestPlanService {
 
     public void testPlanRelevance(PlanCaseRelevanceRequest request) {
 
-        ServiceUtils.getSelectAllIds(request, request.getRequest(),
-                (query) -> extTestCaseMapper.selectRelateIdsByQuery(query));
+        ServiceUtils.getSelectAllIds(request, request.getRequest(), (query) -> extTestCaseMapper.selectRelateIdsByQuery(query));
 
         List<String> testCaseIds = request.getIds();
 
@@ -547,8 +530,7 @@ public class TestPlanService {
             }
         }
         TestPlan testPlan = testPlanMapper.selectByPrimaryKey(request.getPlanId());
-        if (StringUtils.equals(testPlan.getStatus(), TestPlanStatus.Prepare.name())
-                || StringUtils.equals(testPlan.getStatus(), TestPlanStatus.Completed.name())) {
+        if (StringUtils.equals(testPlan.getStatus(), TestPlanStatus.Prepare.name()) || StringUtils.equals(testPlan.getStatus(), TestPlanStatus.Completed.name())) {
             testPlan.setStatus(TestPlanStatus.Underway.name());
             testPlan.setActualStartTime(System.currentTimeMillis());  // 将状态更新为进行中时，开始时间也要更新
             testPlan.setActualEndTime(null);
@@ -648,14 +630,7 @@ public class TestPlanService {
                 User user = userMapper.selectByPrimaryKey(_testPlans.getCreator());
                 Map<String, Object> paramMap = getTestPlanParamMap(_testPlans);
                 paramMap.put("creator", user.getName());
-                NoticeModel noticeModel = NoticeModel.builder()
-                        .context(context)
-                        .relatedUsers(userIds)
-                        .subject(Translator.get("test_plan_notification"))
-                        .mailTemplate("TestPlanEnd")
-                        .paramMap(paramMap)
-                        .event(NoticeConstants.Event.UPDATE)
-                        .build();
+                NoticeModel noticeModel = NoticeModel.builder().context(context).relatedUsers(userIds).subject(Translator.get("test_plan_notification")).mailTemplate("TestPlanEnd").paramMap(paramMap).event(NoticeConstants.Event.UPDATE).build();
                 noticeSendService.send(NoticeConstants.TaskType.TEST_PLAN_TASK, noticeModel);
             } catch (Exception e) {
                 LogUtil.error(e.getMessage(), e);
@@ -669,8 +644,7 @@ public class TestPlanService {
         // test-plan-functional-case status
         List<String> funcStatusList = extTestPlanTestCaseMapper.getStatusByPlanId(planId);
         for (String funcStatus : funcStatusList) {
-            if (StringUtils.equals(funcStatus, TestPlanTestCaseStatus.Prepare.name())
-                    || StringUtils.equals(funcStatus, TestPlanTestCaseStatus.Underway.name())) {
+            if (StringUtils.equals(funcStatus, TestPlanTestCaseStatus.Prepare.name()) || StringUtils.equals(funcStatus, TestPlanTestCaseStatus.Underway.name())) {
                 return TestPlanStatus.Underway.name();
             }
         }
@@ -840,16 +814,14 @@ public class TestPlanService {
                     }
                 }
                 issues.addAll(issue);
-                Collections.sort(issues,
-                        Comparator.comparing(Issues::getCreateTime, (t1, t2) -> {
-                            if (t1 == null) {
-                                return 1;
-                            } else  if (t2 == null) {
-                                return -1;
-                            }
-                            return t2.compareTo(t1);
-                        })
-                );
+                Collections.sort(issues, Comparator.comparing(Issues::getCreateTime, (t1, t2) -> {
+                    if (t1 == null) {
+                        return 1;
+                    } else if (t2 == null) {
+                        return -1;
+                    }
+                    return t2.compareTo(t1);
+                }));
             }
             components.forEach(component -> {
                 component.readRecord(testCase);
@@ -977,15 +949,13 @@ public class TestPlanService {
             group.setOnSampleError(scenario.getOnSampleError());
             // 多态JSON普通转换会丢失内容，需要通过 ObjectMapper 获取
             if (element != null && StringUtils.isNotEmpty(element.getString("hashTree"))) {
-                LinkedList<MsTestElement> elements = mapper.readValue(element.getString("hashTree"),
-                        new TypeReference<LinkedList<MsTestElement>>() {
-                        });
+                LinkedList<MsTestElement> elements = mapper.readValue(element.getString("hashTree"), new TypeReference<LinkedList<MsTestElement>>() {
+                });
                 scenario.setHashTree(elements);
             }
             if (StringUtils.isNotEmpty(element.getString("variables"))) {
-                LinkedList<ScenarioVariable> variables = mapper.readValue(element.getString("variables"),
-                        new TypeReference<LinkedList<ScenarioVariable>>() {
-                        });
+                LinkedList<ScenarioVariable> variables = mapper.readValue(element.getString("variables"), new TypeReference<LinkedList<ScenarioVariable>>() {
+                });
                 scenario.setVariables(variables);
             }
             group.setEnableCookieShare(scenario.isEnableCookieShare());
@@ -993,10 +963,7 @@ public class TestPlanService {
             scenarios.add(scenario);
             // 创建场景报告
             //不同的运行模式，第二个参数入参不同
-            APIScenarioReportResult report = apiAutomationService.createScenarioReport(group.getName(),
-                    planScenarioID + ":" + request.getTestPlanReportId(),
-                    item.getName(), request.getTriggerMode() == null ? ReportTriggerMode.MANUAL.name() : request.getTriggerMode(),
-                    request.getExecuteType(), item.getProjectId(), request.getReportUserID(), request.getConfig());
+            APIScenarioReportResult report = apiAutomationService.createScenarioReport(group.getName(), planScenarioID + ":" + request.getTestPlanReportId(), item.getName(), request.getTriggerMode() == null ? ReportTriggerMode.MANUAL.name() : request.getTriggerMode(), request.getExecuteType(), item.getProjectId(), request.getReportUserID(), request.getConfig());
             apiScenarioReportMapper.insert(report);
             group.setHashTree(scenarios);
             testPlan.getHashTree().add(group);
@@ -1007,15 +974,10 @@ public class TestPlanService {
 
     public String run(String testPlanID, String projectID, String userId, String triggerMode, String apiRunConfig) {
         if (StringUtils.isEmpty(apiRunConfig)) {
-            apiRunConfig =
-                    "{\"mode\":\"parallel\"," +
-                            "\"reportType\":\"iddReport\"," +
-                            "\"onSampleError\":true," +
-                            "\"runWithinResourcePool\":true," +
-                            "\"resourcePoolId\":\"29773f4f-55e4-4bce-ad3d-b531b4eb59c2\"}";
+            apiRunConfig = "{\"mode\":\"parallel\"," + "\"reportType\":\"iddReport\"," + "\"onSampleError\":true," + "\"runWithinResourcePool\":true," + "\"resourcePoolId\":\"29773f4f-55e4-4bce-ad3d-b531b4eb59c2\"}";
         }
         //创建测试报告，然后返回的ID重新赋值为resourceID，作为后续的参数
-        TestPlanScheduleReportInfoDTO reportInfoDTO = testPlanReportService.genTestPlanReportBySchedule(projectID,testPlanID,userId,triggerMode);
+        TestPlanScheduleReportInfoDTO reportInfoDTO = testPlanReportService.genTestPlanReportBySchedule(projectID, testPlanID, userId, triggerMode);
         TestPlanReport testPlanReport = reportInfoDTO.getTestPlanReport();
         Map<String, String> planScenarioIdMap = reportInfoDTO.getPlanScenarioIdMap();
         Map<String, String> apiTestCaseIdMap = reportInfoDTO.getApiTestCaseIdMap();
@@ -1024,9 +986,9 @@ public class TestPlanService {
         String planReportId = testPlanReport.getId();
 
         //不同任务的执行ID
-        Map<String,String> executePerformanceIdMap = new HashMap<>();
-        Map<String,String> executeApiCaseIdMap = new HashMap<>();
-        Map<String,String> executeScenarioCaseIdMap = new HashMap<>();
+        Map<String, String> executePerformanceIdMap = new HashMap<>();
+        Map<String, String> executeApiCaseIdMap = new HashMap<>();
+        Map<String, String> executeScenarioCaseIdMap = new HashMap<>();
 
         //执行性能测试任务
         List<String> performaneReportIDList = new ArrayList<>();
@@ -1062,7 +1024,7 @@ public class TestPlanService {
                 e.printStackTrace();
             }
             if (StringUtils.isNotEmpty(reportId)) {
-                executePerformanceIdMap.put(caseID,TestPlanApiExecuteStatus.RUNNING.name());
+                executePerformanceIdMap.put(caseID, TestPlanApiExecuteStatus.RUNNING.name());
             }
         }
         if (!performaneReportIDList.isEmpty()) {
@@ -1073,12 +1035,12 @@ public class TestPlanService {
 
         for (Map.Entry<String, String> entry : apiTestCaseIdMap.entrySet()) {
             String apiCaseID = entry.getKey();
-            executeApiCaseIdMap.put(apiCaseID,TestPlanApiExecuteStatus.RUNNING.name());
+            executeApiCaseIdMap.put(apiCaseID, TestPlanApiExecuteStatus.RUNNING.name());
         }
         for (String id : planScenarioIdMap.keySet()) {
-            executeScenarioCaseIdMap.put(id,TestPlanApiExecuteStatus.RUNNING.name());
+            executeScenarioCaseIdMap.put(id, TestPlanApiExecuteStatus.RUNNING.name());
         }
-        testPlanReportService.updateExecuteApis(planReportId,executeApiCaseIdMap,executeScenarioCaseIdMap,executePerformanceIdMap);
+        testPlanReportService.updateExecuteApis(planReportId, executeApiCaseIdMap, executeScenarioCaseIdMap, executePerformanceIdMap);
 
 
         //执行接口案例任务
@@ -1092,7 +1054,7 @@ public class TestPlanService {
             } else {
                 apiTestCaseService.run(blobs, UUID.randomUUID().toString(), planReportId, testPlanID, ApiRunMode.SCHEDULE_API_PLAN.name());
             }
-            executeApiCaseIdMap.put(apiCaseID,TestPlanApiExecuteStatus.RUNNING.name());
+            executeApiCaseIdMap.put(apiCaseID, TestPlanApiExecuteStatus.RUNNING.name());
         }
 
         //执行场景执行任务
@@ -1152,5 +1114,24 @@ public class TestPlanService {
             return JSON.toJSONString(details);
         }
         return null;
+    }
+
+    /**
+     * 根据迭代id获取测试计划列表
+     *
+     * @param testPlanBody 迭代id + name
+     * @return 测试计划列表
+     */
+    public List<TestPlan> selectIterationTestPlan(RequirementRequest testPlanBody) {
+        List<TestPlan> testPlans = new ArrayList<>();
+        Iteration iteration = iterationMapper.getIterationByIterationCode(testPlanBody.getIterationCode());
+        if (null == iteration) {
+            return testPlans;
+        }
+        testPlans = testPlanMapper.selectByIterationId(iteration.getId());
+        if (null != testPlanBody.getName() && !testPlanBody.getName().equals("")) {
+            return testPlans.stream().filter(s -> s.getName().contains(testPlanBody.getName())).collect(Collectors.toList());
+        }
+        return testPlans;
     }
 }

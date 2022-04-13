@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.metersphere.base.mapper.IterationMapper">
+    <resultMap id="BaseResultMap" type="io.metersphere.base.domain.Iteration">
+        <id column="id" jdbcType="VARCHAR" property="id"/>
+        <result column="workspace_id" jdbcType="VARCHAR" property="workspaceId"/>
+        <result column="project_id" jdbcType="VARCHAR" property="projectId"/>
+        <result column="code" jdbcType="INTEGER" property="code"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="leader" jdbcType="VARCHAR" property="leader"/>
+        <result column="creator" jdbcType="VARCHAR" property="creator"/>
+        <result column="status" jdbcType="VARCHAR" property="status"/>
+        <result column="description" jdbcType="VARCHAR" property="description"/>
+        <result column="schedule" jdbcType="INTEGER" property="schedule"/>
+        <result column="start_time" jdbcType="BIGINT" property="startTime"/>
+        <result column="end_time" jdbcType="BIGINT" property="endTime"/>
+        <result column="sync_start_time" jdbcType="BIGINT" property="syncStartTime"/>
+        <result column="sync_update_time" jdbcType="BIGINT" property="syncUpdateTime"/>
+        <result column="number_of_executions" jdbcType="INTEGER" property="numberOfExecutions"/>
+        <result column="last_pass_rate" jdbcType="INTEGER" property="lastPassRate"/>
+        <result column="deleted" jdbcType="INTEGER" property="deleted"/>
+        <result column="report_id" jdbcType="BIT" property="reportId"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, workspace_id, project_id, `code`, `name`, leader,creator, status , description, schedule, start_time,
+        end_time, sync_start_time, sync_update_time, number_of_executions,last_pass_rate, deleted, report_id
+    </sql>
+    <select id="getIterationByIterationCode" resultType="io.metersphere.base.domain.Iteration">
+        select
+        <include refid="Base_Column_List"/>
+        from coding_iteration
+        where code = #{iterationCode,jdbcType=VARCHAR}
+        and deleted = 0;
+    </select>
+    <select id="getIterationByIterationId" resultType="io.metersphere.base.domain.Iteration">
+        select
+        <include refid="Base_Column_List"/>
+        from coding_iteration
+        where id = #{iterationId,jdbcType=VARCHAR}
+        and deleted = 0;
+    </select>
+</mapper>

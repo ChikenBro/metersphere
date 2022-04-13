@@ -13,6 +13,7 @@
     <result column="report_id" jdbcType="VARCHAR" property="reportId" />
     <result column="create_user" jdbcType="VARCHAR" property="createUser" />
     <result column="issues_count" jdbcType="INTEGER" property="issuesCount" />
+    <result column="module_id" jdbcType="INTEGER" property="moduleId" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="io.metersphere.base.domain.TestPlanTestCaseWithBLOBs">
     <result column="results" jdbcType="LONGVARCHAR" property="results" />
@@ -79,7 +80,7 @@
   </sql>
   <sql id="Base_Column_List">
     id, plan_id, case_id, executor, `status`, remark, create_time, update_time, report_id, 
-    create_user, issues_count
+    create_user, issues_count, module_id
   </sql>
   <sql id="Blob_Column_List">
     results, issues, actual_result

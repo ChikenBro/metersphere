@@ -35,10 +35,6 @@ public class IssuesUpdateRequest extends IssuesWithBLOBs {
     private String creatorName;
 
     /**
-     * 缺陷 id
-     */
-    private String issueId;
-    /**
      * 缺陷状态 Id
      */
     private Integer statusId;

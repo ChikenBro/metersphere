@@ -47,5 +47,9 @@ public class TestPlan implements Serializable {
 
     private String tags;
 
+    private String iterationId;
+
+    private String environment;
+
     private static final long serialVersionUID = 1L;
 }

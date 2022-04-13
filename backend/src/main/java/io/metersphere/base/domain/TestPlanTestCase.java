@@ -27,5 +27,7 @@ public class TestPlanTestCase implements Serializable {
 
     private Integer issuesCount;
 
+    private String moduleId;
+
     private static final long serialVersionUID = 1L;
 }

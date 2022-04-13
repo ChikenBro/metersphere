@@ -6,4 +6,5 @@ import lombok.Data;
 public class RequirementRequest extends TokenRequest {
     private String projectId;
     private Integer iterationCode;
+    private String name;
 }

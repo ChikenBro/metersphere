@@ -29,5 +29,7 @@ public class TreeNodeDTO<T> {
 
     private Integer caseNum;
 
+    private String moduleId;
+
     private static final long serialVersionUID = 1L;
 }

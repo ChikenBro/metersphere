@@ -2,9 +2,13 @@ package io.metersphere.base.mapper;
 
 import io.metersphere.base.domain.TestPlan;
 import io.metersphere.base.domain.TestPlanExample;
-import java.util.List;
-import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Component;
+
+@Component
 public interface TestPlanMapper {
     long countByExample(TestPlanExample example);
 
@@ -15,6 +19,8 @@ public interface TestPlanMapper {
     int insert(TestPlan record);
 
     int insertSelective(TestPlan record);
+
+    List<TestPlan> selectByIterationId(@Param("iterationId") String iterationId);
 
     List<TestPlan> selectByExampleWithBLOBs(TestPlanExample example);
 

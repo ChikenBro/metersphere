@@ -428,7 +428,18 @@ public class IssuesService {
 
     public List<IssuesDao> list(IssuesRequest request) {
         request.setOrders(ServiceUtils.getDefaultOrder(request.getOrders()));
-        List<IssuesDao> issues = extIssuesMapper.getIssuesByProjectId(request);
+        String search = request.getOrders().get(0).getName();
+        List<IssuesDao> issues;
+        if (search.equals("priority") || search.equals("assignee") || search.equals("due_date") || search.equals("start_date")) {
+            request.getOrders().get(0).setName("update_time");
+            issues = extIssuesMapper.getIssuesByProjectId(request);
+//            issues.forEach(issue->{
+//                JSONObject result = JSON.parseObject(issue.getCustomFields());
+//                issue.set.setresult.get("priority")
+//            });
+        } else {
+            issues = extIssuesMapper.getIssuesByProjectId(request);
+        }
 
         List<String> names = issues.stream().map(IssuesDao::getCreator).collect(Collectors.toList());
         Map<String, User> userMap = ServiceUtils.getUserMapIds(names);

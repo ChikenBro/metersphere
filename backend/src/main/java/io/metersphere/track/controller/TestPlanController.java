@@ -9,6 +9,7 @@ import io.metersphere.commons.constants.OperLogConstants;
 import io.metersphere.commons.constants.PermissionConstants;
 import io.metersphere.commons.utils.PageUtils;
 import io.metersphere.commons.utils.Pager;
+import io.metersphere.iteration.RequirementRequest;
 import io.metersphere.log.annotation.MsAuditLog;
 import io.metersphere.service.CheckPermissionService;
 import io.metersphere.track.dto.ApiRunConfigDTO;
@@ -41,7 +42,7 @@ public class TestPlanController {
     CheckPermissionService checkPermissionService;
 
     @PostMapping("/autoCheck/{testPlanId}")
-    public void autoCheck(@PathVariable String testPlanId){
+    public void autoCheck(@PathVariable String testPlanId) {
         testPlanService.checkStatus(testPlanId);
     }
 
@@ -89,7 +90,6 @@ public class TestPlanController {
     public String addTestPlan(@RequestBody AddTestPlanRequest testPlan) {
         testPlan.setId(UUID.randomUUID().toString());
         return testPlanService.addTestPlan(testPlan);
-
     }
 
     @PostMapping("/edit")
@@ -160,6 +160,15 @@ public class TestPlanController {
         api.setReportType("iddReport");
         String apiRunConfig = JSONObject.toJSONString(api);
         return testPlanService.run(testplanRunRequest.getTestPlanId(), testplanRunRequest.getProjectId(), testplanRunRequest.getUserId(), testplanRunRequest.getTriggerMode(), apiRunConfig);
+    }
+
+    @PostMapping("/iteration/plan")
+    @RequiresPermissions(PermissionConstants.PROJECT_TRACK_PLAN_READ_CREATE)
+    @MsAuditLog(module = "track_test_plan", type = OperLogConstants.CREATE, title = "#testPlan.name", content = "#msClass.getLogDetails(#testPlan.id)", msClass = TestPlanService.class)
+    public List<TestPlan> selectIterationTestPlan(@RequestBody RequirementRequest testPlanBody) {
+//        testPlan.setId(UUID.randomUUID().toString());
+
+        return testPlanService.selectIterationTestPlan(testPlanBody);
     }
 
 }

@@ -11,6 +11,8 @@ import java.util.List;
 public class TestPlanDTO extends TestPlan {
     private String projectName;
     private String userName;
+    private String iterationName;
+    private Integer iterationCode;
     private List<String> projectIds;
 
     /**
