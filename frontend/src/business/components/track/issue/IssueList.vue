@@ -461,6 +461,7 @@ export default {
         projectId: "",
         remark: "",
         num: "",
+        operator: JSON.parse(localStorage.getItem("Admin-Token"))?.id,
       },
       statusOptions: [
         { text: "待处理", value: 1 },
