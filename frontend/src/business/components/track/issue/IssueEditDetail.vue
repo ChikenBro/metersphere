@@ -22,7 +22,6 @@
           <el-col :span="6" v-if="isEdit" :push="2">
             <el-form-item
               :label="$t('test_track.issue.status')"
-              prop="statusId"
               :label-width="formLabelWidth"
             >
               <el-select
@@ -590,13 +589,6 @@ export default {
             trigger: "blur",
           },
         ],
-        statusId: [
-          {
-            required: true,
-            message: this.$t("commons.please_fill_content"),
-            trigger: "blur",
-          },
-        ],
       },
       testCaseContainIds: new Set(),
       url: "",
@@ -802,7 +794,7 @@ export default {
           value: item.id,
         }));
       });
-      
+      [1, 2, 3].forEach((item) => this.getList(item));
     },
     getList(type, name = "") {
       let url = "/field/template/issue/templates/list/1/10";
