@@ -736,6 +736,16 @@ export default {
         if (data.testCaseIds) {
           this.testCaseContainIds = new Set(data.testCaseIds);
         }
+        const statusList = [
+          { label: "待处理", value: 1 },
+          { label: "重新打开", value: 2 },
+          { label: "处理中", value: 3 },
+          { label: "待验证", value: 4 },
+          { label: "已拒绝", value: 5 },
+          { label: "已关闭", value: 6 },
+        ];
+        if (data.statusId !== 6) statusList.splice(1, 1);
+        this.statusList = statusList;
         Object.assign(this.form, data);
         // if (!(data.options instanceof Array)) {
         //   this.form.options = data.options ? JSON.parse(data.options) : [];
