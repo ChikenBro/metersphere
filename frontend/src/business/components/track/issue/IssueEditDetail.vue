@@ -627,7 +627,7 @@ export default {
         { label: "线上环境", value: "prod" },
       ], // 复现环境列表
       repetitionFrequencyList: [
-        { label: "必须", value: "must" },
+        { label: "必现", value: "must" },
         { label: "偶现", value: "sometimes" },
         { label: "高出现率", value: "manyTimes" },
       ], // 复现频率
@@ -780,7 +780,7 @@ export default {
             moduleId: "",
             startDate: "",
             dueDate: "",
-            environment: "dev",
+            environment: "test",
             repetitionFrequency: "must",
           },
         };
@@ -817,6 +817,9 @@ export default {
             this.defectList =
               options &&
               options.map((item) => ({ label: item.name, value: item.id }));
+            if (this.defectList.length > 0) {
+              this.form.fields.defectTypeId = this.defectList[0].value;
+            }
             break;
           case 2:
             this.requirementList =
@@ -836,22 +839,11 @@ export default {
       this.$nextTick(() => (this.isFormAlive = true));
     },
     save(type) {
-      let isValidate = true;
       this.$refs["form"].validate((valid) => {
-        if (!valid) {
-          isValidate = false;
-          return false;
+        if (valid) {
+          this._save(type);
         }
       });
-      // this.$refs['customFieldForm'].validate((valid) => {
-      //   if (!valid) {
-      //     isValidate = false;
-      //     return false;
-      //   }
-      // });
-      if (isValidate) {
-        this._save(type);
-      }
     },
     buildPram() {
       let param = {};
@@ -874,6 +866,7 @@ export default {
       this.parseOldFields(param);
       this.result = this.$post(this.url, param, () => {
         if (type !== "reCreate") this.$emit("close");
+        else this.$emit("openNewDrawer");
         this.$success(this.$t("commons.save_success"));
         this.$emit("refresh");
       });
