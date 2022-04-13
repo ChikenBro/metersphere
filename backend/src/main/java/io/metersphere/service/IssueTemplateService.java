@@ -8,8 +8,10 @@ import io.metersphere.base.mapper.IssueTemplateMapper;
 import io.metersphere.base.mapper.WorkspaceMapper;
 import io.metersphere.base.mapper.ext.ExtIssueTemplateMapper;
 import io.metersphere.commons.constants.TemplateConstants;
+import io.metersphere.commons.exception.CodingException;
 import io.metersphere.commons.exception.MSException;
 import io.metersphere.commons.utils.BeanUtils;
+import io.metersphere.commons.utils.LogUtil;
 import io.metersphere.commons.utils.ServiceUtils;
 import io.metersphere.commons.utils.SessionUtils;
 import io.metersphere.controller.request.BaseQueryRequest;
@@ -28,6 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.lang.reflect.Type;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -325,19 +328,20 @@ public class IssueTemplateService extends TemplateBaseService {
     }
 
     /**
-     * 获取coding issue template
+     * coding customField
      *
-     * @param
-     * @return
+     * @param goPage                 当前页数
+     * @param pageSize               1页多少数量
+     * @param customFieldListRequest 项目Id 与类型
+     * @return 需求、迭代、缺陷类型等
      */
-    public CustomFieldList getCodingIssueTemplate(Integer goPage, Integer pageSize, CodingCustomFieldListRequest customFieldListRequest) {
-        CustomFieldList result = customFieldService.getCodingCustomFieldByTemplateId(goPage, pageSize, customFieldListRequest);
-//        issueTemplateDao.setCustomFieldListList(result.getItems());
-        return result;
+    public JSONObject getCodingIssueTemplate(Integer goPage, Integer pageSize, CodingCustomFieldListRequest customFieldListRequest) {
+        String prefix_domain = System.getProperty("coding.domain");
+        String url = String.format("%s/field/template/issue/templates/list/%s/%s", prefix_domain, goPage, pageSize);
+        LogUtil.info("get coding customField: " + customFieldListRequest);
+        String result = CodingException.checkCodingException(url, customFieldListRequest);
+        return JSON.parseObject(result);
     }
-
-
-
 
     public String getLogDetails(String id) {
         IssueTemplate templateWithBLOBs = issueTemplateMapper.selectByPrimaryKey(id);

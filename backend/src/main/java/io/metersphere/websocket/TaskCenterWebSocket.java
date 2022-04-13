@@ -3,6 +3,7 @@ package io.metersphere.websocket;
 import io.metersphere.commons.utils.LogUtil;
 import io.metersphere.task.dto.TaskCenterRequest;
 import io.metersphere.task.service.TaskService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -15,6 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @ServerEndpoint("/task/center/count/running/{projectId}")
 @Component
+@Slf4j
 public class TaskCenterWebSocket {
     private static TaskService taskService;
     private static ConcurrentHashMap<Session, Timer> refreshTasks = new ConcurrentHashMap<>();
@@ -92,6 +94,8 @@ public class TaskCenterWebSocket {
         @Override
         public void run() {
             try {
+                log.info("总session个数:{}", refreshTasks.keySet().size());
+                log.info("当前session:{}", session);
                 int taskTotal = taskService.getRunningTasks(request).size();
                 if (!session.isOpen()) {
                     return;

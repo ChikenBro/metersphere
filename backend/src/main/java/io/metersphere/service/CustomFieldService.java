@@ -144,22 +144,22 @@ public class CustomFieldService {
         return result;
     }
 
-    /**
-     * coding customField
-     *
-     * @param goPage                 当前页数
-     * @param pageSize               1页多少数量
-     * @param customFieldListRequest 项目Id 与类型
-     * @return 需求、迭代、缺陷类型等
-     */
+//    /**
+//     * coding customField
+//     *
+//     * @param goPage                 当前页数
+//     * @param pageSize               1页多少数量
+//     * @param customFieldListRequest 项目Id 与类型
+//     * @return 需求、迭代、缺陷类型等
+//     */
 
-    public CustomFieldList getCodingCustomFieldByTemplateId(Integer goPage, Integer pageSize, CodingCustomFieldListRequest customFieldListRequest) {
-        String prefix_domain = System.getProperty("coding.domain");
-        String url = String.format("%s/field/template/issue/templates/list/%s/%s", prefix_domain, goPage, pageSize);
-        LogUtil.info("get coding customField: " + customFieldListRequest);
-        String result = CodingException.checkCodingException(url, customFieldListRequest);
-        return JSON.parseObject(result, CustomFieldList.class);
-    }
+//    public CustomFieldList getCodingCustomFieldByTemplateId(Integer goPage, Integer pageSize, CodingCustomFieldListRequest customFieldListRequest) {
+//        String prefix_domain = System.getProperty("coding.domain");
+//        String url = String.format("%s/field/template/issue/templates/list/%s/%s", prefix_domain, goPage, pageSize);
+//        LogUtil.info("get coding customField: " + customFieldListRequest);
+//        String result = CodingException.checkCodingException(url, customFieldListRequest);
+//        return JSON.parseObject(result, CustomFieldList.class);
+//    }
 
     public List<CustomField> getFieldByIds(List<String> ids) {
         if (CollectionUtils.isNotEmpty(ids)) {

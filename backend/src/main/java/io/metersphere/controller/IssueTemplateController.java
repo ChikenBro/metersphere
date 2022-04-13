@@ -1,5 +1,6 @@
 package io.metersphere.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import io.metersphere.base.domain.IssueTemplate;
@@ -63,7 +64,7 @@ public class IssueTemplateController {
 //
 //    }
     @PostMapping("/templates/list/{goPage}/{pageSize}")
-    public CustomFieldList getIssueTemplate(@PathVariable Integer goPage, @PathVariable Integer pageSize, @RequestBody CodingCustomFieldListRequest codingCustomFieldListRequest) {
+    public JSONObject getIssueTemplate(@PathVariable Integer goPage, @PathVariable Integer pageSize, @RequestBody CodingCustomFieldListRequest codingCustomFieldListRequest) {
         return issueTemplateService.getCodingIssueTemplate(goPage, pageSize, codingCustomFieldListRequest);
     }
 
