@@ -170,9 +170,8 @@
               :label-width="formLabelWidth"
             >
               <el-input
-                type="number"
                 v-model="form.fields.workingHours"
-                oninput="if(isNaN(value)) { value = null } if(value.indexOf('.')>0){value=value.slice(0,value.indexOf('.')+3)}"
+                @keyup.native="onWorkingHoursInput"
               >
                 <i slot="suffix">&emsp;小时</i>
               </el-input>
@@ -490,8 +489,8 @@ export default {
           moduleId: "",
           startDate: "",
           dueDate: "",
-          environment: "",
-          repetitionFrequency: "",
+          environment: "dev",
+          repetitionFrequency: "must",
         },
         statusId: undefined,
         issueId: undefined,
@@ -628,7 +627,7 @@ export default {
         { label: "线上环境", value: "prod" },
       ], // 复现环境列表
       repetitionFrequencyList: [
-        { label: "必须", value: "must" },
+        { label: "必现", value: "must" },
         { label: "偶现", value: "sometimes" },
         { label: "高出现率", value: "manyTimes" },
       ], // 复现频率
@@ -781,8 +780,8 @@ export default {
             moduleId: "",
             startDate: "",
             dueDate: "",
-            environment: "",
-            repetitionFrequency: "",
+            environment: "test",
+            repetitionFrequency: "must",
           },
         };
         this.url = "issues/add";
@@ -818,6 +817,9 @@ export default {
             this.defectList =
               options &&
               options.map((item) => ({ label: item.name, value: item.id }));
+            if (this.defectList.length > 0) {
+              this.form.fields.defectTypeId = this.defectList[0].value;
+            }
             break;
           case 2:
             this.requirementList =
@@ -837,22 +839,11 @@ export default {
       this.$nextTick(() => (this.isFormAlive = true));
     },
     save(type) {
-      let isValidate = true;
       this.$refs["form"].validate((valid) => {
-        if (!valid) {
-          isValidate = false;
-          return false;
+        if (valid) {
+          this._save(type);
         }
       });
-      // this.$refs['customFieldForm'].validate((valid) => {
-      //   if (!valid) {
-      //     isValidate = false;
-      //     return false;
-      //   }
-      // });
-      if (isValidate) {
-        this._save(type);
-      }
     },
     buildPram() {
       let param = {};
@@ -875,6 +866,7 @@ export default {
       this.parseOldFields(param);
       this.result = this.$post(this.url, param, () => {
         if (type !== "reCreate") this.$emit("close");
+        else this.$emit("openNewDrawer");
         this.$success(this.$t("commons.save_success"));
         this.$emit("refresh");
       });
@@ -921,6 +913,34 @@ export default {
           }
         },
       };
+    },
+    onWorkingHoursInput({ target }) {
+      // 清除"数字"和"."以外的字符
+      target.value = target.value.replace(/[^\d.]/g, "");
+      // 验证第一个字符是数字
+      target.value = target.value.replace(/^\./g, "");
+      // 只保留第一个, 清除多余的
+      target.value = target.value.replace(/\.{2,}/g, ".");
+      target.value = target.value
+        .replace(".", "$#$")
+        .replace(/\./g, "")
+        .replace("$#$", ".");
+      // 只能输入两个小数
+      target.value = target.value.replace(/^(\-)*(\d+)\.(\d\d).*$/, "$1$2.$3");
+
+      //如果有小数点，不能为类似 1.10的数
+      if (target.value.indexOf(".") > 0 && target.value.indexOf("0") > 2) {
+        target.value = parseFloat(target.value);
+      }
+      //如果有小数点，不能为类似 0.00的数
+      if (target.value.indexOf(".") > 0 && target.value.lastIndexOf("0") > 2) {
+        target.value = parseFloat(target.value);
+      }
+      //以上已经过滤，此处控制的是如果没有小数点，首位不能为类似于 01、02的数
+      if (target.value.indexOf(".") <= 0 && target.value != "") {
+        target.value = parseFloat(target.value);
+      }
+      this.$nextTick(() => (this.form.fields.workingHours = target.value));
     },
   },
 };

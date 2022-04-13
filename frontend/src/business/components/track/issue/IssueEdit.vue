@@ -24,6 +24,7 @@
       <issue-edit-detail
         @refresh="$emit('refresh')"
         @close="handleClose"
+        @openNewDrawer="openNewDrawer"
         ref="issueEditDetail"
         :isDisabled="isDisabled"
         :is-edit="isEdit"
@@ -70,7 +71,9 @@ export default {
     // 保存并清空
     handleCreateNext() {
       this.$refs.issueEditDetail.save("reCreate");
-      this.open();
+    },
+    openNewDrawer() {
+      this.$refs.issueEditDetail.open();
     },
   },
 };
