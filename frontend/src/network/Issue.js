@@ -86,9 +86,12 @@ export function getRelateIssues(page) {
 }
 
 export function syncIssues(success) {
-  return get('/trend/issue/sync/coding?projectId=' + getCurrentProjectID(), (response) => {
-    if (success) {
-      success(response);
-    }
-  });
+  return post("/issues/sync/coding", {
+      projectId: getCurrentProjectID()
+    },
+    (response) => {
+      if (success) {
+        success(response);
+      }
+    });
 }
