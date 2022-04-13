@@ -28,6 +28,7 @@
               <el-select
                 v-model="form.statusId"
                 :placeholder="$t('commons.default')"
+                @change="$forceUpdate()"
               >
                 <el-option
                   v-for="(item, index) in statusList"
@@ -50,11 +51,10 @@
               <el-select
                 v-model="form.fields.defectTypeId"
                 placeholder="缺陷类型"
-                remote
                 clearable
                 @clear="getList(1, '')"
                 filterable
-                :remote-method="(query) => getList(1, query)"
+                :filter-method="(query) => getList(1, query)"
               >
                 <el-option
                   v-for="(item, index) in defectList"
@@ -98,11 +98,10 @@
               <el-select
                 v-model="form.fields.requirementCode"
                 placeholder="未关联需求"
-                remote
                 clearable
                 @clear="getList(2, '')"
                 filterable
-                :remote-method="(query) => getList(2, query)"
+                :filter-method="(query) => getList(2, query)"
               >
                 <el-option
                   v-for="(item, index) in requirementList"
@@ -126,9 +125,8 @@
                 placeholder="请选择迭代"
                 clearable
                 @clear="getList(3, '')"
-                remote
                 filterable
-                :remote-method="(query) => getList(3, query)"
+                :filter-method="(query) => getList(3, query)"
               >
                 <el-option
                   v-for="(item, index) in iterationList"
@@ -804,7 +802,7 @@ export default {
           value: item.id,
         }));
       });
-      [1, 2, 3].forEach((type) => this.getList(type));
+      
     },
     getList(type, name = "") {
       let url = "/field/template/issue/templates/list/1/10";

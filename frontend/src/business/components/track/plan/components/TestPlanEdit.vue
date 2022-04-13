@@ -145,22 +145,21 @@
             <el-form-item
               :label="$t('所属迭代')"
               :label-width="formLabelWidth"
-              prop="iterationId"
+              prop="iterationCode"
             >
               <el-select
-                v-model="form.iterationId"
+                v-model="form.iterationCode"
                 clearable
                 placeholder="请选择迭代"
                 filterable
-                remote
-                :remote-method="getIterationOptions"
+                :filter-method="getIterationOptions"
                 @change="getPlanInheritOptions"
               >
                 <el-option
                   v-for="(item, index) in iterationOptions"
                   :key="index"
-                  :label="item.id"
-                  :value="item.name"
+                  :label="item.label"
+                  :value="item.value"
                 ></el-option>
               </el-select>
             </el-form-item>
@@ -308,7 +307,7 @@ export default {
         plannedStartTime: "",
         plannedEndTime: "",
         automaticStatusUpdate: false,
-        iterationId: "",
+        iterationCode: "",
         environment: "",
         testPlanInherit: "",
         ifRetain: false,
@@ -347,7 +346,7 @@ export default {
             trigger: "blur",
           },
         ],
-        iterationId: [
+        iterationCode: [
           { required: true, message: "请选择所属迭代", trigger: "blur" },
         ],
         environment: [
@@ -494,26 +493,37 @@ export default {
     },
     // 获取迭代列表
     getIterationOptions(name = "") {
-      const url = "/field/template/issue/templates/list/1/10";
+      const url = "/field/template/issue/templates/list/1/20";
       this.$post(
         url,
         { projectId: getCurrentProjectID(), type: 3, name },
         (response) => {
-          this.iterationOptions = response.options || [];
+          let tempArr = response?.data?.options || [];
+          const iterationOptions = [];
+          tempArr.forEach((item) => {
+            iterationOptions.push({
+              label: item.name,
+              value: item.id,
+            });
+          });
+          this.iterationOptions = iterationOptions;
         }
       );
     },
     // 获取计划继承列表
-    getPlanInheritOptions(iterationId) {
-      const url = `/test/plan/iteration/${iterationId}`;
+    getPlanInheritOptions(iterationCode) {
+      const url = `/test/plan/iteration/plan`;
       this.planInheritOptions = [];
-      this.$post(url, {}, (response) => {
-        response.data.forEach((item) => {
-          this.planInheritOptions.push({
-            label: item.testPlanName,
-            value: item.testPlanId,
+      this.$post(url, { iterationCode }, (response) => {
+        let tempArr = response?.data || [];
+        const planInheritOptions = [];
+        tempArr.forEach((item) => {
+          planInheritOptions.push({
+            label: item.name,
+            value: item.id,
           });
         });
+        this.planInheritOptions = planInheritOptions;
       });
     },
     // 重置保留缺陷状态
