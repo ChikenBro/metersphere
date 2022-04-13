@@ -1,6 +1,7 @@
 package io.metersphere.track.service;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import io.metersphere.base.domain.*;
@@ -34,6 +35,7 @@ import io.metersphere.track.request.testcase.AuthUserIssueRequest;
 import io.metersphere.track.request.testcase.IssuesRequest;
 import io.metersphere.track.request.testcase.IssuesUpdateRequest;
 import io.metersphere.track.service.task.SyncJiraIssueTask;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -50,6 +52,7 @@ import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @Transactional(rollbackFor = Exception.class)
 public class IssuesService {
 
@@ -141,11 +144,36 @@ public class IssuesService {
             MSException.throwException("请先去个人设置配置个人访问令牌");
         }
         try {
-            return platformInfo.split("codingToken\":\"")[1].split("\"}}")[0];
+            //解析内容如下
+//            {"d1ab2464-0a3d-11ec-b53d-0c42a1eda428":{"jiraAccount":"1","jiraPassword":"1","codingToken":"2fd336cfa806cae14d5e8f955e1b63e2f193d70c"}}
+            Map<String, String> map = new HashMap<>();
+            map = JSON.parseObject(platformInfo, HashMap.class);
+            return (String) ((JSONObject) map.values().toArray()[0]).get("codingToken");
         } catch (Exception e) {
+            log.error("当前秘钥内容为:{}", platformInfo);
             MSException.throwException("解析个人令牌有误,请检查个人设置中的个人访问令牌");
             return null;
         }
+    }
+
+    public static Map<String, String> getStringToMap(String str) {
+        // 判断str是否有值
+        if (null == str || "".equals(str)) {
+            return null;
+        }
+        // 根据&截取
+        String[] strings = str.split("',");
+        // 设置HashMap长度
+        int mapLength = strings.length;
+        Map<String, String> map = new HashMap<>(mapLength);
+        // 循环加入map集合
+        for (String string : strings) {
+            // 截取一组字符串
+            String[] strArray = string.split(":");
+            // strArray[0]为KEY strArray[1]为值
+            map.put(strArray[0], strArray[1]);
+        }
+        return map;
     }
 
     public void noticeIssueEven(IssuesUpdateRequest issuesRequest, String type) {
