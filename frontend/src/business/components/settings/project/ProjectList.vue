@@ -432,6 +432,13 @@ export default {
       this.createVisible = true;
       listenGoBack(this.handleClose);
       this.form = Object.assign({}, row);
+      this.form.codingInfo = row.codingProjectId
+        ? JSON.stringify({
+            codingDisplayName: row.codingDisplayName,
+            codingProjectId: row.codingProjectId,
+            codingProjectName: row.codingProjectName,
+          })
+        : "";
       this.$get(
         "/service/integration/all/" + getCurrentUser().lastOrganizationId,
         (response) => {
@@ -458,7 +465,8 @@ export default {
           }
           var protocol = document.location.protocol;
           protocol = protocol.substring(0, protocol.indexOf(":"));
-          this.form = { ...this.form, ...this.form.codingInfo };
+          const codingInfo = JSON.parse(this.form.codingInfo);
+          this.form = { ...this.form, ...codingInfo };
           this.form.protocal = protocol;
           this.form.workspaceId = getCurrentWorkspaceId();
           this.form.createUser = getCurrentUserId();

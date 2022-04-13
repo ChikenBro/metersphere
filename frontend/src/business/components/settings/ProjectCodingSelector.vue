@@ -1,5 +1,5 @@
 <template>
-  <el-select v-model="data[prop]" filterable>
+  <el-select v-model="data[prop]" filterable @change="$forceUpdate()">
     <el-option
       v-for="item in options"
       :key="item.id"
@@ -19,7 +19,7 @@ export default {
       type: Object,
       default() {
         return {
-          codingInfo: {},
+          codingInfo: "",
         };
       },
     },
@@ -38,7 +38,11 @@ export default {
         this.options = response.data.map((item) => {
           return {
             ...item,
-            value: { codingId: item.id, codingName: item.displayName },
+            value: JSON.stringify({
+              codingProjectId: item.id,
+              codingProjectName: item.projectName,
+              codingDisplayName: item.displayName,
+            }),
           };
         });
       });
