@@ -35,7 +35,7 @@
         select p.id, p.workspace_id, p.name, p.description, p.update_time, p.issue_template_id, p.case_template_id,
         p.create_time, w.id as workspaceId, w.name as workspaceName, p.tapd_id, p.jira_key, p.zentao_id,p.repeatable, p.custom_num,
         user.name as createUserName,
-        p.scenario_custom_num
+        p.scenario_custom_num,p.coding_project_id,p.coding_display_name,p.coding_project_name
         from project p
         join workspace w on p.workspace_id = w.id
         left join user on user.id = p.create_user
