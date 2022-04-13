@@ -60,17 +60,20 @@ public class IssueTrendController {
     //    @RequestMapping(value = "/queryStmp", method = RequestMethod.GET)
     @GetMapping("/issue/total/getAllProject")
     public ResultHolder getAllProject(@RequestParam HashMap<String, String> hashMap) throws HttpProcessException {
-        if (hashMap.get("token") == null){
-            String token = "363fa5a5fdcc0dec164b9edfc0e1a2860728671c";
+
+        try {
+            String token = "";
+            if (hashMap.get("token") == null){
+                token = "363fa5a5fdcc0dec164b9edfc0e1a2860728671c";
 //            hashMap.get("token")
 //            IssuesService issuesService = new IssuesService();
 
-        }
-        else {
-            token = hashMap.get("token") ;
-        }
-        try {
-            JSONObject resultToken = issueTrendStatisticsService.checkToken(hashMap.get("token"));
+            }
+            else {
+                token = hashMap.get("token") ;
+            }
+
+            JSONObject resultToken = issueTrendStatisticsService.checkToken(token);
 //        System.out.println(String.format("code1:%s,", hashMap.get("token")));
 //        System.out.println(resultToken);
             if(resultToken.get("team") == null ){
