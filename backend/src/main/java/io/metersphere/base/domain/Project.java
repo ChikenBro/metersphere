@@ -37,7 +37,7 @@ public class Project implements Serializable {
 
     private String systemId;
 
-    private String codingProjectId;
+    private Integer codingProjectId;
 
     private String codingDisplayName;
 
