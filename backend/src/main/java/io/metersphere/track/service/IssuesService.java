@@ -100,7 +100,8 @@ public class IssuesService {
         if (null != creatorUser) {
             issuesRequest.setCreatorName(creatorUser.getName());
 //            issuesRequest.set(creatorUser.getName());
-            //todo 更换token秘钥
+            // 获取token秘钥
+            issuesRequest.setToken(getCodingToken(creatorUser));
         }
         User assigneeUser = userMapper.selectByPrimaryKey(issuesRequest.getFields().getAssignee());
         if (null != assigneeUser) {
@@ -126,6 +127,27 @@ public class IssuesService {
         noticeIssueEven(issuesRequest, "IssuesCreate");
     }
 
+
+    /**
+     * 获取用户token-coding
+     *
+     * @param creatorUser 用户信息
+     * @return 用户token
+     */
+    public String getCodingToken(User creatorUser) {
+        // 获取token秘钥
+        String platformInfo = creatorUser.getPlatformInfo();
+        if (null == platformInfo || !platformInfo.contains("codingToken")) {
+            MSException.throwException("请先去个人设置配置个人访问令牌");
+        }
+        try {
+            return platformInfo.split("codingToken\":\"")[1].split("\"}}")[0];
+        } catch (Exception e) {
+            MSException.throwException("解析个人令牌有误,请检查个人设置中的个人访问令牌");
+            return null;
+        }
+    }
+
     public void noticeIssueEven(IssuesUpdateRequest issuesRequest, String type) {
         SessionUser user = SessionUtils.getUser();
         String orgId = user.getLastOrganizationId();
@@ -142,7 +164,12 @@ public class IssuesService {
 
     public void updateIssues(IssuesUpdateRequest issuesRequest) {
         List<AbstractIssuePlatform> platformList = getUpdatePlatforms(issuesRequest);
+        User creatorUser = userMapper.selectByPrimaryKey(issuesRequest.getCreator());
+        if (null != creatorUser) {
+            issuesRequest.setToken(getCodingToken(creatorUser));
+        }
         platformList.forEach(platform -> {
+            // 获取token秘钥
             CodingException.checkCodingResult(platform.updateIssue(issuesRequest), "编辑");
         });
         // todo 缺陷更新事件？
@@ -324,6 +351,10 @@ public class IssuesService {
     }
 
     public void deleteIssue(IssuesRequest request) {
+        User creatorUser = userMapper.selectByPrimaryKey(request.getOperator());
+        if (null != creatorUser) {
+            request.setToken(getCodingToken(creatorUser));
+        }
         String prefix_domain = System.getProperty("coding.domain");
         String url = String.format("%s/issues/delete", prefix_domain);
         LogUtil.info("delete issues: " + request);
@@ -371,8 +402,8 @@ public class IssuesService {
         request.setOrders(ServiceUtils.getDefaultOrder(request.getOrders()));
         List<IssuesDao> issues = extIssuesMapper.getIssuesByProjectId(request);
 
-        List<String> ids = issues.stream().map(IssuesDao::getCreator).collect(Collectors.toList());
-        Map<String, User> userMap = ServiceUtils.getUserMap(ids);
+        List<String> names = issues.stream().map(IssuesDao::getCreator).collect(Collectors.toList());
+        Map<String, User> userMap = ServiceUtils.getUserMapIds(names);
         List<String> resourceIds = issues.stream().map(IssuesDao::getResourceId).collect(Collectors.toList());
 
         List<TestPlan> testPlans = testPlanService.getTestPlanByIds(resourceIds);
@@ -382,6 +413,7 @@ public class IssuesService {
             User createUser = userMap.get(item.getCreator());
             if (createUser != null) {
                 item.setCreatorName(createUser.getName());
+                item.setCreator(createUser.getId());
             }
             if (planMap.get(item.getResourceId()) != null) {
                 item.setResourceName(planMap.get(item.getResourceId()));

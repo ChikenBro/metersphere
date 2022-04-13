@@ -42,5 +42,6 @@ public class IssuesUpdateRequest extends IssuesWithBLOBs {
      * 缺陷状态 Id
      */
     private Integer statusId;
+    private String token;
 
 }

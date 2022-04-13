@@ -106,6 +106,10 @@ public class UserService {
         return extUserMapper.queryNameByIds(userIds);
     }
 
+    public Map<String, User> queryIdByNames(List<String> userNames) {
+        return extUserMapper.queryIdByNames(userNames);
+    }
+
     public Map<String, User> queryName() {
         return extUserMapper.queryName();
     }

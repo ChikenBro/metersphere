@@ -13,6 +13,7 @@ public class IssuesRequest extends BaseQueryRequest {
     private String content;
     private String projectId;
     private String testCaseId;
+    private String operator;
     private List<String> tapdUsers;
     private String userId;
     /**
@@ -37,4 +38,5 @@ public class IssuesRequest extends BaseQueryRequest {
     private String requestType;
     private List<String> ids;
     private String remark;
+    private String token;
 }

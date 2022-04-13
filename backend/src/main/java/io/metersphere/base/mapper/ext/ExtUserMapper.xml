@@ -93,6 +93,16 @@
         </foreach>
     </select>
 
+    <select id="queryIdByNames" resultType="io.metersphere.base.domain.User">
+        select id, name
+        from `user`
+        WHERE name IN
+        <foreach collection="list" item="name" index="index"
+                 open="(" close=")" separator=",">
+            #{name}
+        </foreach>
+    </select>
+
     <select id="queryName" resultType="io.metersphere.base.domain.User">
         select id, name
         from `user`

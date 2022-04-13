@@ -24,6 +24,9 @@ public interface ExtUserMapper {
     @MapKey("id")
     Map<String, User> queryNameByIds(List<String> userIds);
 
+    @MapKey("name")
+    Map<String, User> queryIdByNames(List<String> userNames);
+
     @MapKey("id")
     Map<String, User> queryName();
 

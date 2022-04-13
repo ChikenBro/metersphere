@@ -64,6 +64,15 @@ public class ServiceUtils {
         return new HashMap<>();
     }
 
+    public static Map<String, User> getUserMapIds(List<String> userNames) {
+        UserService userService = CommonBeanFactory.getBean(UserService.class);
+        if (!CollectionUtils.isEmpty(userNames)) {
+            Map<String, User> userMap = userService.queryIdByNames(userNames);
+            return userMap;
+        }
+        return new HashMap<>();
+    }
+
     public static Map<String, String> getUserNameMap(List<String> userIds) {
         Map<String, User> userMap = getUserMap(userIds);
         HashMap<String, String> nameMap = new HashMap<>();
