@@ -620,9 +620,9 @@ export default {
       this.form = Object.assign({}, row);
       this.form.codingInfo = row.codingProjectId
         ? JSON.stringify({
-            codingDisplayName: row.codingDisplayName,
             codingProjectId: row.codingProjectId,
             codingProjectName: row.codingProjectName,
+            codingDisplayName: row.codingDisplayName,
           })
         : "";
       this.$get(
