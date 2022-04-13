@@ -332,6 +332,13 @@ public class IssuesService {
 //        deleteIssueRelate(request);
     }
 
+    public void syncIssues(IssuesRequest request) {
+        String prefix_domain = System.getProperty("coding.domain");
+        String url = String.format("%s/issues/sync/coding", prefix_domain);
+        LogUtil.info("sync coding issues: " + request);
+        CodingException.checkCodingException(url, request);
+    }
+
     public void deleteIssueRelate(IssuesRequest request) {
         String caseId = request.getCaseId();
         String id = request.getId();

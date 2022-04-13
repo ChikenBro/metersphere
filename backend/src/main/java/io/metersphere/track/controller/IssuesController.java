@@ -76,6 +76,11 @@ public class IssuesController {
         issuesService.deleteIssue(request);
     }
 
+    @PostMapping("/sync/coding")
+    public void syncIssues(@RequestBody IssuesRequest request) {
+        issuesService.syncIssues(request);
+    }
+
     @PostMapping("/delete/relate")
     public void deleteRelate(@RequestBody IssuesRequest request) {
         issuesService.deleteIssueRelate(request);
