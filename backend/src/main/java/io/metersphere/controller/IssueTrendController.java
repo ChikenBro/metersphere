@@ -82,7 +82,7 @@ public class IssueTrendController {
             ArrayList<Object>  testMap = new ArrayList<>();
 
 
-            JSONObject json_test =  issueTrendStatisticsService.codingGetProjectAll(hashMap.get("token"));
+            JSONObject json_test =  issueTrendStatisticsService.codingGetProjectAll(token);
             System.out.println(json_test);
 //        JSONObject json_test1 = JSONObject.parseObject(json_test.get("Response"));
             for (Object e:json_test.getJSONObject("Response").getJSONObject("Data").getJSONArray("ProjectList")) {
