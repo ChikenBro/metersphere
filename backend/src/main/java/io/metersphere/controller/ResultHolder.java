@@ -40,6 +40,7 @@ public class ResultHolder {
 
     }
     private ResultHolder(Integer code, String msg, Object data,Integer count) {
+        this.success = true;
         this.code = code;
         this.message = msg;
         this.data = data;
@@ -106,7 +107,9 @@ public class ResultHolder {
     public Integer getCode() {
         return code;
     }
-
+    public boolean getSuccess() {
+        return success;
+    }
     public void setCode(Integer code) {
         this.code = code;
     }
