@@ -170,9 +170,8 @@
               :label-width="formLabelWidth"
             >
               <el-input
-                type="number"
                 v-model="form.fields.workingHours"
-                oninput="if(isNaN(value)) { value = null } if(value.indexOf('.')>0){value=value.slice(0,value.indexOf('.')+3)}"
+                @keyup.native="onWorkingHoursInput"
               >
                 <i slot="suffix">&emsp;小时</i>
               </el-input>
@@ -490,8 +489,8 @@ export default {
           moduleId: "",
           startDate: "",
           dueDate: "",
-          environment: "",
-          repetitionFrequency: "",
+          environment: "dev",
+          repetitionFrequency: "must",
         },
         statusId: undefined,
         issueId: undefined,
@@ -781,8 +780,8 @@ export default {
             moduleId: "",
             startDate: "",
             dueDate: "",
-            environment: "",
-            repetitionFrequency: "",
+            environment: "dev",
+            repetitionFrequency: "must",
           },
         };
         this.url = "issues/add";
@@ -921,6 +920,34 @@ export default {
           }
         },
       };
+    },
+    onWorkingHoursInput({ target }) {
+      // 清除"数字"和"."以外的字符
+      target.value = target.value.replace(/[^\d.]/g, "");
+      // 验证第一个字符是数字
+      target.value = target.value.replace(/^\./g, "");
+      // 只保留第一个, 清除多余的
+      target.value = target.value.replace(/\.{2,}/g, ".");
+      target.value = target.value
+        .replace(".", "$#$")
+        .replace(/\./g, "")
+        .replace("$#$", ".");
+      // 只能输入两个小数
+      target.value = target.value.replace(/^(\-)*(\d+)\.(\d\d).*$/, "$1$2.$3");
+
+      //如果有小数点，不能为类似 1.10的数
+      if (target.value.indexOf(".") > 0 && target.value.indexOf("0") > 2) {
+        target.value = parseFloat(target.value);
+      }
+      //如果有小数点，不能为类似 0.00的数
+      if (target.value.indexOf(".") > 0 && target.value.lastIndexOf("0") > 2) {
+        target.value = parseFloat(target.value);
+      }
+      //以上已经过滤，此处控制的是如果没有小数点，首位不能为类似于 01、02的数
+      if (target.value.indexOf(".") <= 0 && target.value != "") {
+        target.value = parseFloat(target.value);
+      }
+      this.$nextTick(() => (this.form.fields.workingHours = target.value));
     },
   },
 };
