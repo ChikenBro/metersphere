@@ -29,6 +29,7 @@ public class IterationService {
     public JSONObject syncIteration(IterationSyncRequest iterationSyncRequest) {
         String prefix_domain = System.getProperty("coding.domain");
         String url = String.format("%s/iteration/sync/coding", prefix_domain);
+        log.info("url{}", url);
         LogUtil.info("sync iteration: " + iterationSyncRequest);
         String result = CodingException.checkCodingException(url, iterationSyncRequest);
         return JSON.parseObject(result);
@@ -43,6 +44,7 @@ public class IterationService {
     public JSONObject list(int goPage, int pageSize, IterationSyncRequest request) {
         String prefix_domain = System.getProperty("coding.domain");
         String url = String.format("%s/iteration/list/%s/%s", prefix_domain, goPage, pageSize);
+        log.info("url{}", url);
         LogUtil.info("sync iteration: " + request);
         String result = CodingException.checkCodingException(url, request);
         return JSON.parseObject(result);
@@ -55,6 +57,7 @@ public class IterationService {
     public JSONObject iterationReport(RequirementRequest requirementRequest) {
         String prefix_domain = System.getProperty("coding.domain");
         String url = String.format("%s/iteration/report", prefix_domain);
+        log.info("url{}", url);
         LogUtil.info("sync iteration: " + requirementRequest);
         String result = CodingException.checkCodingException(url, requirementRequest);
         return JSON.parseObject(result);
