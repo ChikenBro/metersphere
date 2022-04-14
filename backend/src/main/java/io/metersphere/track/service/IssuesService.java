@@ -385,6 +385,7 @@ public class IssuesService {
         }
         String prefix_domain = System.getProperty("coding.domain");
         String url = String.format("%s/issues/delete", prefix_domain);
+        log.info("url{}", url);
         LogUtil.info("delete issues: " + request);
         CodingException.checkCodingResult(CodingException.checkCodingException(url, request), "删除");
 //        issuesMapper.deleteByPrimaryKey(request.getId());
@@ -394,6 +395,7 @@ public class IssuesService {
     public void syncIssues(IssuesRequest request) {
         String prefix_domain = System.getProperty("coding.domain");
         String url = String.format("%s/issues/sync/coding", prefix_domain);
+        log.info("url{}", url);
         LogUtil.info("sync coding issues: " + request);
         CodingException.checkCodingException(url, request);
     }
@@ -430,7 +432,7 @@ public class IssuesService {
         request.setOrders(ServiceUtils.getDefaultOrder(request.getOrders()));
         String search = request.getOrders().get(0).getName();
         List<IssuesDao> issues;
-        if (search.equals("priority") || search.equals("assignee") || search.equals("due_date") || search.equals("start_date")) {
+        if (search.equals("priority") || search.equals("assignee_name") || search.equals("due_date") || search.equals("start_date")) {
             request.getOrders().get(0).setName("update_time");
             issues = extIssuesMapper.getIssuesByProjectId(request);
 //            issues.forEach(issue->{

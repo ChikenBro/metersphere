@@ -191,15 +191,6 @@
             <if test="systemId != null">
                 system_id,
             </if>
-            <if test="codingProjectId != null">
-                coding_project_id,
-            </if>
-            <if test="codingDisplayName != null">
-                coding_display_name,
-            </if>
-            <if test="codingProjectName != null">
-                coding_project_name,
-            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
