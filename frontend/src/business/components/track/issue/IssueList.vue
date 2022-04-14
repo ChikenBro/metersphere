@@ -366,7 +366,13 @@
           :total="page.total"
         />
 
-        <issue-edit @refresh="getIssues" ref="issueEdit" />
+        <issue-edit
+          @refresh="getIssues"
+          ref="issueEdit"
+          :iteration-options="iterationOptions"
+          :requirement-options="requirementOptions"
+          :defect-type-options="defectTypeOptions"
+        />
       </el-card>
     </ms-main-container>
   </ms-container>
@@ -670,17 +676,29 @@ export default {
           case 1:
             this.defectTypeOptions =
               options &&
-              options.map((item) => ({ text: item.name, value: item.id }));
+              options.map((item) => ({
+                text: item.name,
+                value: item.id,
+                label: item.name,
+              }));
             break;
           case 2:
             this.requirementOptions =
               options &&
-              options.map((item) => ({ text: item.name, value: item.id }));
+              options.map((item) => ({
+                text: item.name,
+                value: item.id,
+                label: item.name,
+              }));
             break;
           case 3:
             this.iterationOptions =
               options &&
-              options.map((item) => ({ text: item.name, value: item.id }));
+              options.map((item) => ({
+                text: item.name,
+                value: item.id,
+                label: item.name,
+              }));
             break;
         }
       });

@@ -50,6 +50,8 @@
               <el-select
                 v-model="form.fields.defectTypeId"
                 placeholder="缺陷类型"
+                @blur="getList(1, '')"
+                @change="$forceUpdate()"
                 clearable
                 @clear="getList(1, '')"
                 filterable
@@ -98,6 +100,8 @@
                 v-model="form.fields.requirementCode"
                 placeholder="未关联需求"
                 clearable
+                @change="$forceUpdate()"
+                @blur="getList(2, '')"
                 @clear="getList(2, '')"
                 filterable
                 :filter-method="(query) => getList(2, query)"
@@ -122,7 +126,9 @@
               <el-select
                 v-model="form.fields.iterationCode"
                 placeholder="请选择迭代"
+                @blur="getList(3, '')"
                 clearable
+                @change="$forceUpdate()"
                 @clear="getList(3, '')"
                 filterable
                 :filter-method="(query) => getList(3, query)"
@@ -299,7 +305,7 @@
         </el-form> -->
 
         <form-rich-text-item
-          :title="$t('custom_field.issue_content')"
+          title="前置步骤"
           :data="form.descriptions"
           prop="preconditions"
           key="preconditions"
@@ -447,16 +453,6 @@ export default {
     MsFormDivider,
     TemplateComponentEditHeader,
   },
-  props: {
-    isPlan: {
-      type: Boolean,
-      default() {
-        return false;
-      },
-    },
-    caseId: String,
-    planId: String,
-  },
   data() {
     return {
       result: {},
@@ -597,15 +593,12 @@ export default {
       Builds: [],
       hasTapdId: false,
       hasZentaoId: false,
-      defectList: [], // 缺陷列表
       priorityList: [
         { label: "紧急", value: "3" },
         { label: "高", value: "2" },
         { label: "中", value: "1" },
         { label: "低", value: "0" },
       ], // 优先级列表
-      requirementList: [], // 需求列表
-      iterationList: [], //迭代列表
       assigneeList: [], //处理人列表
       moduleList: [], //模块列表
       startDatePicker: this.beginDate(), // 开始日期限制
@@ -652,6 +645,24 @@ export default {
     },
     caseId: String,
     planId: String,
+    iterationList: {
+      type: Array,
+      default() {
+        return [];
+      },
+    },
+    requirementList: {
+      type: Array,
+      default() {
+        return [];
+      },
+    },
+    defectList: {
+      type: Array,
+      default() {
+        return [];
+      },
+    },
   },
   computed: {
     isSystem() {
@@ -761,7 +772,10 @@ export default {
           },
           creator: null,
           fields: {
-            defectTypeId: "",
+            defectTypeId:
+              this.defectList && this.defectList.length > 0
+                ? this.defectList[0].value
+                : "",
             priority: "1",
             workingHours: undefined,
             iterationCode: undefined,
@@ -794,7 +808,6 @@ export default {
           value: item.id,
         }));
       });
-      [1, 2, 3].forEach((item) => this.getList(item));
     },
     getList(type, name = "") {
       let url = "/field/template/issue/templates/list/1/10";
@@ -805,21 +818,30 @@ export default {
         switch (type) {
           case 1:
             this.defectList =
-              options &&
-              options.map((item) => ({ label: item.name, value: item.id }));
-            if (this.defectList.length > 0) {
-              this.form.fields.defectTypeId = this.defectList[0].value;
-            }
+              (options &&
+                options.map((item) => ({
+                  label: item.name,
+                  value: item.id,
+                }))) ||
+              [];
             break;
           case 2:
             this.requirementList =
-              options &&
-              options.map((item) => ({ label: item.name, value: item.id }));
+              (options &&
+                options.map((item) => ({
+                  label: item.name,
+                  value: item.id,
+                }))) ||
+              [];
             break;
           case 3:
             this.iterationList =
-              options &&
-              options.map((item) => ({ label: item.name, value: item.id }));
+              (options &&
+                options.map((item) => ({
+                  label: item.name,
+                  value: item.id,
+                }))) ||
+              [];
             break;
         }
       });

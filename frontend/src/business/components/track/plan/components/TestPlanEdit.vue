@@ -151,6 +151,8 @@
                 v-model="form.iterationCode"
                 clearable
                 placeholder="请选择迭代"
+                @clear="getIterationOptions"
+                @blur="getIterationOptions"
                 filterable
                 :filter-method="getIterationOptions"
                 @change="getPlanInheritOptions"

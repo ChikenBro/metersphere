@@ -28,6 +28,9 @@
         ref="issueEditDetail"
         :isDisabled="isDisabled"
         :is-edit="isEdit"
+        :iteration-list="iterationOptions"
+        :requirement-list="requirementOptions"
+        :defect-list="defectTypeOptions"
       />
     </template>
   </el-drawer>
@@ -47,6 +50,26 @@ export default {
       isDisabled: false,
       isEdit: false,
     };
+  },
+  props: {
+    iterationOptions: {
+      type: Array,
+      default() {
+        return [];
+      },
+    },
+    requirementOptions: {
+      type: Array,
+      default() {
+        return [];
+      },
+    },
+    defectTypeOptions: {
+      type: Array,
+      default() {
+        return [];
+      },
+    },
   },
   methods: {
     open(data) {
