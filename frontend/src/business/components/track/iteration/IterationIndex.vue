@@ -116,7 +116,9 @@
               :fields-width="fieldsWidth"
             >
               <template v-slot:default="scope">
-                <span>{{ (scope.row.schedule / 10000).toFixed(2) + "%" }}</span>
+                <span>{{
+                  (scope.row.lastPassRate / 10000).toFixed(2) + "%"
+                }}</span>
               </template>
             </ms-table-column>
           </span>
