@@ -16,12 +16,14 @@ import io.metersphere.track.issue.client.ZentaoClient;
 import io.metersphere.track.issue.domain.PlatformUser;
 import io.metersphere.track.request.testcase.IssuesRequest;
 import io.metersphere.track.request.testcase.IssuesUpdateRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 
 import java.util.List;
 
+@Slf4j
 public class CodingPaltform extends AbstractIssuePlatform {
 
 //    @Value("${coding.domain}")
@@ -87,7 +89,7 @@ public class CodingPaltform extends AbstractIssuePlatform {
     public String addIssue(IssuesUpdateRequest issuesRequest) {
         String prefix_domain = System.getProperty("coding.domain");
         this.url = String.format("%s/issues/add", prefix_domain);
-        LogUtil.info("add issue: " + issuesRequest);
+        log.info("add issue request:{}, url:{}", issuesRequest, this.url);
         return CodingException.checkCodingException(this.url, issuesRequest);
     }
 
@@ -95,7 +97,7 @@ public class CodingPaltform extends AbstractIssuePlatform {
     public String updateIssue(IssuesUpdateRequest request) {
         String prefix_domain = System.getProperty("coding.domain");
         this.url = String.format("%s/issues/update", prefix_domain);
-        LogUtil.info("update issue: " + request);
+        log.info("update issue request:{}, url:{}", request, this.url);
         return CodingException.checkCodingException(this.url, request);
     }
 

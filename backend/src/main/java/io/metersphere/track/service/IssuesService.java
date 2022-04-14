@@ -385,8 +385,7 @@ public class IssuesService {
         }
         String prefix_domain = System.getProperty("coding.domain");
         String url = String.format("%s/issues/delete", prefix_domain);
-        log.info("url{}", url);
-        LogUtil.info("delete issues: " + request);
+        log.info("delete issues request:{}, url:{}", request, url);
         CodingException.checkCodingResult(CodingException.checkCodingException(url, request), "删除");
 //        issuesMapper.deleteByPrimaryKey(request.getId());
 //        deleteIssueRelate(request);

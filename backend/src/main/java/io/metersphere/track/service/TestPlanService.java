@@ -44,6 +44,7 @@ import io.metersphere.track.request.testcase.QueryTestPlanRequest;
 import io.metersphere.track.request.testplan.AddTestPlanRequest;
 import io.metersphere.track.request.testplan.LoadCaseRequest;
 import io.metersphere.track.request.testplancase.QueryTestPlanCaseRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
@@ -61,6 +62,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class TestPlanService {
     @Resource
     ExtScheduleMapper extScheduleMapper;
@@ -1129,9 +1131,14 @@ public class TestPlanService {
             return testPlans;
         }
         testPlans = testPlanMapper.selectByIterationId(iteration.getId());
-        if (null != testPlanBody.getName() && !testPlanBody.getName().equals("")) {
-            return testPlans.stream().filter(s -> s.getName().contains(testPlanBody.getName())).collect(Collectors.toList());
+        try {
+            if (null != testPlanBody.getName() && !testPlanBody.getName().equals("")) {
+                return testPlans.stream().filter(s -> s.getName().contains(testPlanBody.getName())).collect(Collectors.toList());
+            }
+            return testPlans;
+        } catch (Exception e) {
+            log.error("迭代下过滤测试计划有误:{}", e.getMessage());
+            return testPlans;
         }
-        return testPlans;
     }
 }
