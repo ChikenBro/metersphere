@@ -58,7 +58,7 @@
                 :filter-method="(query) => getList(1, query)"
               >
                 <el-option
-                  v-for="(item, index) in defectList"
+                  v-for="(item, index) in defectOptions"
                   :key="index"
                   @change="$forceUpdate()"
                   :label="item.label"
@@ -107,7 +107,7 @@
                 :filter-method="(query) => getList(2, query)"
               >
                 <el-option
-                  v-for="(item, index) in requirementList"
+                  v-for="(item, index) in requirementOptions"
                   :key="index"
                   :label="item.label"
                   :value="item.value"
@@ -134,7 +134,7 @@
                 :filter-method="(query) => getList(3, query)"
               >
                 <el-option
-                  v-for="(item, index) in iterationList"
+                  v-for="(item, index) in iterationOptions"
                   :key="index"
                   :label="item.label"
                   :value="item.value"
@@ -622,6 +622,9 @@ export default {
         { label: "已拒绝", value: 5 },
         { label: "已关闭", value: 6 },
       ],
+      iterationOptions: [...this.iterationList],
+      requirementOptions: [...this.requirementList],
+      defectOptions: [...this.defectList],
     };
   },
   props: {
@@ -817,7 +820,7 @@ export default {
         } = res;
         switch (type) {
           case 1:
-            this.defectList =
+            this.defectOptions =
               (options &&
                 options.map((item) => ({
                   label: item.name,
@@ -826,7 +829,7 @@ export default {
               [];
             break;
           case 2:
-            this.requirementList =
+            this.requirementOptions =
               (options &&
                 options.map((item) => ({
                   label: item.name,
@@ -835,7 +838,7 @@ export default {
               [];
             break;
           case 3:
-            this.iterationList =
+            this.iterationOptions =
               (options &&
                 options.map((item) => ({
                   label: item.name,
