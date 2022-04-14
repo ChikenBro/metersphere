@@ -305,7 +305,7 @@
         </el-form> -->
 
         <form-rich-text-item
-          title="前置步骤"
+          title="前置条件"
           :data="form.descriptions"
           prop="preconditions"
           key="preconditions"
