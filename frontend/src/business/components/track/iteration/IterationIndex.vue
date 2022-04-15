@@ -222,6 +222,7 @@ export default {
     syncIterationCoding() {
       syncCoding(() => {
         this.$success("开始同步");
+        this.fetchIterationList();
       });
     },
     showRequirementList(row) {
