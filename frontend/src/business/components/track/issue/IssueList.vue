@@ -652,7 +652,9 @@ export default {
         fields: {
           ...customFields,
           model: data.model,
-          workingHours: customFields.workingHours + "" || "",
+          workingHours: customFields.workingHours
+            ? customFields.workingHours + ""
+            : "",
           dueDate: customFields.dueDate || "",
           startDate: customFields.startDate || "",
           assignee: customFields.assignee || "",
@@ -661,7 +663,7 @@ export default {
         },
         projectId: data.projectId,
         organizationId: data.organizationId,
-        testCaseIds: ["01142f3b-6c77-457d-b7a0-8073ac750316"],
+        testCaseIds: data.caseIds,
         statusId: data.status * 1,
       };
       return newData;
