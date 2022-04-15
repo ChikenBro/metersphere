@@ -18,7 +18,7 @@ public interface IterationMapper {
      * @param iterationCode 迭代code
      * @return 返回影响行数
      */
-    Iteration getIterationByIterationCode(@Param("iterationCode") Integer iterationCode);
+    List<Iteration> getIterationByIterationCode(@Param("iterationCode") Integer iterationCode);
 
     /**
      * 获取 Iteration对象 根据p
