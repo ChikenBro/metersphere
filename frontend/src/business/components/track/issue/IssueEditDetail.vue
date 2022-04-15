@@ -30,8 +30,8 @@
                 @change="$forceUpdate()"
               >
                 <el-option
-                  v-for="(item, index) in statusList"
-                  :key="index"
+                  v-for="item in statusList"
+                  :key="item.value"
                   :label="item.label"
                   :value="item.value"
                 >
@@ -58,8 +58,8 @@
                 :filter-method="(query) => getList(1, query)"
               >
                 <el-option
-                  v-for="(item, index) in defectOptions"
-                  :key="index"
+                  v-for="item in defectOptions"
+                  :key="item.value"
                   @change="$forceUpdate()"
                   :label="item.label"
                   :value="item.value"
@@ -80,8 +80,8 @@
                 :placeholder="$t('commons.default')"
               >
                 <el-option
-                  v-for="(item, index) in priorityList"
-                  :key="index"
+                  v-for="item in priorityList"
+                  :key="item.value"
                   :label="item.label"
                   :value="item.value"
                 >
@@ -107,8 +107,8 @@
                 :filter-method="(query) => getList(2, query)"
               >
                 <el-option
-                  v-for="(item, index) in requirementOptions"
-                  :key="index"
+                  v-for="item in requirementOptions"
+                  :key="item.value"
                   :label="item.label"
                   :value="item.value"
                 >
@@ -128,14 +128,13 @@
                 placeholder="请选择迭代"
                 @blur="getList(3, '')"
                 clearable
-                @change="$forceUpdate()"
                 @clear="getList(3, '')"
                 filterable
                 :filter-method="(query) => getList(3, query)"
               >
                 <el-option
-                  v-for="(item, index) in iterationOptions"
-                  :key="index"
+                  v-for="item in iterationOptions"
+                  :key="item.value"
                   :label="item.label"
                   :value="item.value"
                 >
@@ -156,8 +155,8 @@
                 placeholder="未指定"
               >
                 <el-option
-                  v-for="(item, index) in assigneeList"
-                  :key="index"
+                  v-for="item in assigneeList"
+                  :key="item.value"
                   :label="item.label"
                   :value="item.value"
                 >
@@ -585,6 +584,7 @@ export default {
             trigger: "blur",
           },
         ],
+        timer: null,
       },
       testCaseContainIds: new Set(),
       url: "",
@@ -814,40 +814,54 @@ export default {
     },
     getList(type, name = "") {
       let url = "/field/template/issue/templates/list/1/10";
-      this.$post(url, { projectId: this.projectId, type, name }, (res) => {
-        let {
-          data: { options },
-        } = res;
-        switch (type) {
-          case 1:
-            this.defectOptions =
-              (options &&
-                options.map((item) => ({
-                  label: item.name,
-                  value: item.id,
-                }))) ||
-              [];
-            break;
-          case 2:
-            this.requirementOptions =
-              (options &&
-                options.map((item) => ({
-                  label: item.name,
-                  value: item.id,
-                }))) ||
-              [];
-            break;
-          case 3:
-            this.iterationOptions =
-              (options &&
-                options.map((item) => ({
-                  label: item.name,
-                  value: item.id,
-                }))) ||
-              [];
-            break;
-        }
-      });
+      const fetchOptionsApi = () => {
+        const obj = {
+          1: "defectTypeId",
+          2: "requirementCode",
+          3: "iterationCode",
+        };
+        name !== "" && (this.form.fields[obj[type]] = "");
+        this.$post(url, { projectId: this.projectId, type, name }, (res) => {
+          let {
+            data: { options },
+          } = res;
+          switch (type) {
+            case 1:
+              this.defectOptions =
+                (options &&
+                  options.map((item) => ({
+                    label: item.name,
+                    value: item.id,
+                  }))) ||
+                [];
+              break;
+            case 2:
+              this.requirementOptions =
+                (options &&
+                  options.map((item) => ({
+                    label: item.name,
+                    value: item.id,
+                  }))) ||
+                [];
+              break;
+            case 3:
+              this.iterationOptions =
+                (options &&
+                  options.map((item) => ({
+                    label: item.name,
+                    value: item.id,
+                  }))) ||
+                [];
+              break;
+          }
+        });
+      };
+      if (name === "") {
+        fetchOptionsApi();
+      } else {
+        clearTimeout(this.timer);
+        this.timer = setTimeout(fetchOptionsApi, 500);
+      }
     },
     reloadForm() {
       this.isFormAlive = false;
@@ -954,6 +968,9 @@ export default {
       //以上已经过滤，此处控制的是如果没有小数点，首位不能为类似于 01、02的数
       if (target.value.indexOf(".") <= 0 && target.value != "") {
         target.value = parseFloat(target.value);
+      }
+      if (target.value >= 9999) {
+        target.value = 9999;
       }
       this.$nextTick(() => (this.form.fields.workingHours = target.value));
     },

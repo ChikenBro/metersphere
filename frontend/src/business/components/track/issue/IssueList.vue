@@ -57,7 +57,7 @@
             >
               <template v-slot="scope">
                 <el-link
-                  :href="linkBaseUrl + scope.row.id"
+                  :href="linkBaseUrl + scope.row.resourceId + '/detail'"
                   type="primary"
                   target="_blank"
                 >
@@ -231,7 +231,7 @@
             <ms-table-column
               :field="item"
               :fields-width="fieldsWidth"
-              :filters="requirementOptions"
+              :filters="iterationOptions"
               min-width="180px"
               :label="$t('test_track.issue.iteration')"
               prop="iterationName"
@@ -342,11 +342,13 @@
           :close-on-click-modal="true"
           @confirm="handleDeLeteConfirm"
         >
-          <el-form>
+          <el-form :model="deleteIssueInfo" ref="deleteIssueRef">
             <el-row>
               <el-col :span="24">
                 <el-form-item
                   :label="`请输入删除缺陷的原因, 缺陷ID: ${deleteIssueInfo.num}`"
+                  :rules="[{ required: true, message: '删除原因不能为空' }]"
+                  prop="remark"
                 >
                   <el-input
                     size="small"
@@ -428,7 +430,8 @@ export default {
   },
   data() {
     return {
-      linkBaseUrl: "https://jira.mudutv.com/browse/",
+      linkBaseUrl:
+        "https://mudu1.coding.net/p/metersphere/bug-tracking/issues/",
       page: getPageInfo(),
       fields: [],
       tableHeaderKey: "ISSUE_LIST",
@@ -614,16 +617,20 @@ export default {
     },
     // 确认提交
     handleDeLeteConfirm() {
-      this.page.result = this.$post(
-        "issues/delete",
-        this.deleteIssueInfo,
-        () => {
-          this.$success(this.$t("commons.delete_success"));
-          this.getIssues();
+      this.$refs.deleteIssueRef.validate((valid) => {
+        if (valid) {
+          this.page.result = this.$post(
+            "issues/delete",
+            this.deleteIssueInfo,
+            () => {
+              this.$success(this.$t("commons.delete_success"));
+              this.getIssues();
+            }
+          );
+          this.dialogVisible = false;
+          this.deleteIssueInfo.remark = "";
         }
-      );
-      this.dialogVisible = false;
-      this.deleteIssueInfo.remark = "";
+      });
     },
     // 打开预览
     handlePreview(data) {
@@ -651,7 +658,9 @@ export default {
         fields: {
           ...customFields,
           model: data.model,
-          workingHours: customFields.workingHours + "" || "",
+          workingHours: customFields.workingHours
+            ? customFields.workingHours + ""
+            : "",
           dueDate: customFields.dueDate || "",
           startDate: customFields.startDate || "",
           assignee: customFields.assignee || "",
@@ -660,7 +669,7 @@ export default {
         },
         projectId: data.projectId,
         organizationId: data.organizationId,
-        testCaseIds: ["01142f3b-6c77-457d-b7a0-8073ac750316"],
+        testCaseIds: data.caseIds || [],
         statusId: data.status * 1,
       };
       return newData;
