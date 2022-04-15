@@ -4,6 +4,7 @@
     :before-close="handleClose"
     :visible.sync="visible"
     size="100%"
+    :modal="false"
     title="需求列表"
   >
     <template v-slot:default="">
@@ -64,7 +65,7 @@
             </el-table-column>
           </el-table>
           <ms-table-pagination
-            :change="() => {}"
+            :change="fetchRequirements"
             :current-page.sync="pagination.currentPage"
             :page-size.sync="pagination.pageSize"
             :total="pagination.total"
@@ -130,7 +131,12 @@ export default {
     },
     fetchRequirements() {
       getIterationRequirements(
-        { iterationCode: Number(this.iterationRow.code), ...this.condition },
+        {
+          iterationCode: Number(this.iterationRow.code),
+          ...this.condition,
+          goPage: this.pagination.currentPage,
+          pageSize: this.pagination.pageSize,
+        },
         (res) => {
           this.tableData = res?.data?.data;
           this.pagination.total = res.data.length;
