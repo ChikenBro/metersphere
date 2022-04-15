@@ -955,6 +955,9 @@ export default {
       if (target.value.indexOf(".") <= 0 && target.value != "") {
         target.value = parseFloat(target.value);
       }
+      if(target.value >= 9999) {
+        target.value = 9999;
+      }
       this.$nextTick(() => (this.form.fields.workingHours = target.value));
     },
   },
