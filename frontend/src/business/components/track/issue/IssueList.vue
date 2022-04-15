@@ -231,7 +231,7 @@
             <ms-table-column
               :field="item"
               :fields-width="fieldsWidth"
-              :filters="requirementOptions"
+              :filters="iterationOptions"
               min-width="180px"
               :label="$t('test_track.issue.iteration')"
               prop="iterationName"
