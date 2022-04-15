@@ -313,6 +313,7 @@ export default {
         environment: "",
         testPlanInherit: "",
         ifRetain: false,
+        projectId: getCurrentProjectID(),
       },
       rules: {
         name: [
