@@ -669,7 +669,7 @@ export default {
         },
         projectId: data.projectId,
         organizationId: data.organizationId,
-        testCaseIds: data.caseIds,
+        testCaseIds: data.caseIds || [],
         statusId: data.status * 1,
       };
       return newData;
