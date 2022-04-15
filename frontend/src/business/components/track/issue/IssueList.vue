@@ -342,11 +342,13 @@
           :close-on-click-modal="true"
           @confirm="handleDeLeteConfirm"
         >
-          <el-form>
+          <el-form :model="deleteIssueInfo" ref="deleteIssueRef">
             <el-row>
               <el-col :span="24">
                 <el-form-item
                   :label="`请输入删除缺陷的原因, 缺陷ID: ${deleteIssueInfo.num}`"
+                  :rules="[{ required: true, message: '删除原因不能为空' }]"
+                  prop="remark"
                 >
                   <el-input
                     size="small"
@@ -615,16 +617,20 @@ export default {
     },
     // 确认提交
     handleDeLeteConfirm() {
-      this.page.result = this.$post(
-        "issues/delete",
-        this.deleteIssueInfo,
-        () => {
-          this.$success(this.$t("commons.delete_success"));
-          this.getIssues();
+      this.$refs.deleteIssueRef.validate((valid) => {
+        if (valid) {
+          this.page.result = this.$post(
+            "issues/delete",
+            this.deleteIssueInfo,
+            () => {
+              this.$success(this.$t("commons.delete_success"));
+              this.getIssues();
+            }
+          );
+          this.dialogVisible = false;
+          this.deleteIssueInfo.remark = "";
         }
-      );
-      this.dialogVisible = false;
-      this.deleteIssueInfo.remark = "";
+      });
     },
     // 打开预览
     handlePreview(data) {
