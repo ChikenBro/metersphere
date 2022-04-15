@@ -57,7 +57,7 @@
             >
               <template v-slot="scope">
                 <el-link
-                  :href="linkBaseUrl + scope.row.id"
+                  :href="linkBaseUrl + scope.row.resourceId + '/detail'"
                   type="primary"
                   target="_blank"
                 >
@@ -428,7 +428,8 @@ export default {
   },
   data() {
     return {
-      linkBaseUrl: "https://jira.mudutv.com/browse/",
+      linkBaseUrl:
+        "https://mudu1.coding.net/p/metersphere/bug-tracking/issues/",
       page: getPageInfo(),
       fields: [],
       tableHeaderKey: "ISSUE_LIST",
