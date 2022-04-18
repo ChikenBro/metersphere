@@ -60,6 +60,4 @@ public class IterationService {
         String result = CodingException.checkCodingException(url, requirementRequest);
         return PlatformResponseConfig.parsePlatformDate(result);
     }
-
-
 }

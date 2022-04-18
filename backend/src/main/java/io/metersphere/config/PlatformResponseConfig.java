@@ -13,7 +13,7 @@ public class PlatformResponseConfig {
      */
     public static JSONObject parsePlatformDate(String result) {
         JSONObject jsonObject = JSON.parseObject(result);
-        if (jsonObject.get("code").equals("10000000")) {
+        if (null != jsonObject.get("code") && jsonObject.get("code").equals("10000000")) {
             return (JSONObject) jsonObject.get("data");
         }
         return jsonObject;
