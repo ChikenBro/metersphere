@@ -409,9 +409,13 @@ import {
 } from "@/common/js/tableUtils";
 import MsContainer from "@/business/components/common/components/MsContainer";
 import MsMainContainer from "@/business/components/common/components/MsMainContainer";
-import { getCurrentProjectID } from "@/common/js/utils";
 import { getIssueTemplate } from "@/network/custom-field-template";
 import { getProjectMember } from "@/network/user";
+import {
+  getCurrentOrganizationId,
+  getCurrentProjectID,
+  getCurrentUserId,
+} from "@/common/js/utils";
 
 export default {
   name: "IssueList",
@@ -560,8 +564,7 @@ export default {
     },
     handleEdit(data) {
       // 传了row(data)和index 只用到了data
-      let newData = this.handleData(data);
-
+      let newData = this.handleData({ ...data, creator: getCurrentUserId() });
       newData.drawerTitle = "编辑缺陷";
       newData.isEdit = true;
       this.$refs.issueEdit.open(newData);

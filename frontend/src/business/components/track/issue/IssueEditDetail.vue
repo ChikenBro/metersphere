@@ -320,14 +320,6 @@
           :disabled="isDisabled"
         />
         <form-rich-text-item
-          :title="$t('custom_field.expected_result')"
-          :data="form.descriptions"
-          prop="expectedResult"
-          key="expectedResult"
-          prefix="descriptions."
-          :disabled="isDisabled"
-        />
-        <form-rich-text-item
           :title="$t('custom_field.actual_result')"
           :data="form.descriptions"
           prop="actualResult"
@@ -335,7 +327,14 @@
           prefix="descriptions."
           :disabled="isDisabled"
         />
-
+        <form-rich-text-item
+          :title="$t('custom_field.expected_result')"
+          :data="form.descriptions"
+          prop="expectedResult"
+          key="expectedResult"
+          prefix="descriptions."
+          :disabled="isDisabled"
+        />
         <el-row class="custom-field-row">
           <el-col v-if="hasTapdId" :span="8">
             <el-form-item
