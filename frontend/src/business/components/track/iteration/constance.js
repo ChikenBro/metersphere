@@ -5,15 +5,9 @@ export const IterationStatusEnum = {
 };
 
 export const StatusTagMap = {
-  PROCESSING: {
-    type: "info",
-  },
-  COMPLETED: {
-    type: "success",
-  },
-  WAIT_PROCESS: {
-    type: "warning",
-  },
+  PROCESSING: "info",
+  COMPLETED: "success",
+  WAIT_PROCESS: "warning",
 };
 
 export const requiremnetPriority = {
