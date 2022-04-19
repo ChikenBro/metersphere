@@ -3,7 +3,19 @@
     :title="title"
     :type="$t('report.test_plan_report')"
   >
-    <div v-for="(item, index) in previews" :key="item.id">
+    <div v-if="iterationReport">
+      <div v-for="(item, index) in previews" :key="item.id">
+        <template-component
+          :source="source"
+          :is-report-view="true"
+          :iteration-report="iterationReport"
+          :plan-dd="planId"
+          :preview="item"
+          :index="index"
+        />
+      </div>
+    </div>
+    <div v-else v-for="(item, index) in previews" :key="item.id">
       <template-component
         ref="templateComponent"
         :is-report-view="true"
@@ -22,7 +34,42 @@ import MsReportTitle from "../../../../common/components/report/MsReportTitle";
 export default {
   name: "MsTestCaseReportExport",
   components: { MsReportTitle, TemplateComponent, MsReportExportTemplate },
-  props: ["previews", "title", "metric"],
+  props: {
+    previews: {
+      type: Array,
+      default() {
+        return [];
+      },
+    },
+    title: {
+      type: String,
+      default: "",
+    },
+    metric: {
+      type: Object,
+      default() {
+        return null;
+      },
+    },
+    iterationReport: {
+      type: Object,
+      default() {
+        return null;
+      },
+    },
+    isReportView: {
+      type: Boolean,
+      default: false,
+    },
+    source: {
+      type: String,
+      default: "",
+    },
+    planId: {
+      type: String,
+      default: "",
+    },
+  },
 };
 </script>
 
