@@ -5,7 +5,7 @@ export const IterationStatusEnum = {
 };
 
 export const StatusTagMap = {
-  PROCESSING: "info",
+  PROCESSING: "primary",
   COMPLETED: "success",
   WAIT_PROCESS: "warning",
 };
