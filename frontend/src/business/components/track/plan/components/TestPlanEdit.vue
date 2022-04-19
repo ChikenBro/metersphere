@@ -209,6 +209,7 @@
                   :value="item.value"
                 ></el-option>
               </el-select>
+              <ms-instructions-icon content="选择继承则负责该计划" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -216,12 +217,14 @@
         <el-row>
           <el-col :span="8" :offset="1" v-if="form.testPlanInherit !== ''">
             <el-form-item
-              label="保留缺陷状态"
+              label="保留用例状态"
               :label-width="formLabelWidth"
               prop="ifRetain"
             >
               <el-switch v-model="form.ifRetain" />
-              <ms-instructions-icon :content="'继承后是否保留缺陷状态'" />
+              <ms-instructions-icon
+                content='选择是否保留用例"阻塞"状态,重置其它用例状态'
+              />
             </el-form-item>
           </el-col>
         </el-row>
