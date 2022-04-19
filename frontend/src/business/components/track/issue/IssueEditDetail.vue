@@ -688,9 +688,9 @@ export default {
     },
   },
   methods: {
-    open(data) {
+    open(data, extraData) {
       this.initList();
-      this.initEdit(data);
+      this.initEdit(data, extraData);
       this.getThirdPartyInfo();
 
       // getIssueTemplate()
@@ -748,6 +748,7 @@ export default {
         if (data.testCaseIds) {
           this.testCaseContainIds = new Set(data.testCaseIds);
         }
+        this.judgeNeedAppendOptions(data.fields);
         const statusList = [
           { label: "待处理", value: 1 },
           { label: "重新打开", value: 2 },
@@ -820,6 +821,27 @@ export default {
           value: item.id,
         }));
       });
+    },
+    // 判断是否需要再次请求下拉数据
+    judgeNeedAppendOptions(fields) {
+      const { defectTypeId, requirementCode, iterationCode } = fields;
+      const {
+        originDefectTypeName,
+        originIterationName,
+        originRequirementName,
+      } = fields;
+      const updateOptions = (value, label, optionName) => {
+        if (value && !this[optionName].find((item) => item.value === value)) {
+          this[optionName].push({ label, value });
+        }
+      };
+      updateOptions(defectTypeId, originDefectTypeName, "defectOptions");
+      updateOptions(
+        requirementCode,
+        originRequirementName,
+        "requirementOptions"
+      );
+      updateOptions(iterationCode, originIterationName, "iterationOptions");
     },
     handleBlur(type) {
       const keywords = this.form.fields[numMapType[type]];
