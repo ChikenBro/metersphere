@@ -112,7 +112,7 @@ export default {
       showDialog: false,
       previews: [],
       report: {
-        name: "缺陷报告",
+        name: "迭代报告",
       },
       source: "ReportView",
       planId: "",
@@ -266,7 +266,7 @@ export default {
       const url = `/iteration/report`;
       const { iterationCode, projectId } = this;
       this.$post(url, { iterationCode, projectId }, (res) => {
-        let iterationReport = res.data?.data || {};
+        let iterationReport = res?.data || {};
         iterationReport.testResult ??= [];
         iterationReport.caseExecutiveCondition ??= [];
         iterationReport.failureTestCases ??= [];

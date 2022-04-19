@@ -21,7 +21,7 @@ export function getIterationList(page) {
       ],
     },
     (response) => {
-      getPageDate(response.data, page);
+      getPageDate(response, page);
     }
   );
 }
