@@ -565,9 +565,8 @@ export default {
     handleEdit(data) {
       // 传了row(data)和index 只用到了data
       let newData = this.handleData({ ...data, creator: getCurrentUserId() });
-      newData.drawerTitle = "编辑缺陷";
-      newData.isEdit = true;
-      this.$refs.issueEdit.open(newData);
+      const extraData = { isEdit: true, drawerTitle: "编辑缺陷" };
+      this.$refs.issueEdit.open(newData, extraData);
     },
     handleCreate() {
       this.$refs.issueEdit.open();
@@ -579,9 +578,8 @@ export default {
         this.handleData({ ...data, creator: getCurrentUserId() })
       );
       copyData.id = null;
-      copyData.isCreateTitle = true;
-      copyData.drawerTitle = "复制缺陷";
-      this.$refs.issueEdit.open(copyData);
+      const extraData = { isCreateTitle: true, drawerTitle: "复制缺陷" };
+      this.$refs.issueEdit.open(copyData, extraData);
     },
     // 显示删除确认框
     handleDelete(data) {
@@ -641,14 +639,13 @@ export default {
     // 打开预览
     handlePreview(data) {
       const newData = this.handleData(data);
-      newData.isOnlyRead = true;
-      newData.drawerTitle = "浏览缺陷";
-      this.$refs.issueEdit.open(newData);
+      const extraData = { isOnlyRead: true, drawerTitle: "浏览缺陷" };
+      this.$refs.issueEdit.open(newData, extraData);
     },
     // 处理数据
     handleData(data) {
       let newData = null;
-      const { customFields, description } = data;
+      const { description } = data;
       let descriptions = JSON.parse(description);
       newData = {
         id: data.id,
@@ -662,16 +659,22 @@ export default {
         },
         creator: data.creator,
         fields: {
-          ...customFields,
-          model: data.model,
-          workingHours: customFields.workingHours
-            ? customFields.workingHours + ""
-            : "",
-          dueDate: customFields.dueDate || "",
-          startDate: customFields.startDate || "",
-          assignee: customFields.assignee || "",
+          moduleId: data.modelId,
+          defectTypeId: data.defectTypeId || "",
+          iterationCode: data.iterationCode || "",
+          requirementCode: data.requirementCode || "",
+          priority: data.priority || "",
+          workingHours: data.workingHours ? data.workingHours + "" : "",
+          dueDate: data.dueDate || "",
+          startDate: data.startDate || "",
+          assignee: data.assignee || "",
           environment: data.environment || "",
           repetitionFrequency: data.repetitionFrequency || "",
+          originModel: data.model || "",
+          originAssignee: data.assigneeName || "",
+          originDefectTypeName: data.defectTypeName || "",
+          originIterationName: data.iterationName || "",
+          originRequirementName: data.requirementName || "",
         },
         projectId: data.projectId,
         organizationId: data.organizationId,

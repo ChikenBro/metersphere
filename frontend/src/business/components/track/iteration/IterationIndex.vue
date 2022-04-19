@@ -62,7 +62,7 @@
               :fields-width="fieldsWidth"
             >
               <template v-slot:default="scope">
-                <el-tag :type="StatusTagMap[scope.row.status]" size="mini">
+                <el-tag :type="StatusTagMap[scope.row.status].type" size="mini">
                   {{ IterationStatusEnum[scope.row.status] || "-" }}
                 </el-tag>
               </template>

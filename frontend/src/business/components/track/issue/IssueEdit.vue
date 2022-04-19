@@ -72,16 +72,16 @@ export default {
     },
   },
   methods: {
-    open(data) {
+    open(data, extraData) {
       this.visible = true;
       this.showCreateNext = data === undefined;
-      this.isCreateTitle = data === undefined || data?.isCreateTitle;
+      this.isCreateTitle = data === undefined || extraData?.isCreateTitle;
       this.title =
-        data?.drawerTitle || this.$t("test_track.issue.create_issue");
-      this.isDisabled = !!data?.isOnlyRead;
-      this.isEdit = !!data?.isEdit;
+        extraData?.drawerTitle || this.$t("test_track.issue.create_issue");
+      this.isDisabled = !!extraData?.isOnlyRead;
+      this.isEdit = !!extraData?.isEdit;
       this.$nextTick(() => {
-        this.$refs.issueEditDetail.open(data);
+        this.$refs.issueEditDetail.open(data, extraData);
         this.$refs.issueEditDetail.$el.scrollTop = 0;
       });
     },

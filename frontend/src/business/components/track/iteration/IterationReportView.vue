@@ -61,6 +61,15 @@
         </div>
       </template>
     </el-drawer>
+    <ms-test-case-report-export
+      v-if="reportExportVisible"
+      id="iterationReportExport"
+      :title="report.name"
+      :iteration-report="iterationReport"
+      :previews="[{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }]"
+      :source="source"
+      :plan-id="planId"
+    />
   </div>
 </template>
 
@@ -74,6 +83,7 @@ import TestCaseReportTemplateEdit from "@/business/components/track/plan/view/co
 import TemplateComponent from "@/business/components/track/plan/view/comonents/report/TemplateComponent/TemplateComponent";
 import html2canvas from "html2canvas";
 import MsTestPlanReportExport from "@/business/components/track/report/components/TestPlanReportExport";
+import MsTestCaseReportExport from "@/business/components/track/plan/view/comonents/TestCaseReportExport";
 
 export default {
   name: "TestPlanReportView",
@@ -85,6 +95,7 @@ export default {
     TestResultComponent,
     TestResultChartComponent,
     BaseInfoComponent,
+    MsTestCaseReportExport,
   },
   data() {
     return {
@@ -100,7 +111,9 @@ export default {
       imgUrl: "",
       showDialog: false,
       previews: [],
-      report: {},
+      report: {
+        name: "迭代报告",
+      },
       source: "ReportView",
       planId: "",
       reportExportVisible: false,
@@ -195,7 +208,7 @@ export default {
 
       this.$nextTick(function () {
         setTimeout(() => {
-          html2canvas(document.getElementById("testCaseReportExport"), {
+          html2canvas(document.getElementById("iterationReportExport"), {
             scale: 2,
           }).then(function (canvas) {
             exportPdf(name, [canvas]);
@@ -253,7 +266,11 @@ export default {
       const url = `/iteration/report`;
       const { iterationCode, projectId } = this;
       this.$post(url, { iterationCode, projectId }, (res) => {
-        let iterationReport = res.data?.data || {};
+        let iterationReport = res?.data || {};
+        iterationReport.testResult ??= [];
+        iterationReport.caseExecutiveCondition ??= [];
+        iterationReport.failureTestCases ??= [];
+        iterationReport.issues ??= [];
         const { testResult, caseExecutiveCondition } = iterationReport;
         iterationReport.handledTestResult =
           (testResult &&
