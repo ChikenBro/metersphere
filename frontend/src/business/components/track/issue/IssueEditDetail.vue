@@ -50,7 +50,7 @@
               <el-select
                 v-model="form.fields.defectTypeId"
                 placeholder="缺陷类型"
-                @blur="getList(1, '')"
+                @blur="handleBlur(1)"
                 @change="$forceUpdate()"
                 clearable
                 @clear="getList(1, '')"
@@ -100,8 +100,9 @@
                 v-model="form.fields.requirementCode"
                 placeholder="未关联需求"
                 clearable
+                :popper-append-to-body="false"
                 @change="$forceUpdate()"
-                @blur="getList(2, '')"
+                @blur="handleBlur(2)"
                 @clear="getList(2, '')"
                 filterable
                 :filter-method="(query) => getList(2, query)"
@@ -126,7 +127,7 @@
               <el-select
                 v-model="form.fields.iterationCode"
                 placeholder="请选择迭代"
-                @blur="getList(3, '')"
+                @blur="handleBlur(3)"
                 clearable
                 @clear="getList(3, '')"
                 filterable
@@ -438,7 +439,16 @@ import {
 } from "@/common/js/utils";
 import { getIssueTemplate } from "@/network/custom-field-template";
 import { getProjectMember } from "@/network/user";
-
+const numMapType = {
+  1: "defectTypeId",
+  2: "requirementCode",
+  3: "iterationCode",
+};
+const numMapOptions = {
+  1: "defectOptions",
+  2: "requirementOptions",
+  3: "iterationOptions",
+};
 export default {
   name: "IssueEditDetail",
   components: {
@@ -811,15 +821,22 @@ export default {
         }));
       });
     },
+    handleBlur(type) {
+      const keywords = this.form.fields[numMapType[type]];
+      const obj = this[numMapOptions[type]].find(
+        (item) => item.label === keywords || item.value === keywords
+      );
+      if (obj !== undefined) {
+        this.form.fields[numMapType[type]] = obj.value;
+      } else {
+        this.form.fields[numMapType[type]] = "";
+        this.getList(type, "");
+      }
+    },
     getList(type, name = "") {
       let url = "/field/template/issue/templates/list/1/10";
+      this.form.fields[numMapType[type]] = name;
       const fetchOptionsApi = () => {
-        const obj = {
-          1: "defectTypeId",
-          2: "requirementCode",
-          3: "iterationCode",
-        };
-        name !== "" && (this.form.fields[obj[type]] = "");
         this.$post(url, { projectId: this.projectId, type, name }, (res) => {
           let {
             data: { options },
@@ -984,5 +1001,13 @@ export default {
 
 .custom-field-row {
   padding-left: 18px;
+}
+
+.container >>> .el-select-dropdown__item span {
+  width: 200px !important;
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 </style>

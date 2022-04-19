@@ -574,7 +574,10 @@ export default {
     },
     handleCopy(data) {
       let copyData = {};
-      Object.assign(copyData, this.handleData(data));
+      Object.assign(
+        copyData,
+        this.handleData({ ...data, creator: getCurrentUserId() })
+      );
       copyData.id = null;
       copyData.isCreateTitle = true;
       copyData.drawerTitle = "复制缺陷";
