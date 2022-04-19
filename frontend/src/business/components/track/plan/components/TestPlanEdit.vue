@@ -152,7 +152,7 @@
                 clearable
                 placeholder="请选择迭代"
                 @clear="getIterationOptions('')"
-                @blur="getIterationOptions('')"
+                @blur="handleBlur"
                 filterable
                 :filter-method="getIterationOptions"
                 @change="getPlanInheritOptions"
@@ -497,6 +497,7 @@ export default {
     // 获取迭代列表
     getIterationOptions(name = "") {
       const url = "/field/template/issue/templates/list/1/20";
+      this.form.iterationCode = name;
       this.$post(
         url,
         { projectId: getCurrentProjectID(), type: 3, name },
@@ -532,6 +533,18 @@ export default {
     // 重置保留缺陷状态
     resetRetain() {
       this.form.ifRetain = false;
+    },
+    handleBlur() {
+      const keywords = this.form.iterationCode;
+      const obj = this.iterationOptions.find(
+        (item) => item.label === keywords || item.value === keywords
+      );
+      if (obj !== undefined) {
+        this.form.iterationCode = obj.value;
+      } else {
+        this.form.iterationCode = "";
+        this.getIterationOptions("");
+      }
     },
   },
 };
