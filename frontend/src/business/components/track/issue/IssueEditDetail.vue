@@ -826,12 +826,6 @@ export default {
       const obj = this[numMapOptions[type]].find(
         (item) => item.label === keywords || item.value === keywords
       );
-      console.log(
-        obj,
-        numMapOptions[type],
-        this[numMapOptions[type]],
-        keywords
-      );
       if (obj !== undefined) {
         this.form.fields[numMapType[type]] = obj.value;
       } else {
