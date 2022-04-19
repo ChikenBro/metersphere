@@ -50,8 +50,9 @@ export function syncCoding(success) {
  * @param projectId
  */
 export function getIterationRequirements(data, success) {
+  const { goPage, pageSize } = data;
   return post(
-    `/iteration/requirement`,
+    `/iteration/requirement/${goPage}/${pageSize}`,
     {
       projectId: getCurrentProjectID(),
       ...data,
