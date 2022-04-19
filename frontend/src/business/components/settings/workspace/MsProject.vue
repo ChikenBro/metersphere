@@ -196,7 +196,11 @@
             type="textarea"
           ></el-input>
         </el-form-item>
-        <el-form-item :label-width="labelWidth" label="同步Coding项目">
+        <el-form-item
+          :label-width="labelWidth"
+          label="同步Coding项目"
+          prop="codingInfo"
+        >
           <project-coding-selector
             :data="form"
             prop="codingInfo"
@@ -497,6 +501,13 @@ export default {
             max: 60,
             message: this.$t("commons.input_limit", [2, 60]),
             trigger: "blur",
+          },
+        ],
+        codingInfo: [
+          {
+            required: true,
+            trigger: "change",
+            message: "请选择同步coding项目",
           },
         ],
         description: [
