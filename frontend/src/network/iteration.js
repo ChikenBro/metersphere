@@ -1,13 +1,6 @@
-import {
-  post,
-  get
-} from "@/common/js/ajax";
-import {
-  getPageDate
-} from "@/common/js/tableUtils";
-import {
-  getCurrentProjectID
-} from "@/common/js/utils";
+import { post, get } from "@/common/js/ajax";
+import { getPageDate } from "@/common/js/tableUtils";
+import { getCurrentProjectID } from "@/common/js/utils";
 
 /**
  * @param {string} projectId
@@ -15,14 +8,17 @@ import {
  */
 export function getIterationList(page) {
   return post(
-    "/iteration/list/" + page.currentPage + "/" + page.pageSize, {
+    "/iteration/list/" + page.currentPage + "/" + page.pageSize,
+    {
       ...page.condition,
       projectId: getCurrentProjectID(),
       iterationName: "",
-      orders: [{
-        name: "start_time",
-        type: "desc"
-      }]
+      orders: [
+        {
+          name: "start_time",
+          type: "desc",
+        },
+      ],
     },
     (response) => {
       getPageDate(response.data, page);
@@ -36,7 +32,8 @@ export function getIterationList(page) {
  */
 export function syncCoding(success) {
   return post(
-    "/iteration/sync/coding", {
+    "/iteration/sync/coding",
+    {
       projectId: getCurrentProjectID(),
     },
     (response) => {
@@ -54,9 +51,10 @@ export function syncCoding(success) {
  */
 export function getIterationRequirements(data, success) {
   return post(
-    `/iteration/requirement`, {
+    `/iteration/requirement`,
+    {
       projectId: getCurrentProjectID(),
-      ...data
+      ...data,
     },
     (response) => {
       if (success) {
