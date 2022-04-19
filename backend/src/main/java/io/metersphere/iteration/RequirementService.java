@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import io.metersphere.commons.exception.CodingException;
 import io.metersphere.commons.utils.LogUtil;
+import io.metersphere.config.PlatformResponseConfig;
 import io.metersphere.iteration.response.Options;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,6 @@ public class RequirementService {
         String url = String.format("%s/iteration/requirement", prefix_domain);
         LogUtil.info("requirement data: " + requirementRequest);
         String result = CodingException.checkCodingException(url, requirementRequest);
-        return JSON.parseObject(result);
+        return PlatformResponseConfig.parsePlatformDate(result);
     }
 }
