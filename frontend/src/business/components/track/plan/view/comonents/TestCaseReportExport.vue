@@ -9,20 +9,22 @@
           :source="source"
           :is-report-view="true"
           :iteration-report="iterationReport"
-          :plan-dd="planId"
+          :plan-id="planId"
           :preview="item"
           :index="index"
         />
       </div>
     </div>
-    <div v-else v-for="(item, index) in previews" :key="item.id">
-      <template-component
-        ref="templateComponent"
-        :is-report-view="true"
-        :metric="metric"
-        :preview="item"
-        :index="index"
-      />
+    <div v-else>
+      <div v-for="(item, index) in previews" :key="item.id">
+        <template-component
+          ref="templateComponent"
+          :is-report-view="true"
+          :metric="metric"
+          :preview="item"
+          :index="index"
+        />
+      </div>
     </div>
   </ms-report-export-template>
 </template>

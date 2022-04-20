@@ -109,8 +109,9 @@ export default {
       this.reload();
     },
     getTestResultCharData() {
-      if (this.executeResult) {
-        this.executeResult.forEach((obj) => {
+      const executeResult = JSON.parse(JSON.stringify(this.executeResult));
+      if (executeResult) {
+        executeResult.forEach((obj) => {
           const arr = [];
           obj.dataList.forEach((item) => {
             let data = this.copyData(item.status);
@@ -120,7 +121,7 @@ export default {
           obj.dataList = arr;
         });
       }
-      this.testResultCharData = this.executeResult;
+      this.testResultCharData = executeResult;
     },
     copyData(status) {
       if (this.dataMap.get(status)) {

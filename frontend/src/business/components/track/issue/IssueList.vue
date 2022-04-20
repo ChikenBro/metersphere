@@ -19,6 +19,7 @@
                 <ms-table-button
                   icon="el-icon-refresh"
                   v-if="true"
+                  :disabled="isSyncingBugs"
                   :content="$t('test_track.issue.sync_bugs')"
                   @click="syncIssues"
                 />
@@ -488,6 +489,7 @@ export default {
       defectTypeOptions: [],
       requirementOptions: [],
       iterationOptions: [],
+      isSyncingBugs: false,
     };
   },
   filters: {
@@ -598,8 +600,13 @@ export default {
       saveLastTableSortField(key, JSON.stringify(orders));
     },
     syncIssues() {
+      this.isSyncingBugs = true;
       this.page.result = syncIssues(() => {
         this.getIssues();
+        setTimeout(() => {
+          this.isSyncingBugs = false;
+          this.$success("同步成功");
+        }, 0);
       });
     },
     getSortField() {
