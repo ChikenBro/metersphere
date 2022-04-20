@@ -102,8 +102,9 @@ export default {
       this.reload();
     },
     getTestResultCharData() {
-      if (this.executeResult) {
-        this.executeResult.forEach((obj) => {
+      const executeResult = JSON.parse(JSON.stringify(this.executeResult));
+      if (executeResult) {
+        executeResult.forEach((obj) => {
           obj.executerTestList.forEach((role) => {
             const arr = [];
             role.dataList.forEach((item) => {
@@ -115,7 +116,7 @@ export default {
           });
         });
       }
-      this.executerTestList = this.executeResult;
+      this.executerTestList = executeResult;
       this.filterData();
     },
     copyData(status) {

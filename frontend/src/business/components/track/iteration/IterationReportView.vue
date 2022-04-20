@@ -62,11 +62,11 @@
       </template>
     </el-drawer>
     <ms-test-case-report-export
-      v-if="reportExportVisible"
+      v-if="true"
       id="iterationReportExport"
       :title="report.name"
       :iteration-report="iterationReport"
-      :previews="[{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }]"
+      :previews="previews"
       :source="source"
       :plan-id="planId"
     />
@@ -86,7 +86,7 @@ import MsTestPlanReportExport from "@/business/components/track/report/component
 import MsTestCaseReportExport from "@/business/components/track/plan/view/comonents/TestCaseReportExport";
 
 export default {
-  name: "TestPlanReportView",
+  name: "IterationReportView",
   components: {
     MsTestPlanReportExport,
     TemplateComponent,
@@ -110,7 +110,7 @@ export default {
       result: {},
       imgUrl: "",
       showDialog: false,
-      previews: [],
+      previews: [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }],
       report: {
         name: "迭代报告",
       },
@@ -273,23 +273,20 @@ export default {
         iterationReport.issues ??= [];
         const { testResult, caseExecutiveCondition } = iterationReport;
         iterationReport.handledTestResult =
-          (testResult &&
-            testResult.map((item) => {
-              return {
-                title: item.testPlanName,
-                dataList: [
-                  { status: "Pass", count: item.passCount },
-                  { status: "Failure", count: item.failureCount },
-                  { status: "Blocking", count: item.blockingCount },
-                  { status: "Skip", count: item.skipCount },
-                  { status: "Underway", count: item.underwayCount },
-                  { status: "Prepare", count: item.prepareCount },
-                ],
-              };
-            })) ||
-          [];
+          testResult.map((item) => {
+            return {
+              title: item.testPlanName,
+              dataList: [
+                { status: "Pass", count: item.passCount },
+                { status: "Failure", count: item.failureCount },
+                { status: "Blocking", count: item.blockingCount },
+                { status: "Skip", count: item.skipCount },
+                { status: "Underway", count: item.underwayCount },
+                { status: "Prepare", count: item.prepareCount },
+              ],
+            };
+          }) || [];
         iterationReport.handledCaseExecutiveCondition =
-          caseExecutiveCondition &&
           caseExecutiveCondition.map((item) => {
             return {
               title: item.testPlanName,
@@ -318,7 +315,6 @@ export default {
   },
 };
 </script>
-cd
 
 <style scoped>
 .el-main {
