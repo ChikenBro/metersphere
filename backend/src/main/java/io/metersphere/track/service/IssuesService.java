@@ -2,6 +2,7 @@ package io.metersphere.track.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.esotericsoftware.minlog.Log;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import io.metersphere.base.domain.*;
@@ -32,6 +33,7 @@ import io.metersphere.track.issue.*;
 import io.metersphere.track.issue.domain.PlatformUser;
 import io.metersphere.track.issue.domain.zentao.ZentaoBuild;
 import io.metersphere.track.request.testcase.AuthUserIssueRequest;
+import io.metersphere.track.request.testcase.IssuesFilters;
 import io.metersphere.track.request.testcase.IssuesRequest;
 import io.metersphere.track.request.testcase.IssuesUpdateRequest;
 import io.metersphere.track.service.task.SyncJiraIssueTask;
@@ -141,10 +143,11 @@ public class IssuesService {
         // 获取token秘钥
         String platformInfo = creatorUser.getPlatformInfo();
         if (null == platformInfo || !platformInfo.contains("codingToken")) {
+            log.info("当前操作者: {}", creatorUser.getName());
             MSException.throwException("请先去个人设置配置个人访问令牌");
         }
         try {
-            //解析内容如下
+            //解析内容如下,获取codingToken
 //            {"d1ab2464-0a3d-11ec-b53d-0c42a1eda428":{"jiraAccount":"1","jiraPassword":"1","codingToken":"2fd336cfa806cae14d5e8f955e1b63e2f193d70c"}}
             Map<String, String> map = new HashMap<>();
             map = JSON.parseObject(platformInfo, HashMap.class);
@@ -385,16 +388,17 @@ public class IssuesService {
         }
         String prefix_domain = System.getProperty("coding.domain");
         String url = String.format("%s/issues/delete", prefix_domain);
-        LogUtil.info("delete issues: " + request);
+        log.info("delete issues request:{}, url:{}", request, url);
+        LogUtil.info(String.format("delete issues request:%s, url:%s", request, url));
         CodingException.checkCodingResult(CodingException.checkCodingException(url, request), "删除");
-//        issuesMapper.deleteByPrimaryKey(request.getId());
-//        deleteIssueRelate(request);
     }
 
     public void syncIssues(IssuesRequest request) {
         String prefix_domain = System.getProperty("coding.domain");
         String url = String.format("%s/issues/sync/coding", prefix_domain);
+        log.info("url{}", url);
         LogUtil.info("sync coding issues: " + request);
+        LogUtil.info(String.format("sync coding issues: %s", request));
         CodingException.checkCodingException(url, request);
     }
 
@@ -430,7 +434,7 @@ public class IssuesService {
         request.setOrders(ServiceUtils.getDefaultOrder(request.getOrders()));
         String search = request.getOrders().get(0).getName();
         List<IssuesDao> issues;
-        if (search.equals("priority") || search.equals("assignee") || search.equals("due_date") || search.equals("start_date")) {
+        if (search.equals("priority") || search.equals("assignee_name") || search.equals("due_date") || search.equals("start_date")) {
             request.getOrders().get(0).setName("update_time");
             issues = extIssuesMapper.getIssuesByProjectId(request);
 //            issues.forEach(issue->{
@@ -464,8 +468,88 @@ public class IssuesService {
             item.setCaseIds(caseIds);
             item.setCaseCount(testCaseIssues.size());
         });
+//        if (null != request.getFilters()) {
+//            issues = filterIssue(request.getFilters(), issues);
+//        }
         return issues;
     }
+
+    /**
+     * 根据过滤条件筛选issues
+     *
+     * @param filters 过滤条件
+     * @param issues  issues
+     * @return issues
+     */
+    private List<IssuesDao> filterIssue(Map<String, List<String>> filters, List<IssuesDao> issues) {
+        List<String> createNames = filters.get("create_name");
+        List<String> assigneeNames = filters.get("assignee_name");
+        List<String> iterationNames = filters.get("iteration_name");
+        List<String> requirementNames = filters.get("requirement_name");
+        List<String> platformStatus = filters.get("platform_status");
+//        filters.forEach(filter->{
+//            filterIssueField(filter, issues);
+//        });
+        if (issues.isEmpty() || (null == createNames && null == assigneeNames & null == iterationNames && null == requirementNames && null == platformStatus)) {
+            return issues;
+        }
+        List<IssuesDao> createNameIssues = new ArrayList<>();
+        if (null != createNames) {
+            List<IssuesDao> finalIssues = issues;
+            createNames.forEach(createName -> {
+                createNameIssues.addAll(finalIssues.stream().filter(s -> s.getCreator().equals(createName)).collect(Collectors.toList()));
+            });
+        }
+        if (!createNameIssues.isEmpty()) {
+            issues = createNameIssues;
+        }
+        List<IssuesDao> assigneeNamesIssues = new ArrayList<>();
+        if (null != assigneeNames) {
+            List<IssuesDao> finalIssues1 = issues;
+            assigneeNames.forEach(assigneeName -> {
+                assigneeNamesIssues.addAll(finalIssues1.stream().filter(s -> s.getCustomFields().contains(assigneeName)).collect(Collectors.toList()));
+            });
+        }
+        if (!assigneeNamesIssues.isEmpty()) {
+            issues = assigneeNamesIssues;
+        }
+        List<IssuesDao> iterationNamesIssues = new ArrayList<>();
+        if (null != iterationNames) {
+            List<IssuesDao> finalIssues2 = issues;
+            iterationNames.forEach(iterationName -> {
+                iterationNamesIssues.addAll(finalIssues2.stream().filter(s -> s.getCustomFields().equals(iterationName)).collect(Collectors.toList()));
+            });
+        }
+        if (!iterationNamesIssues.isEmpty()) {
+            issues = iterationNamesIssues;
+        }
+        List<IssuesDao> requirementNamesIssues = new ArrayList<>();
+        if (null != requirementNames) {
+            List<IssuesDao> finalIssues3 = issues;
+            requirementNames.forEach(requirementName -> {
+                requirementNamesIssues.addAll(finalIssues3.stream().filter(s -> s.getCustomFields().equals(requirementName)).collect(Collectors.toList()));
+            });
+        }
+        if (!requirementNamesIssues.isEmpty()) {
+            issues = requirementNamesIssues;
+        }
+        List<IssuesDao> platformStatusIssues = new ArrayList<>();
+        if (null != platformStatus) {
+            List<IssuesDao> finalIssues4 = issues;
+            platformStatus.forEach(status -> {
+                platformStatusIssues.addAll(finalIssues4.stream().filter(s -> s.getStatus().equals(status)).collect(Collectors.toList()));
+            });
+        }
+        if (!platformStatusIssues.isEmpty()) {
+            issues = platformStatusIssues;
+        }
+        return issues;
+    }
+
+//    private List<IssuesDao> filterIssueField(List<String> filters, List<IssuesDao> issues){
+//        return issues;
+//    }
+
 
     public Map<String, List<IssuesDao>> getIssueMap(List<IssuesDao> issues) {
         Map<String, List<IssuesDao>> issueMap = new HashMap<>();

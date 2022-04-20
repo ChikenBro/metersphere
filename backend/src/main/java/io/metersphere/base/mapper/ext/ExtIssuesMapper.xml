@@ -49,7 +49,7 @@
             <if test="request.name != null">
                 and (
                       issues.title LIKE CONCAT('%', #{request.name}, '%')
-                      or issues.id LIKE CONCAT('%', #{request.name}, '%')
+                      or issues.num LIKE CONCAT('%', #{request.name}, '%')
                     )
             </if>
 
@@ -80,6 +80,26 @@
                                 AND issues.platform IN
                                 <foreach collection="values" item="value" separator="," open="(" close=")">
                                     #{value}
+                                </foreach>
+                            </when>
+                        </choose>
+                    </if>
+                    <if test="values != null and values.size() > 0">
+                        <choose>
+                            <when test="key == 'platform_status'">
+                                AND issues.status IN
+                                <foreach collection="values" item="value" separator="," open="(" close=")">
+                                    #{value}
+                                </foreach>
+                            </when>
+                        </choose>
+                    </if>
+                    <if test="values != null and values.size() > 0">
+                        <choose>
+                            <when test="key == 'assignee_name'">
+                                AND issues.custom_fields LIKE
+                                <foreach collection="values" item="value" separator="," open="(" close=")">
+                                    CONCAT('%', #{value}, '%')
                                 </foreach>
                             </when>
                         </choose>

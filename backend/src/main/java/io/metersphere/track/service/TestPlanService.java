@@ -44,6 +44,7 @@ import io.metersphere.track.request.testcase.QueryTestPlanRequest;
 import io.metersphere.track.request.testplan.AddTestPlanRequest;
 import io.metersphere.track.request.testplan.LoadCaseRequest;
 import io.metersphere.track.request.testplancase.QueryTestPlanCaseRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
@@ -61,6 +62,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class TestPlanService {
     @Resource
     ExtScheduleMapper extScheduleMapper;
@@ -153,14 +155,15 @@ public class TestPlanService {
         testPlan.setCreateTime(System.currentTimeMillis());
         testPlan.setUpdateTime(System.currentTimeMillis());
         testPlan.setCreator(SessionUtils.getUser().getId());
-        if (null != testPlan.getIterationCode()) {
-            Iteration iteration = iterationMapper.getIterationByIterationCode(testPlan.getIterationCode());
-            if (null != iteration) {
-                testPlan.setIterationId(iteration.getId());
-            }
-        }
         if (StringUtils.isBlank(testPlan.getProjectId())) {
             testPlan.setProjectId(SessionUtils.getCurrentProjectId());
+        }
+        if (null != testPlan.getIterationCode()) {
+            List<Iteration> iteration = iterationMapper.getIterationByIterationCode(testPlan.getIterationCode());
+            iteration = iteration.stream().filter(s -> s.getProjectId().equals(testPlan.getProjectId())).collect(Collectors.toList());
+            if (!iteration.isEmpty()) {
+                testPlan.setIterationId(iteration.get(0).getId());
+            }
         }
         testPlanMapper.insert(testPlan);
 
@@ -1124,14 +1127,22 @@ public class TestPlanService {
      */
     public List<TestPlan> selectIterationTestPlan(RequirementRequest testPlanBody) {
         List<TestPlan> testPlans = new ArrayList<>();
-        Iteration iteration = iterationMapper.getIterationByIterationCode(testPlanBody.getIterationCode());
-        if (null == iteration) {
+        List<Iteration> iteration = iterationMapper.getIterationByIterationCode(testPlanBody.getIterationCode());
+        if(null != testPlanBody.getProjectId()){
+            iteration = iteration.stream().filter(s->s.getProjectId().equals(testPlanBody.getProjectId())).collect(Collectors.toList());
+        }
+        if (iteration.isEmpty()) {
             return testPlans;
         }
-        testPlans = testPlanMapper.selectByIterationId(iteration.getId());
-        if (null != testPlanBody.getName() && !testPlanBody.getName().equals("")) {
-            return testPlans.stream().filter(s -> s.getName().contains(testPlanBody.getName())).collect(Collectors.toList());
+        testPlans = testPlanMapper.selectByIterationId(iteration.get(0).getId());
+        try {
+            if (null != testPlanBody.getName() && !testPlanBody.getName().equals("")) {
+                return testPlans.stream().filter(s -> s.getName().contains(testPlanBody.getName())).collect(Collectors.toList());
+            }
+            return testPlans;
+        } catch (Exception e) {
+            log.error("迭代下过滤测试计划有误:{}", e.getMessage());
+            return testPlans;
         }
-        return testPlans;
     }
 }

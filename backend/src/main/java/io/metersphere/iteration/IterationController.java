@@ -52,9 +52,9 @@ public class IterationController {
      * @param requirementRequest 请求参数
      * @return 需求列表数据
      */
-    @PostMapping("/requirement")
-    public JSONObject requirementList(@RequestBody RequirementRequest requirementRequest) {
-        return requirementService.list(requirementRequest);
+    @PostMapping("/requirement/{goPage}/{pageSize}")
+    public JSONObject requirementList(@PathVariable int goPage, @PathVariable int pageSize, @RequestBody RequirementRequest requirementRequest) {
+        return requirementService.list(goPage, pageSize, requirementRequest);
     }
 
     @PostMapping("/report")

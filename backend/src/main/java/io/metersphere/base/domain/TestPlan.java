@@ -1,7 +1,11 @@
 package io.metersphere.base.domain;
 
 import java.io.Serializable;
+
 import lombok.Data;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 
 @Data
 public class TestPlan implements Serializable {
@@ -39,6 +43,7 @@ public class TestPlan implements Serializable {
 
     private String creator;
 
+    @NotEmpty(message = "projectId不能为空", groups = {addTestPlan.class})
     private String projectId;
 
     private Integer executionTimes;
@@ -52,4 +57,7 @@ public class TestPlan implements Serializable {
     private String environment;
 
     private static final long serialVersionUID = 1L;
+
+    public interface addTestPlan {
+    }
 }

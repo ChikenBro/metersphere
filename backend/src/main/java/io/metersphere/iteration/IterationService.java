@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import io.metersphere.commons.exception.CodingException;
 import io.metersphere.commons.utils.LogUtil;
+import io.metersphere.config.PlatformResponseConfig;
 import io.metersphere.iteration.response.Options;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +30,9 @@ public class IterationService {
     public JSONObject syncIteration(IterationSyncRequest iterationSyncRequest) {
         String prefix_domain = System.getProperty("coding.domain");
         String url = String.format("%s/iteration/sync/coding", prefix_domain);
-        LogUtil.info("sync iteration: " + iterationSyncRequest);
+        log.info("sync iteration request: {}, url: {}", iterationSyncRequest, url);
         String result = CodingException.checkCodingException(url, iterationSyncRequest);
-        return JSON.parseObject(result);
+        return PlatformResponseConfig.parsePlatformDate(result);
     }
 
     /**
@@ -43,9 +44,10 @@ public class IterationService {
     public JSONObject list(int goPage, int pageSize, IterationSyncRequest request) {
         String prefix_domain = System.getProperty("coding.domain");
         String url = String.format("%s/iteration/list/%s/%s", prefix_domain, goPage, pageSize);
-        LogUtil.info("sync iteration: " + request);
+        log.info("iteration list request: {}, url: {}", request, url);
+        LogUtil.info(String.format("iteration list request: %s, url: %s", request, url));
         String result = CodingException.checkCodingException(url, request);
-        return JSON.parseObject(result);
+        return PlatformResponseConfig.parsePlatformDate(result);
     }
 
     /**
@@ -55,10 +57,8 @@ public class IterationService {
     public JSONObject iterationReport(RequirementRequest requirementRequest) {
         String prefix_domain = System.getProperty("coding.domain");
         String url = String.format("%s/iteration/report", prefix_domain);
-        LogUtil.info("sync iteration: " + requirementRequest);
+        log.info("iteration report request: {}, url: {}", requirementRequest, url);
         String result = CodingException.checkCodingException(url, requirementRequest);
-        return JSON.parseObject(result);
+        return PlatformResponseConfig.parsePlatformDate(result);
     }
-
-
 }

@@ -39,4 +39,5 @@ public class IssuesRequest extends BaseQueryRequest {
     private List<String> ids;
     private String remark;
     private String token;
+//    private IssuesFilters filters;
 }

@@ -17,8 +17,8 @@ module.exports = {
 //        ws: true,
 //      },
       ["^((?!/login)(?!/document))"]: {
-//        target: "http://localhost:8081",
-        target: "http://metersphere.dev.mudu.tv/",
+        target: "http://localhost:8081",
+//        target: "http://metersphere.dev.mudu.tv/",
         ws: true,
       },
     },

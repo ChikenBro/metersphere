@@ -58,11 +58,11 @@ public class IssueTemplateController {
         return issueTemplateService.getOption(workspaceId);
     }
 
-//    @GetMapping("/get/relate/{projectId}")
-//    public IssueTemplateDao getTemplate(@PathVariable String projectId) {
-//        return issueTemplateService.getCodingIssueTemplate(projectId);
-//
-//    }
+    @GetMapping("/get/relate/{projectId}")
+    public IssueTemplateDao getTemplate(@PathVariable String projectId) {
+        return issueTemplateService.getTemplate(projectId);
+    }
+
     @PostMapping("/templates/list/{goPage}/{pageSize}")
     public JSONObject getIssueTemplate(@PathVariable Integer goPage, @PathVariable Integer pageSize, @RequestBody CodingCustomFieldListRequest codingCustomFieldListRequest) {
         return issueTemplateService.getCodingIssueTemplate(goPage, pageSize, codingCustomFieldListRequest);
