@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -19,18 +20,15 @@ import java.util.stream.Collectors;
 @Slf4j
 public class RequirementService {
 
-    private List<Options> updateRequirementLists = new ArrayList<>();
-
-
     /**
      * 返回需求列表数据
      *
      * @param requirementRequest 查询需求列表入参
      * @return 需求列表数据
      */
-    public JSONObject list(RequirementRequest requirementRequest) {
+    public JSONObject list(int goPage, int pageSize, RequirementRequest requirementRequest) {
         String prefix_domain = System.getProperty("coding.domain");
-        String url = String.format("%s/iteration/requirement", prefix_domain);
+        String url = String.format("%s/iteration/requirement/%s/%s", prefix_domain, goPage, pageSize);
         LogUtil.info("requirement data: " + requirementRequest);
         String result = CodingException.checkCodingException(url, requirementRequest);
         return PlatformResponseConfig.parsePlatformDate(result);
