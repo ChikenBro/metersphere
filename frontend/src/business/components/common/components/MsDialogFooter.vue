@@ -1,9 +1,13 @@
 <template>
   <div class="dialog-footer">
     <el-button @click="cancel">{{ $t("commons.cancel") }}</el-button>
-    <el-button type="primary" @click="confirm" @keydown.enter.native.prevent>{{
-      $t("commons.confirm")
-    }}</el-button>
+    <el-button
+      :loading="isSubmiting"
+      type="primary"
+      @click="confirm"
+      @keydown.enter.native.prevent
+      >{{ $t("commons.confirm") }}</el-button
+    >
     <el-button
       type="primary"
       v-if="isShow"
@@ -23,6 +27,10 @@ export default {
       default: false,
     },
     title: String,
+    isSubmiting: {
+      type: Boolean,
+      default: false,
+    },
   },
   methods: {
     cancel() {
