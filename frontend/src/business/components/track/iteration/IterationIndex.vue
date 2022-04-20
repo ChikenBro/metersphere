@@ -13,6 +13,7 @@
               <ms-table-button
                 icon="el-icon-refresh"
                 content="同步coding迭代"
+                :disabled="isSyncCoding"
                 @click="syncIterationCoding"
               />
             </template>
@@ -205,6 +206,7 @@ export default {
           exec: this.handleEdit,
         },
       ],
+      isSyncCoding: false,
     };
   },
   activated() {
@@ -220,9 +222,13 @@ export default {
       this.$refs.table?.reloadTable();
     },
     syncIterationCoding() {
+      this.isSyncCoding = true;
       syncCoding(() => {
-        this.$success("开始同步");
         this.fetchIterationList();
+        setTimeout(() => {
+          this.isSyncCoding = false;
+          this.$success("同步成功");
+        }, 0);
       });
     },
     showRequirementList(row) {
