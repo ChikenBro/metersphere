@@ -5,6 +5,7 @@
     :flag="true"
     @setProject="setProject"
     @save="saveCaseRelevance"
+    :is-submiting="isSubmiting"
   >
     <template v-slot:aside>
       <node-tree
@@ -164,6 +165,7 @@ export default {
         { text: "P2", value: "P2" },
         { text: "P3", value: "P3" },
       ],
+      isSubmiting: false,
     };
   },
   watch: {
@@ -199,16 +201,25 @@ export default {
       });
     },
     saveCaseRelevance(item) {
+      this.isSubmiting = true;
       let param = {};
       param.planId = this.planId;
       param.ids = this.$refs.table.selectIds;
       param.request = this.page.condition;
       param.checked = item;
-      this.result = this.$post("/test/plan/relevance", param, () => {
-        this.$success(this.$t("commons.save_success"));
-        this.$refs.baseRelevance.close();
-        this.$emit("refresh");
-      });
+      this.result = this.$post(
+        "/test/plan/relevance",
+        param,
+        () => {
+          this.$success(this.$t("commons.save_success"));
+          this.$refs.baseRelevance.close();
+          this.$emit("refresh");
+          this.isSubmiting = false;
+        },
+        () => {
+          this.isSubmiting = false;
+        }
+      );
     },
     search() {
       this.getTestCases();

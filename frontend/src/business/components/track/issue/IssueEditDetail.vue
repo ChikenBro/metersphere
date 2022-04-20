@@ -909,6 +909,8 @@ export default {
       this.$refs["form"].validate((valid) => {
         if (valid) {
           this._save(type);
+        } else {
+          this.$emit("finishOperateIssue");
         }
       });
     },
@@ -931,12 +933,20 @@ export default {
     _save(type) {
       let param = this.buildPram();
       this.parseOldFields(param);
-      this.result = this.$post(this.url, param, () => {
-        if (type !== "reCreate") this.$emit("close");
-        else this.$emit("openNewDrawer");
-        this.$success(this.$t("commons.save_success"));
-        this.$emit("refresh");
-      });
+      this.result = this.$post(
+        this.url,
+        param,
+        () => {
+          if (type !== "reCreate") this.$emit("close");
+          else this.$emit("openNewDrawer");
+          this.$success(this.$t("commons.save_success"));
+          this.$emit("refresh");
+          this.$emit("finishOperateIssue");
+        },
+        () => {
+          this.$emit("finishOperateIssue");
+        }
+      );
     },
     parseOldFields(param) {
       let customFieldsStr = param.customFields;

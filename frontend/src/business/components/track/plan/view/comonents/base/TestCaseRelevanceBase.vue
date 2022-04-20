@@ -23,7 +23,11 @@
             $t("test_track.sync_add_api_load")
           }}</el-checkbox>
         </div>
-        <ms-dialog-footer @cancel="close" @confirm="save" />
+        <ms-dialog-footer
+          @cancel="close"
+          @confirm="save"
+          :is-submiting="isSubmiting"
+        />
       </div>
     </template>
   </relevance-dialog>
@@ -58,6 +62,10 @@ export default {
     },
     flag: {
       type: Boolean,
+    },
+    isSubmiting: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {

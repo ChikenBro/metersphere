@@ -20,11 +20,13 @@
         :title="title"
         :isCreateTitle="isCreateTitle"
         :isDisabled="isDisabled"
+        :is-submiting="isSubmiting"
       />
       <issue-edit-detail
         @refresh="$emit('refresh')"
         @close="handleClose"
         @openNewDrawer="openNewDrawer"
+        @finishOperateIssue="finishOperateIssue"
         ref="issueEditDetail"
         :isDisabled="isDisabled"
         :is-edit="isEdit"
@@ -49,6 +51,7 @@ export default {
       title: "",
       isDisabled: false,
       isEdit: false,
+      isSubmiting: false,
     };
   },
   props: {
@@ -89,14 +92,20 @@ export default {
       this.visible = false;
     },
     save() {
+      this.isSubmiting = true;
       this.$refs.issueEditDetail.save();
     },
     // 保存并清空
     handleCreateNext() {
+      this.isSubmiting = true;
       this.$refs.issueEditDetail.save("reCreate");
     },
     openNewDrawer() {
       this.$refs.issueEditDetail.open();
+    },
+    // 操作缺陷 改变加载状态
+    finishOperateIssue() {
+      this.isSubmiting = false;
     },
   },
 };

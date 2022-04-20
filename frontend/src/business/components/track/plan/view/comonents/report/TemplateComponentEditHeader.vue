@@ -22,6 +22,7 @@
       <el-button
         type="primary"
         size="mini"
+        :loading="isSubmiting"
         v-if="!isDisabled"
         @click="handleSave"
         >{{
@@ -31,6 +32,7 @@
       <el-button
         type="primary"
         size="mini"
+        :loading="isSubmiting"
         @click="handleCreateNext"
         v-if="showCreateNext"
         >{{ $t("test_track.create_next") }}</el-button
@@ -83,6 +85,12 @@ export default {
       },
     },
     isDisabled: {
+      type: Boolean,
+      default() {
+        return false;
+      },
+    },
+    isSubmiting: {
       type: Boolean,
       default() {
         return false;
