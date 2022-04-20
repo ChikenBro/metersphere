@@ -41,7 +41,6 @@ public class HttpUtils {
         try {
             response = client.execute(httppost);
             res = EntityUtils.toString(response.getEntity());
-            System.out.println(res);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

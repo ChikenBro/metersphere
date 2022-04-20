@@ -2,6 +2,7 @@ package io.metersphere.track.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.esotericsoftware.minlog.Log;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import io.metersphere.base.domain.*;
@@ -388,9 +389,8 @@ public class IssuesService {
         String prefix_domain = System.getProperty("coding.domain");
         String url = String.format("%s/issues/delete", prefix_domain);
         log.info("delete issues request:{}, url:{}", request, url);
+        LogUtil.info(String.format("delete issues request:%s, url:%s", request, url));
         CodingException.checkCodingResult(CodingException.checkCodingException(url, request), "删除");
-//        issuesMapper.deleteByPrimaryKey(request.getId());
-//        deleteIssueRelate(request);
     }
 
     public void syncIssues(IssuesRequest request) {
@@ -398,6 +398,7 @@ public class IssuesService {
         String url = String.format("%s/issues/sync/coding", prefix_domain);
         log.info("url{}", url);
         LogUtil.info("sync coding issues: " + request);
+        LogUtil.info(String.format("sync coding issues: %s", request));
         CodingException.checkCodingException(url, request);
     }
 

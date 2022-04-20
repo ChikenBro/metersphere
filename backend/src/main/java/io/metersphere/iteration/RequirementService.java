@@ -29,7 +29,7 @@ public class RequirementService {
     public JSONObject list(int goPage, int pageSize, RequirementRequest requirementRequest) {
         String prefix_domain = System.getProperty("coding.domain");
         String url = String.format("%s/iteration/requirement/%s/%s", prefix_domain, goPage, pageSize);
-        LogUtil.info("requirement data: " + requirementRequest);
+        log.info("requirement data: {},url: {}", requirementRequest, url);
         String result = CodingException.checkCodingException(url, requirementRequest);
         return PlatformResponseConfig.parsePlatformDate(result);
     }

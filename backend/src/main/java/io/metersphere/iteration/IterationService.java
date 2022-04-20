@@ -45,6 +45,7 @@ public class IterationService {
         String prefix_domain = System.getProperty("coding.domain");
         String url = String.format("%s/iteration/list/%s/%s", prefix_domain, goPage, pageSize);
         log.info("iteration list request: {}, url: {}", request, url);
+        LogUtil.info(String.format("iteration list request: %s, url: %s", request, url));
         String result = CodingException.checkCodingException(url, request);
         return PlatformResponseConfig.parsePlatformDate(result);
     }
