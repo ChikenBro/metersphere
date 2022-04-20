@@ -14,21 +14,21 @@
         v-if="preview.id == 2"
       />
       <test-result-advance-chart-component
-        id="resultChartComponent"
+        id="testResultAdvanceChartComponent"
         :execute-result="iterationReport.handledTestResult"
         :source="source"
         :planId="planId"
         v-if="preview.id == 2"
       />
       <executive-condition-advance-chart-component
-        id="executiveConditionChartComponent"
+        id="executiveConditionAdvanceChartComponent"
         :execute-result="iterationReport.handledCaseExecutiveCondition"
         :source="source"
         :planId="planId"
         v-if="preview.id == 3"
       />
       <failure-test-cases-list
-        id="failureResultComponent"
+        id="failureTestCasesList"
         :failure-test-cases="iterationReport.failureTestCases"
         v-if="preview.id == 4"
       />

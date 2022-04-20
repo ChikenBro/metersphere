@@ -138,8 +138,8 @@ export default {
           pageSize: this.pagination.pageSize,
         },
         (res) => {
-          this.tableData = res?.data?.data;
-          this.pagination.total = res.data.length;
+          this.tableData = res?.data?.listObject || [];
+          this.pagination.total = res.data.itemCount;
         }
       );
     },
