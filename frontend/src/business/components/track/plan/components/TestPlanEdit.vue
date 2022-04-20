@@ -9,7 +9,7 @@
       "
       :visible.sync="dialogFormVisible"
       @close="close"
-      width="65%"
+      width="70%"
     >
       <el-form
         :model="form"
@@ -190,7 +190,7 @@
             </el-form-item>
           </el-col>
 
-          <el-col :span="8">
+          <el-col :span="13">
             <el-form-item
               :label="$t('计划继承')"
               :label-width="formLabelWidth"
