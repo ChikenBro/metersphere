@@ -62,7 +62,7 @@
       </template>
     </el-drawer>
     <ms-test-case-report-export
-      v-if="true"
+      v-if="reportExportVisible"
       id="iterationReportExport"
       :title="report.name"
       :iteration-report="iterationReport"
