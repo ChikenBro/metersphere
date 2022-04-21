@@ -12,6 +12,8 @@ LABEL maintainer="FIT2CLOUD <support@fit2cloud.com>"
 ARG MS_VERSION=dev
 ARG DEPENDENCY=/workspace/app/dependency
 
+RUN mkdir -p /app
+
 RUN cp -r ${DEPENDENCY}/BOOT-INF/lib/* /app/lib
 RUN cp -r ${DEPENDENCY}/META-INF/* /app/META-INF
 RUN cp -r ${DEPENDENCY}/BOOT-INF/classes/* /app
