@@ -13,7 +13,7 @@ LABEL maintainer="FIT2CLOUD <support@fit2cloud.com>"
 ARG MS_VERSION=dev
 ARG DEPENDENCY=/workspace/app/dependency
 
-COPY --from=build1 /deployments/run-java.sh /deployments/run-java.sh
+
 
 COPY --from=build ${DEPENDENCY}/BOOT-INF/lib /app/lib
 COPY --from=build ${DEPENDENCY}/META-INF /app/META-INF
@@ -21,7 +21,7 @@ COPY --from=build ${DEPENDENCY}/BOOT-INF/classes /app
 FROM openjdk:8-jdk-alpine
 
 COPY --from=build1 /app/jmeter /opt/
-
+COPY --from=build1 /deployments/run-java.sh /deployments/run-java.sh
 RUN mkdir -p /opt/jmeter/lib/junit
 
 ENV FORMAT_MESSAGES_PATTERN_DISABLE_LOOKUPS=true
