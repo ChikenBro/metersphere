@@ -18,7 +18,8 @@ COPY --from=build ${DEPENDENCY}/META-INF /app/META-INF
 COPY --from=build ${DEPENDENCY}/BOOT-INF/classes /app
 
 COPY --from=build1 /app/jmeter /opt/
-COPY --from=build1 /deployments/run-java.sh /deployments/run-java.sh
+RUN mkdir -p /deployments
+COPY --from=build1 /deployments/ /deployments/
 RUN mkdir -p /opt/jmeter/lib/junit
 
 
