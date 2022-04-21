@@ -1,6 +1,5 @@
 FROM openjdk:8-jdk-alpine as build
 WORKDIR /workspace/app
-
 COPY backend/target/*.jar .
 
 RUN mkdir -p dependency && (cd dependency; jar -xf ../*.jar)
@@ -18,6 +17,10 @@ COPY --from=build ${DEPENDENCY}/BOOT-INF/classes /app
 
 RUN mv /app/jmeter /opt/
 RUN mkdir -p /opt/jmeter/lib/junit
+
+FROM openjdk:8-jdk-alpine
+WORKDIR /workspace/app
+COPY --from=hengyunabc/arthas:latest /opt/arthas /opt/arthas
 
 ENV FORMAT_MESSAGES_PATTERN_DISABLE_LOOKUPS=true
 ENV JAVA_CLASSPATH=/app:/app/lib/*
