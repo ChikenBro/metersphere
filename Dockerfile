@@ -1,11 +1,12 @@
-FROM openjdk:8-jdk-alpine as build
+
 
 FROM metersphere/fabric8-java-alpine-openjdk8-jre as build1
 
-COPY --from=build1 /app/jmeter /opt/
+FROM openjdk:8-jdk-alpine as build
 RUN mkdir -p /deployments
 COPY --from=build1 /deployments/ /deployments/
 RUN mkdir -p /opt/jmeter/lib/junit
+RUN mv /app/jmeter /opt/
 
 WORKDIR /workspace/app
 
