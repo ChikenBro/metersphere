@@ -12,9 +12,9 @@ LABEL maintainer="FIT2CLOUD <support@fit2cloud.com>"
 ARG MS_VERSION=dev
 ARG DEPENDENCY=/workspace/app/dependency
 
-RUN mv -r ${DEPENDENCY}/BOOT-INF/lib /app/lib
-RUN mv -r ${DEPENDENCY}/META-INF /app/META-INF
-RUN mv -r ${DEPENDENCY}/BOOT-INF/classes /app
+RUN cp -r ${DEPENDENCY}/BOOT-INF/lib/* /app/lib
+RUN cp -r ${DEPENDENCY}/META-INF/* /app/META-INF
+RUN cp -r ${DEPENDENCY}/BOOT-INF/classes/* /app
 
 COPY --from=metersphere/fabric8-java-alpine-openjdk8-jre /app/jmeter /opt/
 COPY --from=metersphere/fabric8-java-alpine-openjdk8-jre /deployments/run-java.sh /deployments/run-java.sh
