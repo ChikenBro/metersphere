@@ -38,6 +38,7 @@
         :is-iteration-report="true"
         v-if="preview.id == 6"
       />
+      <rich-text-component :preview="preview" v-if="preview.type != 'system'" />
     </div>
 
     <!--模版-->
