@@ -96,7 +96,9 @@ export default {
         handledTestResult: [],
         handledCaseExecutiveCondition: [],
       },
-      result: {},
+      result: {
+        loading: false,
+      },
       imgUrl: "",
       showDialog: false,
       previews: [
@@ -133,7 +135,7 @@ export default {
         [
           3,
           {
-            name: this.$t("test_track.plan_view.result_distribution"),
+            name: "测试结果统计",
             id: 3,
             type: "system",
           },
@@ -141,7 +143,7 @@ export default {
         [
           4,
           {
-            name: this.$t("test_track.plan_view.failure_case"),
+            name: "用例执行情况",
             id: 4,
             type: "system",
           },
@@ -149,7 +151,7 @@ export default {
         [
           5,
           {
-            name: this.$t("test_track.plan_view.defect_list"),
+            name: this.$t("test_track.plan_view.failure_case"),
             id: 5,
             type: "system",
           },
@@ -157,8 +159,16 @@ export default {
         [
           6,
           {
-            name: this.$t("test_track.plan_view.custom_component"),
+            name: this.$t("test_track.plan_view.defect_list"),
             id: 6,
+            type: "system",
+          },
+        ],
+        [
+          7,
+          {
+            name: this.$t("test_track.plan_view.custom_component"),
+            id: 7,
             type: "custom",
           },
         ],
@@ -261,52 +271,61 @@ export default {
     getIterationReport() {
       const url = `/iteration/report`;
       const { iterationCode, projectId } = this;
-      this.$post(url, { iterationCode, projectId }, (res) => {
-        let iterationReport = res?.data || {};
-        iterationReport.testResult ??= [];
-        iterationReport.caseExecutiveCondition ??= [];
-        iterationReport.failureTestCases ??= [];
-        iterationReport.issues ??= [];
-        const { testResult, caseExecutiveCondition } = iterationReport;
-        iterationReport.handledTestResult =
-          testResult.map((item) => {
-            return {
-              title: item.testPlanName,
-              dataList: [
-                { status: "Pass", count: item.passCount },
-                { status: "Failure", count: item.failureCount },
-                { status: "Blocking", count: item.blockingCount },
-                { status: "Skip", count: item.skipCount },
-                { status: "Underway", count: item.underwayCount },
-                { status: "Prepare", count: item.prepareCount },
-              ],
-            };
-          }) || [];
-        iterationReport.handledCaseExecutiveCondition =
-          caseExecutiveCondition.map((item) => {
-            return {
-              title: item.testPlanName,
-              executerTestList:
-                (item.executorTestList &&
-                  item.executorTestList.map((ele) => {
-                    return {
-                      executorName: ele.executorName,
-                      dataList: [
-                        { status: "Pass", count: ele.passCount },
-                        { status: "Failure", count: ele.failureCount },
-                        { status: "Blocking", count: ele.blockingCount },
-                        { status: "Skip", count: ele.skipCount },
-                        { status: "Underway", count: ele.underwayCount },
-                        { status: "Prepare", count: ele.prepareCount },
-                      ],
-                    };
-                  })) ||
-                [],
-            };
-          });
+      this.result.loading = true;
+      this.$post(
+        url,
+        { iterationCode, projectId },
+        (res) => {
+          let iterationReport = res?.data || {};
+          iterationReport.testResult ??= [];
+          iterationReport.caseExecutiveCondition ??= [];
+          iterationReport.failureTestCases ??= [];
+          iterationReport.issues ??= [];
+          const { testResult, caseExecutiveCondition } = iterationReport;
+          iterationReport.handledTestResult =
+            testResult.map((item) => {
+              return {
+                title: item.testPlanName,
+                dataList: [
+                  { status: "Pass", count: item.passCount },
+                  { status: "Failure", count: item.failureCount },
+                  { status: "Blocking", count: item.blockingCount },
+                  { status: "Skip", count: item.skipCount },
+                  { status: "Underway", count: item.underwayCount },
+                  { status: "Prepare", count: item.prepareCount },
+                ],
+              };
+            }) || [];
+          iterationReport.handledCaseExecutiveCondition =
+            caseExecutiveCondition.map((item) => {
+              return {
+                title: item.testPlanName,
+                executerTestList:
+                  (item.executorTestList &&
+                    item.executorTestList.map((ele) => {
+                      return {
+                        executorName: ele.executorName,
+                        dataList: [
+                          { status: "Pass", count: ele.passCount },
+                          { status: "Failure", count: ele.failureCount },
+                          { status: "Blocking", count: ele.blockingCount },
+                          { status: "Skip", count: ele.skipCount },
+                          { status: "Underway", count: ele.underwayCount },
+                          { status: "Prepare", count: ele.prepareCount },
+                        ],
+                      };
+                    })) ||
+                  [],
+              };
+            });
 
-        this.iterationReport = iterationReport;
-      });
+          this.iterationReport = iterationReport;
+          this.result.loading = false;
+        },
+        () => {
+          this.result.loading = false;
+        }
+      );
     },
   },
 };
