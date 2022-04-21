@@ -1,48 +1,20 @@
 <template>
   <div>
-    <!--迭代报告-->
-    <div v-if="iterationReport">
-      <base-info-component
-        id="baseInfoComponent"
-        :report-info="iterationReport"
-        v-if="preview.id == 1"
-      />
-      <test-result-component
-        id="testResultComponent"
-        :test-results="iterationReport.testResult"
-        :is-iteration-report="true"
-        v-if="preview.id == 2"
-      />
-      <test-result-advance-chart-component
-        id="testResultAdvanceChartComponent"
-        :execute-result="iterationReport.handledTestResult"
-        :source="source"
-        :planId="planId"
-        v-if="preview.id == 2"
-      />
-      <executive-condition-advance-chart-component
-        id="executiveConditionAdvanceChartComponent"
-        :execute-result="iterationReport.handledCaseExecutiveCondition"
-        :source="source"
-        :planId="planId"
-        v-if="preview.id == 3"
-      />
-      <failure-test-cases-list
-        id="failureTestCasesList"
-        :failure-test-cases="iterationReport.failureTestCases"
-        v-if="preview.id == 4"
-      />
-      <defect-list-component
-        id="defectListComponent"
-        :defect-list="iterationReport.issues"
-        :is-iteration-report="true"
-        v-if="preview.id == 5"
-      />
+    <!--模版-->
+    <div v-if="!metric">
+      <base-info-component :is-report="false" v-if="preview.id == 1" />
+      <test-result-component v-if="preview.id == 2" />
+      <!--<test-result-chart-component v-if="preview.id == 3"/>-->
+      <test-result-advance-chart-component v-if="preview.id == 3" />
+      <!--<failure-result-component v-if="preview.id == 4"/>-->
+      <failure-result-advance-component v-if="preview.id == 4" />
+      <defect-list-component v-if="preview.id == 5" />
+      <rich-text-component :preview="preview" v-if="preview.type != 'system'" />
     </div>
 
-    <!--测试报告-->
-    <div v-else-if="metric">
-      <old-base-info-component
+    <!--报告-->
+    <div v-if="metric">
+      <base-info-component
         id="baseInfoComponent"
         :report-info="metric"
         v-if="preview.id == 1"
@@ -53,7 +25,7 @@
         v-if="preview.id == 2"
       />
       <!--<test-result-chart-component id="resultChartComponent" :execute-result="metric.executeResult" v-if="preview.id == 3"/>-->
-      <old-test-result-advance-chart-component
+      <test-result-advance-chart-component
         id="resultChartComponent"
         :execute-result="metric.executeResult"
         :source="source"
@@ -78,25 +50,11 @@
         v-if="preview.type != 'system'"
       />
     </div>
-
-    <!--模版-->
-    <div v-else>
-      <base-info-component :is-report="false" v-if="preview.id == 1" />
-      <test-result-component v-if="preview.id == 2" />
-      <!--<test-result-chart-component v-if="preview.id == 3"/>-->
-      <test-result-advance-chart-component v-if="preview.id == 3" />
-      <!--<failure-result-component v-if="preview.id == 4"/>-->
-      <failure-result-advance-component v-if="preview.id == 4" />
-      <defect-list-component v-if="preview.id == 5" />
-      <rich-text-component :preview="preview" v-if="preview.type != 'system'" />
-    </div>
   </div>
 </template>
 
 <script>
 import BaseInfoComponent from "./BaseInfoComponent";
-import OldBaseInfoComponent from "./OldBaseInfoComponent";
-import FailureTestCasesList from "./component/FailureTestCasesList";
 import TestResultComponent from "./TestResultComponent";
 import TestResultChartComponent from "./TestResultChartComponent";
 import RichTextComponent from "./RichTextComponent";
@@ -104,25 +62,19 @@ import FailureResultComponent from "./FailureResultComponent";
 import DefectListComponent from "./DefectListComponent";
 import html2canvas from "html2canvas";
 import TestResultAdvanceChartComponent from "./TestResultAdvanceChartComponent";
-import OldTestResultAdvanceChartComponent from "./OldTestResultAdvanceChartComponent";
 import FailureResultAdvanceComponent from "./FailureResultAdvanceComponent";
-import ExecutiveConditionAdvanceChartComponent from "./ExecutiveConditionAdvanceChartComponent";
 
 export default {
   name: "TemplateComponent",
   components: {
     FailureResultAdvanceComponent,
     TestResultAdvanceChartComponent,
-    OldTestResultAdvanceChartComponent,
     FailureResultComponent,
     DefectListComponent,
     RichTextComponent,
     TestResultChartComponent,
     TestResultComponent,
     BaseInfoComponent,
-    OldBaseInfoComponent,
-    ExecutiveConditionAdvanceChartComponent,
-    FailureTestCasesList,
   },
   props: {
     preview: {
@@ -144,12 +96,6 @@ export default {
     index: {
       type: Number,
       default: 0,
-    },
-    iterationReport: {
-      type: Object,
-      default() {
-        return null;
-      },
     },
   },
   methods: {

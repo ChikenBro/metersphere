@@ -37,17 +37,8 @@
 
         <div id="app" ref="resume" class="container">
           <el-main>
-            <div
-              v-for="(item, index) in [
-                { id: 1 },
-                { id: 2 },
-                { id: 3 },
-                { id: 4 },
-                { id: 5 },
-              ]"
-              :key="item.id"
-            >
-              <template-component
+            <div v-for="(item, index) in previews" :key="item.id">
+              <new-template-component
                 :source="source"
                 :isReportView="true"
                 :iteration-report="iterationReport"
@@ -61,7 +52,7 @@
         </div>
       </template>
     </el-drawer>
-    <ms-test-case-report-export
+    <ms-iteration-report-export
       v-if="reportExportVisible"
       id="iterationReportExport"
       :title="report.name"
@@ -80,22 +71,20 @@ import TestResultChartComponent from "@/business/components/track/plan/view/como
 import TestResultComponent from "@/business/components/track/plan/view/comonents/report/TemplateComponent/TestResultComponent";
 import RichTextComponent from "@/business/components/track/plan/view/comonents/report/TemplateComponent/RichTextComponent";
 import TestCaseReportTemplateEdit from "@/business/components/track/plan/view/comonents/report/TestCaseReportTemplateEdit";
-import TemplateComponent from "@/business/components/track/plan/view/comonents/report/TemplateComponent/TemplateComponent";
+import NewTemplateComponent from "@/business/components/track/plan/view/comonents/report/TemplateComponent/NewTemplateComponent";
 import html2canvas from "html2canvas";
-import MsTestPlanReportExport from "@/business/components/track/report/components/TestPlanReportExport";
-import MsTestCaseReportExport from "@/business/components/track/plan/view/comonents/TestCaseReportExport";
+import MsIterationReportExport from "./IterationReportExport";
 
 export default {
   name: "IterationReportView",
   components: {
-    MsTestPlanReportExport,
-    TemplateComponent,
+    NewTemplateComponent,
     TestCaseReportTemplateEdit,
     RichTextComponent,
     TestResultComponent,
     TestResultChartComponent,
     BaseInfoComponent,
-    MsTestCaseReportExport,
+    MsIterationReportExport,
   },
   data() {
     return {
@@ -110,9 +99,16 @@ export default {
       result: {},
       imgUrl: "",
       showDialog: false,
-      previews: [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }],
+      previews: [
+        { id: 1 },
+        { id: 2 },
+        { id: 3 },
+        { id: 4 },
+        { id: 5 },
+        { id: 6 },
+      ],
       report: {
-        name: "迭代报告",
+        name: "",
       },
       source: "ReportView",
       planId: "",

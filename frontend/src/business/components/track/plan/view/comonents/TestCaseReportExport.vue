@@ -3,28 +3,14 @@
     :title="title"
     :type="$t('report.test_plan_report')"
   >
-    <div v-if="iterationReport">
-      <div v-for="(item, index) in previews" :key="item.id">
-        <template-component
-          :source="source"
-          :is-report-view="true"
-          :iteration-report="iterationReport"
-          :plan-id="planId"
-          :preview="item"
-          :index="index"
-        />
-      </div>
-    </div>
-    <div v-else>
-      <div v-for="(item, index) in previews" :key="item.id">
-        <template-component
-          ref="templateComponent"
-          :is-report-view="true"
-          :metric="metric"
-          :preview="item"
-          :index="index"
-        />
-      </div>
+    <div v-for="(item, index) in previews" :key="item.id">
+      <template-component
+        :isReportView="true"
+        :metric="metric"
+        :preview="item"
+        :index="index"
+        ref="templateComponent"
+      />
     </div>
   </ms-report-export-template>
 </template>
@@ -36,42 +22,7 @@ import MsReportTitle from "../../../../common/components/report/MsReportTitle";
 export default {
   name: "MsTestCaseReportExport",
   components: { MsReportTitle, TemplateComponent, MsReportExportTemplate },
-  props: {
-    previews: {
-      type: Array,
-      default() {
-        return [];
-      },
-    },
-    title: {
-      type: String,
-      default: "",
-    },
-    metric: {
-      type: Object,
-      default() {
-        return null;
-      },
-    },
-    iterationReport: {
-      type: Object,
-      default() {
-        return null;
-      },
-    },
-    isReportView: {
-      type: Boolean,
-      default: false,
-    },
-    source: {
-      type: String,
-      default: "",
-    },
-    planId: {
-      type: String,
-      default: "",
-    },
-  },
+  props: ["previews", "title", "metric"],
 };
 </script>
 
