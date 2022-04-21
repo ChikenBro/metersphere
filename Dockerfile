@@ -5,9 +5,6 @@ COPY backend/target/*.jar .
 
 RUN mkdir -p dependency && (cd dependency; jar -xf ../*.jar)
 
-FROM 
-
-LABEL maintainer="FIT2CLOUD <support@fit2cloud.com>"
 
 ARG MS_VERSION=dev
 ARG DEPENDENCY=/workspace/app/dependency
