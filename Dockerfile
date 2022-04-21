@@ -2,9 +2,9 @@ FROM openjdk:8-jdk-alpine as build
 
 
 
-COPY --from=metersphere/fabric8-java-alpine-openjdk8-jre /app/jmeter /opt/
+COPY --from=metersphere/fabric8-java-alpine-openjdk8-jre:latest /app/jmeter /opt/
 RUN mkdir -p /deployments
-COPY --from=metersphere/fabric8-java-alpine-openjdk8-jre /deployments/ /deployments/
+COPY --from=metersphere/fabric8-java-alpine-openjdk8-jre:latest /deployments/ /deployments/
 RUN mkdir -p /opt/jmeter/lib/junit
 
 WORKDIR /workspace/app
@@ -22,6 +22,10 @@ COPY --from=build ${DEPENDENCY}/BOOT-INF/lib /app/lib
 COPY --from=build ${DEPENDENCY}/META-INF /app/META-INF
 COPY --from=build ${DEPENDENCY}/BOOT-INF/classes /app
 
+
+COPY --from=hengyunabc/arthas:latest /opt/arthas /opt/arthas
+
+RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo 'Asia/Shanghai' >/etc/timezone && apk add --no-cache tini
 
 ENV FORMAT_MESSAGES_PATTERN_DISABLE_LOOKUPS=true
 ENV JAVA_CLASSPATH=/app:/app/lib/*
