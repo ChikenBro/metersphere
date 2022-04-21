@@ -5,11 +5,9 @@ COPY backend/target/*.jar .
 
 RUN mkdir -p dependency && (cd dependency; jar -xf ../*.jar)
 
-FROM metersphere/fabric8-java-alpine-openjdk8-jre as build1
+FROM  as build1
 
-LABEL maintainer="FIT2CLOUD <support@fit2cloud.com>"
 
-FROM openjdk:8-jdk-alpine
 ARG MS_VERSION=dev
 ARG DEPENDENCY=/workspace/app/dependency
 
@@ -17,9 +15,9 @@ COPY --from=build ${DEPENDENCY}/BOOT-INF/lib /app/lib
 COPY --from=build ${DEPENDENCY}/META-INF /app/META-INF
 COPY --from=build ${DEPENDENCY}/BOOT-INF/classes /app
 
-COPY --from=build1 /app/jmeter /opt/
+COPY --from=metersphere/fabric8-java-alpine-openjdk8-jre /app/jmeter /opt/
 RUN mkdir -p /deployments
-COPY --from=build1 /deployments/ /deployments/
+COPY --from=metersphere/fabric8-java-alpine-openjdk8-jre /deployments/ /deployments/
 RUN mkdir -p /opt/jmeter/lib/junit
 
 
