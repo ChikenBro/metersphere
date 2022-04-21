@@ -1,10 +1,10 @@
 FROM openjdk:8-jdk-alpine as build
 
+FROM metersphere/fabric8-java-alpine-openjdk8-jre as build1
 
-
-COPY --from=metersphere/fabric8-java-alpine-openjdk8-jre:latest /app/jmeter /opt/
+COPY --from=build1 /app/jmeter /opt/
 RUN mkdir -p /deployments
-COPY --from=metersphere/fabric8-java-alpine-openjdk8-jre:latest /deployments/ /deployments/
+COPY --from=build1 /deployments/ /deployments/
 RUN mkdir -p /opt/jmeter/lib/junit
 
 WORKDIR /workspace/app
