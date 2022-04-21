@@ -378,10 +378,10 @@ export function exportPdf(name, canvasList) {
           leftHeight -= occupation;
           position -= occupation;
           //避免添加空白页
-          // if (leftHeight > 0) {
-          // pdf.addPage();
-          // currentHeight = 0;
-          // }
+          if (leftHeight > 0) {
+            pdf.addPage();
+            currentHeight = 0;
+          }
         }
       } else {
         pdf.addImage(pageData, "JPEG", 0, currentHeight, imgWidth, imgHeight);
