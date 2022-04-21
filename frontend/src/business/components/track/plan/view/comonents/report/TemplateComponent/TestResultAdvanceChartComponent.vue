@@ -1,19 +1,54 @@
 <template>
   <common-component :title="$t('test_track.plan_view.result_statistics')">
     <div class="char-component">
-      <el-row>
-        <el-col
-          :span="8"
-          v-for="(item, index) in testResultCharData"
-          :key="index"
-        >
+      <el-row v-if="showFunctional" type="flex" justify="center">
+        <el-col :span="12">
           <ms-pie-chart
             v-if="isShow"
-            :text="item.title"
-            :is-show-legend="index === 0"
-            @onClick="onTestResultClick"
+            :text="$t('test_track.functional_test_case')"
+            @onClick="onFuncCharClick"
+            :is-show-legend="true"
             :name="$t('test_track.plan_view.test_result')"
-            :data="item.dataList"
+            :data="functionalCharData"
+          />
+        </el-col>
+      </el-row>
+
+      <el-row v-if="showApi" type="flex" justify="center">
+        <el-col :span="12">
+          <ms-pie-chart
+            v-if="isShow"
+            :text="$t('test_track.api_test_case')"
+            @onClick="onApiCharClick"
+            :is-show-legend="true"
+            :name="$t('test_track.plan_view.test_result')"
+            :data="apiCharData"
+          />
+        </el-col>
+      </el-row>
+
+      <el-row v-if="showScenario" type="flex" justify="center">
+        <el-col :span="12">
+          <ms-pie-chart
+            v-if="isShow"
+            :is-show-legend="true"
+            :text="$t('test_track.scenario_test_case')"
+            @onClick="onScenarioCharClick"
+            :name="$t('test_track.plan_view.test_result')"
+            :data="scenarioCharData"
+          />
+        </el-col>
+      </el-row>
+
+      <el-row v-if="showLoad" type="flex" justify="center">
+        <el-col :span="12">
+          <ms-pie-chart
+            v-if="isShow"
+            :is-show-legend="true"
+            :text="$t('test_track.performance_test_case')"
+            @onClick="onLoadCharClick"
+            :name="$t('test_track.plan_view.test_result')"
+            :data="loadCharData"
           />
         </el-col>
       </el-row>
@@ -74,7 +109,10 @@ export default {
           },
         ],
       ]),
-      testResultCharData: [],
+      functionalCharData: [],
+      apiCharData: [],
+      scenarioCharData: [],
+      loadCharData: [],
       isShow: true,
     };
   },
@@ -82,17 +120,69 @@ export default {
     planId: String,
     source: String,
     executeResult: {
-      type: Array,
+      type: Object,
       default() {
-        return [
-          { status: "Pass", count: "1" },
-          { status: "Failure", count: "2" },
-          { status: "Blocking", count: "3" },
-          { status: "Skip", count: "4" },
-          { status: "Underway", count: "5" },
-          { status: "Prepare", count: "6" },
-        ];
+        return {
+          functionalResult: [
+            { status: "Pass", count: "0" },
+            { status: "Failure", count: "0" },
+            { status: "Blocking", count: "0" },
+            { status: "Skip", count: "0" },
+            { status: "Underway", count: "0" },
+            { status: "Prepare", count: "0" },
+          ],
+          apiResult: [
+            { status: "Pass", count: "0" },
+            { status: "Failure", count: "0" },
+            { status: "Underway", count: "0" },
+          ],
+          scenarioResult: [
+            { status: "Pass", count: "0" },
+            { status: "Failure", count: "0" },
+            { status: "Underway", count: "0" },
+          ],
+          loadResult: [
+            { status: "Pass", count: "0" },
+            { status: "Failure", count: "0" },
+            { status: "Underway", count: "0" },
+          ],
+        };
       },
+    },
+  },
+  computed: {
+    showFunctional() {
+      if (this.executeResult.functionalResult) {
+        return (
+          this.executeResult.functionalResult.length > 0 ||
+          (this.executeResult.apiResult.length <= 0 &&
+            this.executeResult.scenarioResult.length <= 0 &&
+            this.executeResult.loadResult.length <= 0)
+        );
+      } else {
+        return false;
+      }
+    },
+    showApi() {
+      if (this.executeResult.apiResult) {
+        return this.executeResult.apiResult.length > 0;
+      } else {
+        return false;
+      }
+    },
+    showScenario() {
+      if (this.executeResult.scenarioResult) {
+        return this.executeResult.scenarioResult.length > 0;
+      } else {
+        return false;
+      }
+    },
+    showLoad() {
+      if (this.executeResult.loadResult) {
+        return this.executeResult.loadResult.length > 0;
+      } else {
+        return false;
+      }
     },
   },
   watch: {
@@ -105,23 +195,51 @@ export default {
   },
   methods: {
     getCharData() {
-      this.getTestResultCharData();
+      this.getFunctionalCharData();
+      this.getApiCharData();
+      this.getScenarioCharData();
+      this.getLoadCharData();
       this.reload();
     },
-    getTestResultCharData() {
-      const executeResult = JSON.parse(JSON.stringify(this.executeResult));
-      if (executeResult) {
-        executeResult.forEach((obj) => {
-          const arr = [];
-          obj.dataList.forEach((item) => {
-            let data = this.copyData(item.status);
-            data.value = item.count;
-            arr.push(data);
-          });
-          obj.dataList = arr;
+    getFunctionalCharData() {
+      this.functionalCharData = [];
+      if (this.executeResult.functionalResult) {
+        this.executeResult.functionalResult.forEach((item) => {
+          let data = this.copyData(item.status);
+          data.value = item.count;
+          this.functionalCharData.push(data);
         });
       }
-      this.testResultCharData = executeResult;
+    },
+    getApiCharData() {
+      this.apiCharData = [];
+      if (this.executeResult.apiResult) {
+        this.executeResult.apiResult.forEach((item) => {
+          let data = this.copyData(item.status);
+          data.value = item.count;
+          this.apiCharData.push(data);
+        });
+      }
+    },
+    getScenarioCharData() {
+      this.scenarioCharData = [];
+      if (this.executeResult.apiResult) {
+        this.executeResult.scenarioResult.forEach((item) => {
+          let data = this.copyData(item.status);
+          data.value = item.count;
+          this.scenarioCharData.push(data);
+        });
+      }
+    },
+    getLoadCharData() {
+      this.loadCharData = [];
+      if (this.executeResult.loadResult) {
+        this.executeResult.loadResult.forEach((item) => {
+          let data = this.copyData(item.status);
+          data.value = item.count;
+          this.loadCharData.push(data);
+        });
+      }
     },
     copyData(status) {
       if (this.dataMap.get(status)) {
@@ -148,10 +266,38 @@ export default {
       }
       return status;
     },
-    onTestResultClick(params) {
+    onFuncCharClick(params) {
       let clickType = params["name"];
       clickType = this.onvertDataStatus(clickType);
       this.redirectPage("functional", clickType);
+    },
+    onApiCharClick(params) {
+      let clickType = params["name"];
+      clickType = this.onvertDataStatus(clickType);
+      if (clickType == "Failure") {
+        clickType = "error";
+      } else if (clickType == "Pass") {
+        clickType = "success";
+      }
+      this.redirectPage("api", clickType);
+    },
+    onScenarioCharClick(params) {
+      let clickType = params["name"];
+      clickType = this.onvertDataStatus(clickType);
+      if (clickType == "Failure") {
+        clickType = "Fail";
+      } else if (clickType == "Pass") {
+        clickType = "Success";
+      }
+      this.redirectPage("scenario", clickType);
+    },
+    onLoadCharClick(params) {
+      let clickType = params["name"];
+      clickType = this.onvertDataStatus(clickType);
+      if (clickType == "Failure") {
+        clickType = "error";
+      }
+      this.redirectPage("load", clickType);
     },
     redirectPage(charType, clickType) {
       if (this.source == "ReportView") {
@@ -165,25 +311,12 @@ export default {
         });
       }
     },
-    filterData() {
-      this.testResultCharData = this.testResultCharData.filter((item) => {
-        return item.dataList && item.dataList.length > 0;
-      });
-    },
   },
 };
 </script>
 
 <style scoped>
-.echarts {
-  margin: 0 auto;
-}
-
 .char-item {
-  display: inline-block;
-}
-
-.char-component {
-  text-align: center;
+  width: 100%;
 }
 </style>

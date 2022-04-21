@@ -24,6 +24,22 @@
           </el-col>
           <el-col :span="12" class="head-right">
             <el-button
+              :disabled="!isTestManagerOrTestUser"
+              plain
+              size="mini"
+              @click="handleSave"
+            >
+              {{ $t("commons.save") }}
+            </el-button>
+            <el-button
+              :disabled="!isTestManagerOrTestUser"
+              plain
+              size="mini"
+              @click="handleEdit"
+            >
+              {{ $t("test_track.plan_view.edit_component") }}
+            </el-button>
+            <el-button
               v-permission="['PROJECT_TRACK_REPORT:READ+EXPORT']"
               :disabled="!isTestManagerOrTestUser"
               plain
@@ -37,31 +53,21 @@
 
         <div id="app" ref="resume" class="container">
           <el-main>
-            <div
-              v-for="(item, index) in [
-                { id: 1 },
-                { id: 2 },
-                { id: 3 },
-                { id: 4 },
-                { id: 5 },
-              ]"
-              :key="item.id"
-            >
-              <template-component
+            <div v-for="(item, index) in previews" :key="item.id">
+              <new-template-component
+                ref="templateComponent"
+                :plan-id="planId"
                 :source="source"
-                :isReportView="true"
                 :iteration-report="iterationReport"
-                :planId="planId"
                 :preview="item"
                 :index="index"
-                ref="templateComponent"
               />
             </div>
           </el-main>
         </div>
       </template>
     </el-drawer>
-    <ms-test-case-report-export
+    <ms-iteration-report-export
       v-if="reportExportVisible"
       id="iterationReportExport"
       :title="report.name"
@@ -69,6 +75,11 @@
       :previews="previews"
       :source="source"
       :plan-id="planId"
+    />
+    <iteration-report-template-edit
+      ref="templateEdit"
+      :iteration-report="iterationReport"
+      @refresh="getReport"
     />
   </div>
 </template>
@@ -79,23 +90,21 @@ import BaseInfoComponent from "@/business/components/track/plan/view/comonents/r
 import TestResultChartComponent from "@/business/components/track/plan/view/comonents/report/TemplateComponent/TestResultChartComponent";
 import TestResultComponent from "@/business/components/track/plan/view/comonents/report/TemplateComponent/TestResultComponent";
 import RichTextComponent from "@/business/components/track/plan/view/comonents/report/TemplateComponent/RichTextComponent";
-import TestCaseReportTemplateEdit from "@/business/components/track/plan/view/comonents/report/TestCaseReportTemplateEdit";
-import TemplateComponent from "@/business/components/track/plan/view/comonents/report/TemplateComponent/TemplateComponent";
+import NewTemplateComponent from "@/business/components/track/plan/view/comonents/report/TemplateComponent/NewTemplateComponent";
 import html2canvas from "html2canvas";
-import MsTestPlanReportExport from "@/business/components/track/report/components/TestPlanReportExport";
-import MsTestCaseReportExport from "@/business/components/track/plan/view/comonents/TestCaseReportExport";
+import MsIterationReportExport from "./IterationReportExport";
+import IterationReportTemplateEdit from "@/business/components/track/plan/view/comonents/report/IterationReportTemplateEdit";
 
 export default {
   name: "IterationReportView",
   components: {
-    MsTestPlanReportExport,
-    TemplateComponent,
-    TestCaseReportTemplateEdit,
+    NewTemplateComponent,
     RichTextComponent,
     TestResultComponent,
     TestResultChartComponent,
     BaseInfoComponent,
-    MsTestCaseReportExport,
+    MsIterationReportExport,
+    IterationReportTemplateEdit,
   },
   data() {
     return {
@@ -107,12 +116,45 @@ export default {
         handledTestResult: [],
         handledCaseExecutiveCondition: [],
       },
-      result: {},
+      result: {
+        loading: false,
+      },
       imgUrl: "",
       showDialog: false,
-      previews: [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }],
+      previews: [
+        {
+          name: this.$t("test_track.plan_view.base_info"),
+          id: 1,
+          type: "system",
+        },
+        {
+          name: "测试结果",
+          id: 2,
+          type: "system",
+        },
+        {
+          name: "测试结果统计",
+          id: 3,
+          type: "system",
+        },
+        {
+          name: "用例执行情况",
+          id: 4,
+          type: "system",
+        },
+        {
+          name: "失败用例",
+          id: 5,
+          type: "system",
+        },
+        {
+          name: "缺陷列表",
+          id: 6,
+          type: "system",
+        },
+      ],
       report: {
-        name: "迭代报告",
+        name: "",
       },
       source: "ReportView",
       planId: "",
@@ -137,7 +179,7 @@ export default {
         [
           3,
           {
-            name: this.$t("test_track.plan_view.result_distribution"),
+            name: "测试结果统计",
             id: 3,
             type: "system",
           },
@@ -145,7 +187,7 @@ export default {
         [
           4,
           {
-            name: this.$t("test_track.plan_view.failure_case"),
+            name: "用例执行情况",
             id: 4,
             type: "system",
           },
@@ -153,7 +195,7 @@ export default {
         [
           5,
           {
-            name: this.$t("test_track.plan_view.defect_list"),
+            name: this.$t("test_track.plan_view.failure_case"),
             id: 5,
             type: "system",
           },
@@ -161,8 +203,16 @@ export default {
         [
           6,
           {
-            name: this.$t("test_track.plan_view.custom_component"),
+            name: this.$t("test_track.plan_view.defect_list"),
             id: 6,
+            type: "system",
+          },
+        ],
+        [
+          7,
+          {
+            name: this.$t("test_track.plan_view.custom_component"),
+            id: 7,
             type: "custom",
           },
         ],
@@ -186,8 +236,8 @@ export default {
     goBack() {
       this.handleClose();
     },
-    open(id, projectId) {
-      this.iterationCode = id;
+    open(iterationCode, projectId) {
+      this.iterationCode = iterationCode;
       this.projectId = projectId;
       this.getReport();
       this.showDialog = true;
@@ -195,6 +245,30 @@ export default {
     },
     getReport() {
       this.getIterationReport();
+    },
+    initPreviews() {
+      /* 待修改
+      this.previews = [];
+      this.report.content.components.forEach((item) => {
+        let preview = this.componentMap.get(item);
+        if (preview && preview.type != "custom") {
+          this.previews.push(preview);
+        } else {
+          if (this.report.content.customComponent) {
+            let customComponent = this.report.content.customComponent.get(
+              item.toString()
+            );
+            if (customComponent) {
+              this.previews.push({
+                id: item,
+                title: customComponent.title,
+                content: customComponent.content,
+              });
+            }
+          }
+        }
+      });
+      */
     },
     handleClose() {
       window.removeEventListener("popstate", this.goBack, false);
@@ -221,7 +295,9 @@ export default {
       this.reportExportVisible = false;
       this.result.loading = false;
     },
+    // 待修改
     handleSave() {
+      console.log(1);
       let param = {};
       this.buildParam(param);
       this.$get(
@@ -259,58 +335,70 @@ export default {
         param.endTime = this.metric.endTime.getTime();
       }
     },
+
     handleEdit() {
+      // 是不是要传projectId
       this.$refs.templateEdit.open(this.reportId, true);
     },
     getIterationReport() {
       const url = `/iteration/report`;
       const { iterationCode, projectId } = this;
-      this.$post(url, { iterationCode, projectId }, (res) => {
-        let iterationReport = res?.data || {};
-        iterationReport.testResult ??= [];
-        iterationReport.caseExecutiveCondition ??= [];
-        iterationReport.failureTestCases ??= [];
-        iterationReport.issues ??= [];
-        const { testResult, caseExecutiveCondition } = iterationReport;
-        iterationReport.handledTestResult =
-          testResult.map((item) => {
-            return {
-              title: item.testPlanName,
-              dataList: [
-                { status: "Pass", count: item.passCount },
-                { status: "Failure", count: item.failureCount },
-                { status: "Blocking", count: item.blockingCount },
-                { status: "Skip", count: item.skipCount },
-                { status: "Underway", count: item.underwayCount },
-                { status: "Prepare", count: item.prepareCount },
-              ],
-            };
-          }) || [];
-        iterationReport.handledCaseExecutiveCondition =
-          caseExecutiveCondition.map((item) => {
-            return {
-              title: item.testPlanName,
-              executerTestList:
-                (item.executorTestList &&
-                  item.executorTestList.map((ele) => {
-                    return {
-                      executorName: ele.executorName,
-                      dataList: [
-                        { status: "Pass", count: ele.passCount },
-                        { status: "Failure", count: ele.failureCount },
-                        { status: "Blocking", count: ele.blockingCount },
-                        { status: "Skip", count: ele.skipCount },
-                        { status: "Underway", count: ele.underwayCount },
-                        { status: "Prepare", count: ele.prepareCount },
-                      ],
-                    };
-                  })) ||
-                [],
-            };
-          });
+      this.result.loading = true;
+      this.$post(
+        url,
+        { iterationCode, projectId },
+        (res) => {
+          let iterationReport = res?.data || {};
+          iterationReport.testResult ??= [];
+          iterationReport.caseExecutiveCondition ??= [];
+          iterationReport.failureTestCases ??= [];
+          iterationReport.issues ??= [];
+          const { testResult, caseExecutiveCondition } = iterationReport;
+          iterationReport.handledTestResult =
+            testResult.map((item) => {
+              return {
+                title: item.testPlanName,
+                dataList: [
+                  { status: "Pass", count: item.passCount },
+                  { status: "Failure", count: item.failureCount },
+                  { status: "Blocking", count: item.blockingCount },
+                  { status: "Skip", count: item.skipCount },
+                  { status: "Underway", count: item.underwayCount },
+                  { status: "Prepare", count: item.prepareCount },
+                ],
+              };
+            }) || [];
+          iterationReport.handledCaseExecutiveCondition =
+            caseExecutiveCondition.map((item) => {
+              return {
+                title: item.testPlanName,
+                executerTestList:
+                  (item.executorTestList &&
+                    item.executorTestList.map((ele) => {
+                      return {
+                        executorName: ele.executorName,
+                        dataList: [
+                          { status: "Pass", count: ele.passCount },
+                          { status: "Failure", count: ele.failureCount },
+                          { status: "Blocking", count: ele.blockingCount },
+                          { status: "Skip", count: ele.skipCount },
+                          { status: "Underway", count: ele.underwayCount },
+                          { status: "Prepare", count: ele.prepareCount },
+                        ],
+                      };
+                    })) ||
+                  [],
+              };
+            });
 
-        this.iterationReport = iterationReport;
-      });
+          this.iterationReport = iterationReport;
+          this.initPreviews();
+          this.result.loading = false;
+        },
+        () => {
+          this.result.loading = false;
+        }
+      );
     },
   },
 };
