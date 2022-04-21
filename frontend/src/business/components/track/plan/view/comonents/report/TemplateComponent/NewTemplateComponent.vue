@@ -54,9 +54,9 @@
 </template>
 
 <script>
-import BaseInfoComponent from "./BaseInfoComponent";
+import BaseInfoComponent from "./NewBaseInfoComponent";
 import TestResultComponent from "./TestResultComponent";
-import TestResultAdvanceChartComponent from "./TestResultAdvanceChartComponent";
+import TestResultAdvanceChartComponent from "./NewTestResultAdvanceChartComponent";
 import ExecutiveConditionAdvanceChartComponent from "./ExecutiveConditionAdvanceChartComponent";
 import FailureTestCasesList from "./component/FailureTestCasesList";
 import DefectListComponent from "./DefectListComponent";
