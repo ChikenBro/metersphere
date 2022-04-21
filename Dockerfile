@@ -5,7 +5,6 @@ COPY backend/target/*.jar .
 
 RUN mkdir -p dependency && (cd dependency; jar -xf ../*.jar)
 
-FROM  as build1
 
 
 ARG MS_VERSION=dev
