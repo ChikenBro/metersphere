@@ -1,26 +1,28 @@
 FROM openjdk:8-jdk-alpine as build
 WORKDIR /workspace/app
+
 COPY backend/target/*.jar .
 
 RUN mkdir -p dependency && (cd dependency; jar -xf ../*.jar)
 
-FROM metersphere/fabric8-java-alpine-openjdk8-jre
+FROM metersphere/fabric8-java-alpine-openjdk8-jre as build1
 
+COPY --from=hengyunabc/arthas:latest /opt/arthas /opt/arthas
 LABEL maintainer="FIT2CLOUD <support@fit2cloud.com>"
 
 ARG MS_VERSION=dev
 ARG DEPENDENCY=/workspace/app/dependency
 
+COPY --from=build1 /deployments/run-java.sh /deployments/run-java.sh
+
 COPY --from=build ${DEPENDENCY}/BOOT-INF/lib /app/lib
 COPY --from=build ${DEPENDENCY}/META-INF /app/META-INF
 COPY --from=build ${DEPENDENCY}/BOOT-INF/classes /app
-
-RUN mv /app/jmeter /opt/
-RUN mkdir -p /opt/jmeter/lib/junit
-
 FROM openjdk:8-jdk-alpine
-WORKDIR /workspace/app
-COPY --from=hengyunabc/arthas:latest /opt/arthas /opt/arthas
+
+COPY --from=build1 /app/jmeter /opt/
+
+RUN mkdir -p /opt/jmeter/lib/junit
 
 ENV FORMAT_MESSAGES_PATTERN_DISABLE_LOOKUPS=true
 ENV JAVA_CLASSPATH=/app:/app/lib/*
