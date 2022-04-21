@@ -1,4 +1,4 @@
-FROM openjdk:8-jdk-alpine
+FROM openjdk:8-jdk-alpine as build
 WORKDIR /workspace/app
 
 COPY backend/target/*.jar .
@@ -12,9 +12,9 @@ LABEL maintainer="FIT2CLOUD <support@fit2cloud.com>"
 ARG MS_VERSION=dev
 ARG DEPENDENCY=/workspace/app/dependency
 
-RUN mv ${DEPENDENCY}/BOOT-INF/lib /app/lib
-RUN mv ${DEPENDENCY}/META-INF /app/META-INF
-RUN mv ${DEPENDENCY}/BOOT-INF/classes /app
+COPY --from=build ${DEPENDENCY}/BOOT-INF/lib /app/lib
+COPY --from=build ${DEPENDENCY}/META-INF /app/META-INF
+COPY --from=build ${DEPENDENCY}/BOOT-INF/classes /app
 
 COPY --from=metersphere/fabric8-java-alpine-openjdk8-jre /app/jmeter /opt/
 COPY --from=metersphere/fabric8-java-alpine-openjdk8-jre /deployments/run-java.sh /deployments/run-java.sh
