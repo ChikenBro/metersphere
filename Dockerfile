@@ -31,4 +31,4 @@ ENV AB_OFF=true
 ENV MS_VERSION=${MS_VERSION}
 ENV JAVA_OPTIONS="-Dfile.encoding=utf-8 -Djava.awt.headless=true  -Dlog4j2.formatMsgNoLookups=true"
 
-ENTRYPOINT ["/sbin/tini", "--", "/bin/sh", "-c", "/deployments/run-java.sh"]
+CMD ["/sbin/tini", "--", "/bin/sh", "-c", "/deployments/run-java.sh"]
