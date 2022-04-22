@@ -3,7 +3,7 @@ WORKDIR /app
 
 COPY backend/target/*.jar .
 
-RUN  jar -xf ../*.jar
+RUN mkdir -p dependency && (cd dependency; jar -xf ../*.jar)
 
 
 ARG MS_VERSION=dev
@@ -20,7 +20,7 @@ RUN mv /app/jmeter /opt/
 RUN mkdir -p /opt/jmeter/lib/junit
 
 ENV FORMAT_MESSAGES_PATTERN_DISABLE_LOOKUPS=true
-ENV JAVA_CLASSPATH=/app/BOOT-INF/classes:/app/BOOT-INF/lib/*
+ENV JAVA_CLASSPATH=/app/dependency/BOOT-INF/classes:/app/dependency/BOOT-INF/lib/*
 ENV JAVA_MAIN_CLASS=io.metersphere.Application
 ENV AB_OFF=true
 ENV MS_VERSION=${MS_VERSION}
