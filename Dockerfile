@@ -8,6 +8,8 @@ RUN mkdir -p dependency && (cd dependency; jar -xf ../*.jar)
 
 ARG MS_VERSION=dev
 
+ARG DEPENDENCY=/workspace/app/dependency
+
 
 COPY --from=hengyunabc/arthas:latest /opt/arthas /opt/arthas
 
