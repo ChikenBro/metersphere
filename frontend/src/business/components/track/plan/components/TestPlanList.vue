@@ -128,6 +128,7 @@
         <el-table-column
           v-if="item.id == 'iterationName'"
           prop="iterationName"
+          :filters="iterationFilters"
           :label="$t('test_track.issue.iteration')"
           show-overflow-tooltip
           :key="index"
@@ -399,6 +400,7 @@ export default {
           value: "regression",
         },
       ],
+      iterationFilters: [],
     };
   },
   watch: {
@@ -419,6 +421,7 @@ export default {
       this.condition.orders = orderArr;
     }
     this.initTableData();
+    this.getIterationFilters();
   },
   methods: {
     inite() {
@@ -562,6 +565,27 @@ export default {
         }
       }
       return returnObj;
+    },
+    // 获取迭代版本筛选下拉列表
+    getIterationFilters() {
+      this.$post(
+        "/field/template/issue/templates/list/1/30",
+        {
+          projectId: getCurrentProjectID(),
+          type: 3,
+          name: "",
+        },
+        (response) => {
+          const { data } = response;
+          if (data?.options) {
+            const iterationFilters = [];
+            data.options.forEach((item) => {
+              iterationFilters.push({ text: item.name, value: item.id });
+            });
+            this.iterationFilters = iterationFilters;
+          }
+        }
+      );
     },
   },
 };
