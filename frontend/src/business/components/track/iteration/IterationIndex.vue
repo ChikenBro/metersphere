@@ -204,6 +204,7 @@ export default {
           tip: "查看报告",
           icon: "el-icon-s-data",
           exec: this.handleEdit,
+          size: "medium",
         },
       ],
       isSyncCoding: false,

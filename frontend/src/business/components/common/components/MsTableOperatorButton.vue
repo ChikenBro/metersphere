@@ -9,7 +9,7 @@
                :disabled="isReadOnly"
                circle
                style="color:white;padding: 0px 0.1px;width: 28px;height: 28px;"
-               size="mini">
+               :size="size">
       <div style="transform: scale(0.8)">
         <span style="margin-left: -4px;line-height: 27px;">{{ tip }}</span>
       </div>
@@ -21,7 +21,7 @@
                  @clickStop="clickStop"
                  :type="type"
                  :tip="tip"
-                 :icon="icon" size="mini" circle/>
+                 :icon="icon" :size="size" circle/>
 </template>
 
 <script>
@@ -58,7 +58,11 @@
       isTesterPermission: {
         type: Boolean,
         default: false
-      }
+      },
+      size: {
+        type: String,
+        default: 'mini'
+      },
     },
     methods: {
       exec() {
