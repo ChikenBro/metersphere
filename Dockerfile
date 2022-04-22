@@ -31,4 +31,4 @@ ENV AB_OFF=true
 ENV MS_VERSION=${MS_VERSION}
 ENV JAVA_OPTIONS="-Dfile.encoding=utf-8 -Djava.awt.headless=true  -Dlog4j2.formatMsgNoLookups=true"
 
-CMD ["/deployments/run-java.sh"]
+CMD ["java -Dfile.encoding=utf-8 -Djava.awt.headless=true -Dlog4j2.formatMsgNoLookups=true -Xss5m -XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=40 -XX:+ExitOnOutOfMemoryError -cp /app/dependency/BOOT-INF/classes:/app/dependency/BOOT-INF/lib/* io.metersphere.Application"]
