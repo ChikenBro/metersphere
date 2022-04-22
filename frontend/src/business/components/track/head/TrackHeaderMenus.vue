@@ -47,7 +47,7 @@
           </el-menu-item>
 
           <el-menu-item
-            :index="'/track/testPlan/reportList'"
+            :index="'/track/report/testPlan'"
             popper-class="submenu"
           >
             {{ $t("commons.report") }}

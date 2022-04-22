@@ -8,8 +8,12 @@ const TestCaseReviewView = () =>
   import("@/business/components/track/review/view/TestCaseReviewView");
 const TestPlanView = () =>
   import("@/business/components/track/plan/view/TestPlanView");
+const ReportIndex = () =>
+  import("@/business/components/track/report/ReportIndex");
 const reportListView = () =>
   import("@/business/components/track/report/TestPlanReport");
+const IterationReport = () =>
+  import("@/business/components/track/report/IterationReport");
 const issueList = () =>
   import("@/business/components/track/issue/IssueList.vue");
 // const reportListView = () => import('@/business/components/track/plan/TestPlan')
@@ -45,9 +49,21 @@ export default {
       component: TestCase,
     },
     {
-      path: "testPlan/reportList",
-      name: "testPlanReportList",
-      component: reportListView,
+      path: "report/",
+      redirect: "report/testPlan",
+      component: ReportIndex,
+      children: [
+        {
+          path: "testPlan",
+          name: "testPlanReport",
+          component: reportListView,
+        },
+        {
+          path: "iteration",
+          name: "iterationReport",
+          component: IterationReport,
+        },
+      ],
     },
     {
       path: "issue",

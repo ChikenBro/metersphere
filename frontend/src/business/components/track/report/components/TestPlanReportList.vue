@@ -1,11 +1,15 @@
 <template>
   <el-card v-loading="result.loading" class="table-card">
     <template v-slot:header>
-      <ms-table-header
-        :condition.sync="condition"
-        :show-create="false"
-        @search="initTableData"
-      />
+      <el-row>
+        <el-col :span="12"><report-header-menu /></el-col>
+        <el-col :span="12">
+          <ms-table-header
+            :condition.sync="condition"
+            :show-create="false"
+            @search="initTableData"
+          /> </el-col
+      ></el-row>
     </template>
     <el-table
       border
@@ -159,6 +163,7 @@ import {
 } from "@/common/js/tableUtils";
 import MsTableHeaderSelectPopover from "@/business/components/common/components/table/MsTableHeaderSelectPopover";
 import { getCurrentProjectID } from "@/common/js/utils";
+import ReportHeaderMenu from "../components/ReportHeaderMenu";
 
 export default {
   name: "TestPlanReportList",
@@ -173,6 +178,7 @@ export default {
     MsTag,
     ShowMoreBtn,
     MsTableSelectAll,
+    ReportHeaderMenu,
   },
   data() {
     return {
