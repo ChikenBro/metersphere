@@ -7,7 +7,7 @@
           :unique-opened="true"
           mode="horizontal"
           router
-          default-active="/track/report/testPlan"
+          :default-active="path"
         >
           <el-menu-item index="/track/report/testPlan"> 测试报告 </el-menu-item>
           <el-menu-item index="/track/report/iteration">
@@ -21,8 +21,25 @@
 <script>
 export default {
   name: "ReportHeaderMenu",
+  props: {
+    pathName: {
+      type: String,
+      default: "",
+    },
+  },
   data() {
-    return {};
+    return {
+      path: this.pathName,
+    };
+  },
+  watch: {
+    $route: {
+      immediate: true,
+      handler(to, from) {
+        this.path = to.path;
+        this.init();
+      },
+    },
   },
 };
 </script>
@@ -33,7 +50,6 @@ export default {
 }
 
 #menu-bar {
-  border-bottom: 1px solid #e6e6e6;
   background-color: #fff;
 }
 

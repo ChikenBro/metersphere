@@ -3,7 +3,7 @@
     <template v-slot:header>
       <el-row>
         <el-col :span="12"
-          ><report-header-menu path-name="/track/report/testPlan"
+          ><report-header-menu path-name="/track/report/iteration"
         /></el-col>
         <el-col :span="12">
           <ms-table-header

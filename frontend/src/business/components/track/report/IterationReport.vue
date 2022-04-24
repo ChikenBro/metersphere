@@ -1,17 +1,19 @@
 <template>
   <ms-container>
-    <ms-main-container> 迭代报告展示区 </ms-main-container>
+    <ms-main-container>
+      <iteration-report-list ref="IterationReportList" />
+    </ms-main-container>
   </ms-container>
 </template>
 
 <script>
-import TestPlanReportList from "./components/TestPlanReportList";
+import IterationReportList from "./components/IterationReportList";
 import MsContainer from "../../common/components/MsContainer";
 import MsMainContainer from "../../common/components/MsMainContainer";
 
 export default {
-  name: "IterationReport",
-  components: { MsMainContainer, MsContainer, TestPlanReportList },
+  name: "TestPlanReport",
+  components: { MsMainContainer, MsContainer, IterationReportList },
   data() {
     return {};
   },
@@ -25,9 +27,9 @@ export default {
     $route(to, from) {},
   },
   methods: {
-    refreshTestPlanList() {
-      this.$refs.testPlanReportList.condition = {};
-      this.$refs.testPlanReportList.initTableData();
+    refreshIterationList() {
+      this.$refs.IterationReportList.condition = {};
+      this.$refs.IterationReportList.initTableData();
     },
   },
 };
