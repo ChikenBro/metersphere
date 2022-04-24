@@ -226,6 +226,11 @@ export default {
     selectNodeIds() {
       this.selectDataCounts = 0;
     },
+    data() {
+      this.$nextTick(() => {
+        this.$refs.table.doLayout();
+      });
+    },
   },
   mounted() {
     getLabel(this, TEST_CASE_LIST);

@@ -166,11 +166,7 @@ import {
   getTableHeaderWithCustomFields,
 } from "@/common/js/tableUtils";
 
-import {
-  getIterationList,
-  syncCoding,
-  getIterationRequirements,
-} from "@/network/iteration";
+import { getIterationList, syncCoding } from "@/network/iteration";
 import { IterationStatusEnum, StatusTagMap } from "./constance";
 
 const pageKey = "ITERATION_LIST";
@@ -216,6 +212,7 @@ export default {
   },
   methods: {
     fetchIterationList() {
+      this.page.data = [];
       this.page.result = getIterationList(this.page);
     },
     getTableTitleFields() {

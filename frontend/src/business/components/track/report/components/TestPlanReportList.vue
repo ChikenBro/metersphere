@@ -231,7 +231,11 @@ export default {
     };
   },
   watch: {
-    $route(to, from) {},
+    tableData() {
+      this.$nextTick(() => {
+        this.$refs.testPlanReportTable.doLayout();
+      });
+    },
   },
   activated() {
     this.components = TEST_PLAN_REPORT_CONFIGS;

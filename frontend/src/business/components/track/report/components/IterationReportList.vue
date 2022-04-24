@@ -2,26 +2,27 @@
   <el-card v-loading="result.loading" class="table-card">
     <template v-slot:header>
       <el-row>
-        <el-col :span="12"
-          ><report-header-menu path-name="/track/report/iteration"
-        /></el-col>
+        <el-col :span="12">
+          <report-header-menu path-name="/track/report/iteration" />
+        </el-col>
         <el-col :span="12">
           <ms-table-header
             :condition.sync="condition"
             :show-create="false"
             @search="initTableData"
-          /> </el-col
-      ></el-row>
+          />
+        </el-col>
+      </el-row>
     </template>
     <el-table
+      ref="iterationReportTable"
       border
       :data="tableData"
-      @select-all="handleSelectAll"
-      @select="handleSelect"
       :height="screenHeight"
-      ref="testPlanReportTable"
       row-key="id"
       class="test-content adjust-table ms-select-all-fixed"
+      @select-all="handleSelectAll"
+      @select="handleSelect"
       @filter-change="filter"
       @sort-change="sort"
     >
@@ -57,7 +58,7 @@
         prop="testPlanName"
         min-width="150"
         sortable
-        :label="$t('test_track.report.list.test_plan')"
+        label="迭代管理名称"
         show-overflow-tooltip
       ></el-table-column>
       <el-table-column
@@ -135,7 +136,11 @@
       :page-size.sync="pageSize"
       :total="total"
     />
-    <test-plan-report-view @refresh="initTableData" ref="testPlanReportView" />
+    <iteration-report-view
+      ref="iterationReportView"
+      :is-report="true"
+      @refresh="initTableData"
+    />
   </el-card>
 </template>
 
@@ -145,7 +150,7 @@ import MsTableHeader from "@/business/components/common/components/MsTableHeader
 import MsTableOperatorButton from "../../../common/components/MsTableOperatorButton";
 import MsTableOperator from "../../../common/components/MsTableOperator";
 import { TEST_PLAN_REPORT_CONFIGS } from "../../../common/components/search/search-components";
-import TestPlanReportView from "@/business/components/track/report/components/TestPlanReportView";
+import IterationReportView from "@/business/components/track/iteration/IterationReportView";
 import ReportTriggerModeItem from "@/business/components/common/tableItem/ReportTriggerModeItem";
 import MsTag from "@/business/components/common/components/MsTag";
 import ShowMoreBtn from "@/business/components/track/case/components/ShowMoreBtn";
@@ -168,10 +173,10 @@ import { getCurrentProjectID } from "@/common/js/utils";
 import ReportHeaderMenu from "../components/ReportHeaderMenu";
 
 export default {
-  name: "TestPlanReportList",
+  name: "IterationReportList",
   components: {
     MsTableHeaderSelectPopover,
-    TestPlanReportView,
+    IterationReportView,
     MsTableOperator,
     MsTableOperatorButton,
     MsTableHeader,
@@ -231,7 +236,11 @@ export default {
     };
   },
   watch: {
-    $route(to, from) {},
+    tableData() {
+      this.$nextTick(() => {
+        this.$refs.iterationReportTable.doLayout();
+      });
+    },
   },
   activated() {
     this.components = TEST_PLAN_REPORT_CONFIGS;
@@ -269,15 +278,15 @@ export default {
           let data = response.data;
           this.total = data.itemCount;
           this.tableData = data.listObject;
-          if (this.$refs.testPlanReportTable) {
-            // setTimeout(this.$refs.testPlanReportTable,200);
+          if (this.$refs.iterationReportTable) {
+            // setTimeout(this.$refs.iterationReportTable,200);
           }
           this.$nextTick(() => {
             checkTableRowIsSelect(
               this,
               this.condition,
               this.tableData,
-              this.$refs.testPlanReportTable,
+              this.$refs.iterationReportTable,
               this.selectRows
             );
           });
@@ -370,16 +379,16 @@ export default {
       this.saveSortField(this.tableHeaderKey, this.condition.orders);
       this.initTableData();
     },
-    openReport(planId) {
-      if (planId) {
-        this.$refs.testPlanReportView.open(planId);
+    openReport(iterationCode) {
+      if (iterationCode) {
+        this.$refs.iterationReportView.open(iterationCode, this.projectId);
       }
     },
     isSelectDataAll(data) {
       this.condition.selectAll = data;
       //设置勾选
       toggleAllSelection(
-        this.$refs.testPlanReportTable,
+        this.$refs.iterationReportTable,
         this.tableData,
         this.selectRows
       );
