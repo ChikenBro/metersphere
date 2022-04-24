@@ -37,7 +37,6 @@ export default {
       immediate: true,
       handler(to, from) {
         this.path = to.path;
-        this.init();
       },
     },
   },

@@ -18,9 +18,6 @@ export default {
       baseUrl: "report",
     };
   },
-  activated() {
-    this.$refs.table.doLayout();
-  },
 };
 </script>
 
