@@ -1,16 +1,16 @@
 <template>
   <el-main
-    v-loading="result.loading"
+    v-loading="result && result.loading"
     class="container"
     :style="isPlan ? '' : 'height: calc(100vh - 62px)'"
   >
     <el-scrollbar style="paddingtop: 20px">
       <el-form
+        ref="form"
         :model="form"
         :rules="rules"
         label-position="right"
         label-width="80px"
-        ref="form"
         :disabled="isDisabled"
       >
         <el-row class="custom-field-row">
@@ -19,7 +19,7 @@
               <el-input v-model="form.title" autocomplete="off"></el-input>
             </el-form-item>
           </el-col>
-          <el-col :span="6" v-if="isEdit" :push="2">
+          <el-col v-if="isEdit" :span="6" :push="2">
             <el-form-item
               :label="$t('test_track.issue.status')"
               :label-width="formLabelWidth"
@@ -50,19 +50,19 @@
               <el-select
                 v-model="form.fields.defectTypeId"
                 placeholder="缺陷类型"
-                @blur="handleBlur(1)"
-                @change="$forceUpdate()"
                 clearable
-                @clear="getList(1, '')"
                 filterable
                 :filter-method="(query) => getList(1, query)"
+                @blur="handleBlur(1)"
+                @change="$forceUpdate()"
+                @clear="getList(1, '')"
               >
                 <el-option
                   v-for="item in defectOptions"
                   :key="item.value"
-                  @change="$forceUpdate()"
                   :label="item.label"
                   :value="item.value"
+                  @change="$forceUpdate()"
                 >
                 </el-option>
               </el-select>
@@ -101,11 +101,11 @@
                 placeholder="未关联需求"
                 clearable
                 :popper-append-to-body="false"
+                filterable
+                :filter-method="(query) => getList(2, query)"
                 @change="$forceUpdate()"
                 @blur="handleBlur(2)"
                 @clear="getList(2, '')"
-                filterable
-                :filter-method="(query) => getList(2, query)"
               >
                 <el-option
                   v-for="item in requirementOptions"
@@ -127,11 +127,11 @@
               <el-select
                 v-model="form.fields.iterationCode"
                 placeholder="请选择迭代"
-                @blur="handleBlur(3)"
                 clearable
-                @clear="getList(3, '')"
                 filterable
                 :filter-method="(query) => getList(3, query)"
+                @blur="handleBlur(3)"
+                @clear="getList(3, '')"
               >
                 <el-option
                   v-for="item in iterationOptions"
@@ -151,8 +151,8 @@
               :label-width="formLabelWidth"
             >
               <el-select
-                filterable
                 v-model="form.fields.assignee"
+                filterable
                 placeholder="未指定"
               >
                 <el-option
@@ -188,8 +188,8 @@
               :label-width="formLabelWidth"
             >
               <el-select
-                filterable
                 v-model="form.fields.moduleId"
+                filterable
                 placeholder="未指定"
               >
                 <el-option
@@ -305,34 +305,34 @@
         </el-form> -->
 
         <form-rich-text-item
+          key="preconditions"
           title="前置条件"
           :data="form.descriptions"
           prop="preconditions"
-          key="preconditions"
           prefix="descriptions."
           :disabled="isDisabled"
         />
         <form-rich-text-item
+          key="operatingSteps"
           :title="$t('custom_field.operating_steps')"
           :data="form.descriptions"
           prop="operatingSteps"
-          key="operatingSteps"
           prefix="descriptions."
           :disabled="isDisabled"
         />
         <form-rich-text-item
+          key="actualResult"
           :title="$t('custom_field.actual_result')"
           :data="form.descriptions"
           prop="actualResult"
-          key="actualResult"
           prefix="descriptions."
           :disabled="isDisabled"
         />
         <form-rich-text-item
+          key="expectedResult"
           :title="$t('custom_field.expected_result')"
           :data="form.descriptions"
           prop="expectedResult"
-          key="expectedResult"
           prefix="descriptions."
           :disabled="isDisabled"
         />
@@ -460,6 +460,46 @@ export default {
     CustomFieldFormList,
     MsFormDivider,
     TemplateComponentEditHeader,
+  },
+  props: {
+    isPlan: {
+      type: Boolean,
+      default() {
+        return false;
+      },
+    },
+    isEdit: {
+      type: Boolean,
+      default() {
+        return false;
+      },
+    },
+    isDisabled: {
+      type: Boolean,
+      default() {
+        return false;
+      },
+    },
+    caseId: String,
+    planId: String,
+    iterationList: {
+      type: Array,
+      default() {
+        return [];
+      },
+    },
+    requirementList: {
+      type: Array,
+      default() {
+        return [];
+      },
+    },
+    defectList: {
+      type: Array,
+      default() {
+        return [];
+      },
+    },
   },
   data() {
     return {
@@ -636,46 +676,6 @@ export default {
       defectOptions: [...this.defectList],
     };
   },
-  props: {
-    isPlan: {
-      type: Boolean,
-      default() {
-        return false;
-      },
-    },
-    isEdit: {
-      type: Boolean,
-      default() {
-        return false;
-      },
-    },
-    isDisabled: {
-      type: Boolean,
-      default() {
-        return false;
-      },
-    },
-    caseId: String,
-    planId: String,
-    iterationList: {
-      type: Array,
-      default() {
-        return [];
-      },
-    },
-    requirementList: {
-      type: Array,
-      default() {
-        return [];
-      },
-    },
-    defectList: {
-      type: Array,
-      default() {
-        return [];
-      },
-    },
-  },
   computed: {
     isSystem() {
       return this.form.system;
@@ -691,59 +691,10 @@ export default {
     open(data, extraData) {
       this.initList();
       this.initEdit(data, extraData);
-      this.getThirdPartyInfo();
-
-      // getIssueTemplate()
-      //   .then((template) => {
-      //     this.issueTemplate = template;
-      //     this.getThirdPartyInfo();
-      //     initAddFuc(data);
-      //   });
-    },
-    getThirdPartyInfo() {
-      let platform = this.issueTemplate.platform;
-      if (platform === "Zentao") {
-        this.hasZentaoId = true;
-        this.result = this.$post(
-          "/issues/zentao/builds",
-          {
-            projectId: this.projectId,
-            organizationId: getCurrentOrganizationId(),
-          },
-          (response) => {
-            if (response.data) {
-              this.Builds = response.data;
-            }
-            this.result = this.$post(
-              "/issues/zentao/user",
-              {
-                projectId: this.projectId,
-                organizationId: getCurrentOrganizationId(),
-              },
-              (response) => {
-                this.zentaoUsers = response.data;
-              }
-            );
-          }
-        );
-      }
-      if (platform === "Tapd") {
-        this.hasTapdId = true;
-        this.result = this.$post(
-          "/issues/tapd/user",
-          {
-            projectId: this.projectId,
-            organizationId: getCurrentOrganizationId(),
-          },
-          (response) => {
-            this.tapdUsers = response.data;
-          }
-        );
-      }
     },
     initEdit(data) {
       this.testCaseContainIds = new Set();
-      this.$refs["form"].resetFields();
+      this.$refs["form"]?.resetFields();
       if (data) {
         if (data.testCaseIds) {
           this.testCaseContainIds = new Set(data.testCaseIds);
