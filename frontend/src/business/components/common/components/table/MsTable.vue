@@ -227,9 +227,7 @@ export default {
       this.selectDataCounts = 0;
     },
     data() {
-      this.$nextTick(() => {
-        this.$refs.table.doLayout();
-      });
+      this.doLayout();
     },
   },
   mounted() {
