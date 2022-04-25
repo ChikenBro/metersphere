@@ -24,14 +24,14 @@ public class IterationService {
     /**
      * 同步迭代数据
      *
-     * @param iterationSyncRequest 同步迭代对象
+     * @param jsonObject 同步迭代对象
      * @return 同步成功个数
      */
-    public JSONObject syncIteration(IterationSyncRequest iterationSyncRequest) {
+    public JSONObject syncIteration(JSONObject jsonObject) {
         String prefix_domain = System.getProperty("coding.domain");
         String url = String.format("%s/iteration/sync/coding", prefix_domain);
-        log.info("sync iteration request: {}, url: {}", iterationSyncRequest, url);
-        String result = CodingException.checkCodingException(url, iterationSyncRequest);
+        log.info("sync iteration request: {}, url: {}", jsonObject, url);
+        String result = CodingException.checkCodingException(url, jsonObject);
         return PlatformResponseConfig.parsePlatformDate(result);
     }
 

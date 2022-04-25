@@ -20,6 +20,8 @@ public interface UserMapper {
 
     List<User> selectByExample(UserExample example);
 
+    List<User> selectUsers();
+
     User selectByPrimaryKey(String id);
 
     User selectByName(String name);

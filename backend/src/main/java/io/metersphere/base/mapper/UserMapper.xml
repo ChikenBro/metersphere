@@ -79,7 +79,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, `name`, email, `password`, `status`, create_time, update_time, `language`, last_workspace_id, 
+    id, `name`, email, `password`, `status`, create_time, update_time, `language`, last_workspace_id,
     last_organization_id, phone, `source`, last_project_id, create_user
   </sql>
   <sql id="Blob_Column_List">
@@ -115,8 +115,13 @@
       order by ${orderByClause}
     </if>
   </select>
+  <select id="selectUsers" parameterType="io.metersphere.base.domain.User" resultMap="BaseResultMap">
+    select * from
+    user
+    where status = 1
+  </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="ResultMapWithBLOBs">
-    select 
+    select
     <include refid="Base_Column_List" />
     ,
     <include refid="Blob_Column_List" />
@@ -142,16 +147,16 @@
     </if>
   </delete>
   <insert id="insert" parameterType="io.metersphere.base.domain.User">
-    insert into user (id, `name`, email, 
-      `password`, `status`, create_time, 
-      update_time, `language`, last_workspace_id, 
-      last_organization_id, phone, `source`, 
+    insert into user (id, `name`, email,
+      `password`, `status`, create_time,
+      update_time, `language`, last_workspace_id,
+      last_organization_id, phone, `source`,
       last_project_id, create_user, platform_info
       )
-    values (#{id,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, 
-      #{password,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{createTime,jdbcType=BIGINT}, 
-      #{updateTime,jdbcType=BIGINT}, #{language,jdbcType=VARCHAR}, #{lastWorkspaceId,jdbcType=VARCHAR}, 
-      #{lastOrganizationId,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, #{source,jdbcType=VARCHAR}, 
+    values (#{id,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR},
+      #{password,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{createTime,jdbcType=BIGINT},
+      #{updateTime,jdbcType=BIGINT}, #{language,jdbcType=VARCHAR}, #{lastWorkspaceId,jdbcType=VARCHAR},
+      #{lastOrganizationId,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, #{source,jdbcType=VARCHAR},
       #{lastProjectId,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, #{platformInfo,jdbcType=LONGVARCHAR}
       )
   </insert>
