@@ -15,6 +15,7 @@
       </el-row>
     </template>
     <el-table
+      v-if="false"
       ref="iterationReportTable"
       border
       :data="tableData"
@@ -51,14 +52,14 @@
       <el-table-column
         min-width="300"
         prop="name"
-        :label="$t('test_track.report.list.name')"
+        label="名称"
         show-overflow-tooltip
       ></el-table-column>
       <el-table-column
         prop="testPlanName"
         min-width="150"
         sortable
-        label="迭代管理名称"
+        label="所属迭代"
         show-overflow-tooltip
       ></el-table-column>
       <el-table-column

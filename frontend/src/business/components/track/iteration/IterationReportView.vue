@@ -24,6 +24,7 @@
           </el-col>
           <el-col :span="12" class="head-right">
             <el-button
+              v-if="!isReport"
               :disabled="!isTestManagerOrTestUser"
               plain
               size="mini"
@@ -32,6 +33,7 @@
               {{ $t("commons.save") }}
             </el-button>
             <el-button
+              v-if="!isReport"
               :disabled="!isTestManagerOrTestUser"
               plain
               size="mini"
@@ -105,6 +107,12 @@ export default {
     BaseInfoComponent,
     MsIterationReportExport,
     IterationReportTemplateEdit,
+  },
+  props: {
+    isReport: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {

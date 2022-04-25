@@ -18,10 +18,10 @@ export default {
     return {};
   },
   activated() {
-    this.refreshTestPlanList();
+    this.refreshIterationList();
   },
   mounted() {
-    this.refreshTestPlanList();
+    this.refreshIterationList();
   },
   watch: {
     $route(to, from) {},

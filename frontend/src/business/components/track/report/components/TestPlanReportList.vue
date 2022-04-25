@@ -14,14 +14,14 @@
       ></el-row>
     </template>
     <el-table
-      border
-      :data="tableData"
-      @select-all="handleSelectAll"
-      @select="handleSelect"
-      :height="screenHeight"
       ref="testPlanReportTable"
       row-key="id"
       class="test-content adjust-table ms-select-all-fixed"
+      border
+      :data="tableData"
+      :height="screenHeight"
+      @select-all="handleSelectAll"
+      @select="handleSelect"
       @filter-change="filter"
       @sort-change="sort"
     >
@@ -135,7 +135,7 @@
       :page-size.sync="pageSize"
       :total="total"
     />
-    <test-plan-report-view @refresh="initTableData" ref="testPlanReportView" />
+    <test-plan-report-view ref="testPlanReportView" @refresh="initTableData" />
   </el-card>
 </template>
 
