@@ -3,7 +3,9 @@ package io.metersphere.base.mapper;
 import io.metersphere.base.domain.TestPlanTestCase;
 import io.metersphere.base.domain.TestPlanTestCaseExample;
 import io.metersphere.base.domain.TestPlanTestCaseWithBLOBs;
+
 import java.util.List;
+
 import org.apache.ibatis.annotations.Param;
 
 public interface TestPlanTestCaseMapper {
@@ -16,6 +18,8 @@ public interface TestPlanTestCaseMapper {
     int insert(TestPlanTestCaseWithBLOBs record);
 
     int insertSelective(TestPlanTestCaseWithBLOBs record);
+
+    int insertTestPlanTestCases(@Param("testPlanTestCases") List<TestPlanTestCase> testPlanTestCases);
 
     List<TestPlanTestCaseWithBLOBs> selectByExampleWithBLOBs(TestPlanTestCaseExample example);
 

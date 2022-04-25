@@ -16,6 +16,7 @@ import io.metersphere.commons.constants.ApiRunMode;
 import io.metersphere.commons.constants.TriggerMode;
 import io.metersphere.commons.utils.LogUtil;
 import io.metersphere.commons.utils.PageUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -24,6 +25,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class TestCase {
     @Resource
     private WorkspaceMapper workspaceMapper;
@@ -88,16 +90,19 @@ public class TestCase {
     public boolean checkTestCaseData(TestCaseRequest testCaseRequest) {
         if (null == testCaseRequest.getScenarioIds()) {
             testCaseRequest.setMessage("模块不存在或业务线不存在");
+            log.info("模块不存在或业务线不存在,接口测试运行场景:{}", testCaseRequest.getScenarioIds());
             testCaseRequest.setIfCase(false);
             return false;
         }
         if (testCaseRequest.getScenarioIds().isEmpty()) {
             testCaseRequest.setMessage("无可执行的接口测试用例");
+            log.info("无可执行的接口测试用例,接口测试运行场景:{}", testCaseRequest.getScenarioIds());
             testCaseRequest.setIfCase(false);
             return false;
         }
         if (null == this.getProjectEnv(testCaseRequest)) {
             testCaseRequest.setMessage("没有配置当前接口测试的环境");
+            log.info("没有配置当前接口测试的环境,接口测试运行场景:{}", testCaseRequest.getScenarioIds());
             testCaseRequest.setIfCase(false);
             return false;
         }
@@ -113,8 +118,7 @@ public class TestCase {
     public String getProjectEnv(TestCaseRequest testCaseRequest) {
         //是否有存在的环境
         List<ApiTestEnvironment> projectEnv = apiTestEnvironmentMapper.selectByProjectEnv(testCaseRequest.getProjectId());
-        List optionalEnv = projectEnv.stream().filter(x -> x.getName().equals(testCaseRequest.getEnv())).collect(Collectors.toList())
-                .stream().map(ApiTestEnvironment::getId).collect(Collectors.toList());
+        List optionalEnv = projectEnv.stream().filter(x -> x.getName().equals(testCaseRequest.getEnv())).collect(Collectors.toList()).stream().map(ApiTestEnvironment::getId).collect(Collectors.toList());
         if (optionalEnv.isEmpty()) {
             return null;
         }
@@ -142,6 +146,9 @@ public class TestCase {
             List<String> allProjectId = projectIds.stream().map(Project::getId).collect(Collectors.toList());
             //查询模块id
             List<ApiScenarioModule> apiScenarioModules = apiScenarioModuleMapper.selectScenarioModuleId(allProjectId, serverName);
+            if (apiScenarioModules.isEmpty()) {
+                return testCaseRequest;
+            }
             String scenarioModuleId = apiScenarioModules.get(0).getId();
             testCaseRequest.setProjectId(apiScenarioModules.get(0).getProjectId());
             //查询接口自动化模块下所有场景id

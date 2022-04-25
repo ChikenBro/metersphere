@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@RequestMapping("iteration")
+@RequestMapping("/iteration")
 @RestController
 @Slf4j
 public class IterationController {
@@ -28,8 +28,8 @@ public class IterationController {
      * @return
      */
     @PostMapping("/sync/coding")
-    public JSONObject syncIteration(@RequestBody IterationSyncRequest iterationSyncRequest) {
-        return iterationService.syncIteration(iterationSyncRequest);
+    public JSONObject syncIteration(@RequestBody JSONObject jsonObject) {
+        return iterationService.syncIteration(jsonObject);
     }
 
     /**

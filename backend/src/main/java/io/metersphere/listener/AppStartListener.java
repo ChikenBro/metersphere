@@ -4,11 +4,13 @@ import io.metersphere.api.jmeter.JMeterService;
 import io.metersphere.api.jmeter.NewDriverManager;
 import io.metersphere.api.service.ApiAutomationService;
 import io.metersphere.base.domain.JarConfig;
+import io.metersphere.commons.user.UserCommons;
 import io.metersphere.commons.utils.LogUtil;
 import io.metersphere.commons.utils.RunInterface;
 import io.metersphere.service.JarConfigService;
 import io.metersphere.service.ScheduleService;
 import io.metersphere.service.SystemParameterService;
+import io.metersphere.service.UserService;
 import io.metersphere.track.service.IssuesService;
 import org.apache.commons.lang3.StringUtils;
 import org.python.core.Options;
@@ -36,10 +38,14 @@ public class AppStartListener implements ApplicationListener<ApplicationReadyEve
     private SystemParameterService systemParameterService;
     @Resource
     private IssuesService issuesService;
+    @Resource
+    private UserService userService;
     @Value("${jmeter.home}")
     private String jmeterHome;
     @Value("${coding.domain}")
     private String codingDomain;
+
+    private String userList;
 
     @Override
     public void onApplicationEvent(ApplicationReadyEvent applicationReadyEvent) {
@@ -48,7 +54,8 @@ public class AppStartListener implements ApplicationListener<ApplicationReadyEve
 
         System.setProperty("jmeter.home", jmeterHome);
         System.setProperty("coding.domain", codingDomain);
-
+        //当前全部用户添加至全局变量
+        UserCommons.userList.addAll(userService.getUserList());
         loadJars();
 
         initPythonEnv();

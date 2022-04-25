@@ -670,6 +670,7 @@
         where api_scenario_module_id = #{scenarioModuleId,jdbcType=VARCHAR}
         and version is not null
         and delete_user_id is null
+        and delete_time is null
     </select>
 
 </mapper>
