@@ -132,6 +132,7 @@
       </el-table-column>
     </el-table>
     <ms-table-pagination
+      v-if="false"
       :change="initTableData"
       :current-page.sync="currentPage"
       :page-size.sync="pageSize"
@@ -239,7 +240,7 @@ export default {
   watch: {
     tableData() {
       this.$nextTick(() => {
-        this.$refs.iterationReportTable.doLayout();
+        // this.$refs.iterationReportTable.doLayout();
       });
     },
   },
