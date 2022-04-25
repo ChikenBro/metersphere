@@ -62,7 +62,7 @@
                   type="primary"
                   target="_blank"
                 >
-                  {{ scope.row.num }}
+                  {{ scope.row.resourceId }}
                 </el-link>
               </template>
             </ms-table-column>
