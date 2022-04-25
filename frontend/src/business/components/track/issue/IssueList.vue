@@ -435,8 +435,7 @@ export default {
   },
   data() {
     return {
-      linkBaseUrl:
-        "https://mudu1.coding.net/p/metersphere/bug-tracking/issues/",
+      linkBaseUrl: "",
       page: getPageInfo(),
       fields: [],
       tableHeaderKey: "ISSUE_LIST",
@@ -491,6 +490,17 @@ export default {
       iterationOptions: [],
       isSyncingBugs: false,
     };
+  },
+  watch: {
+    projectId: {
+      handler(id) {
+        this.$get("/project/get/" + id, (res) => {
+          const { codingProjectName } = res.data;
+          this.linkBaseUrl = `https://mudu1.coding.net/p/${codingProjectName}/bug-tracking/issues/`;
+        });
+      },
+      immediate: true,
+    },
   },
   filters: {
     priorityFormat(value) {
@@ -700,30 +710,33 @@ export default {
         switch (type) {
           case 1:
             this.defectTypeOptions =
-              options &&
-              options.map((item) => ({
-                text: item.name,
-                value: item.id,
-                label: item.name,
-              }));
+              (options &&
+                options.map((item) => ({
+                  text: item.name,
+                  value: item.id,
+                  label: item.name,
+                }))) ||
+              [];
             break;
           case 2:
             this.requirementOptions =
-              options &&
-              options.map((item) => ({
-                text: item.name,
-                value: item.id,
-                label: item.name,
-              }));
+              (options &&
+                options.map((item) => ({
+                  text: item.name,
+                  value: item.id,
+                  label: item.name,
+                }))) ||
+              [];
             break;
           case 3:
             this.iterationOptions =
-              options &&
-              options.map((item) => ({
-                text: item.name,
-                value: item.id,
-                label: item.name,
-              }));
+              (options &&
+                options.map((item) => ({
+                  text: item.name,
+                  value: item.id,
+                  label: item.name,
+                }))) ||
+              [];
             break;
         }
       });
