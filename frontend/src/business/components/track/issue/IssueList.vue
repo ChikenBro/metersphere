@@ -435,8 +435,7 @@ export default {
   },
   data() {
     return {
-      linkBaseUrl:
-        "https://mudu1.coding.net/p/metersphere/bug-tracking/issues/",
+      linkBaseUrl: "",
       page: getPageInfo(),
       fields: [],
       tableHeaderKey: "ISSUE_LIST",
@@ -491,6 +490,17 @@ export default {
       iterationOptions: [],
       isSyncingBugs: false,
     };
+  },
+  watch: {
+    projectId: {
+      handler(id) {
+        this.$get("/project/get/" + id, (res) => {
+          const { codingProjectName } = res.data;
+          this.linkBaseUrl = `https://mudu1.coding.net/p/${codingProjectName}/bug-tracking/issues/`;
+        });
+      },
+      immediate: true,
+    },
   },
   filters: {
     priorityFormat(value) {
