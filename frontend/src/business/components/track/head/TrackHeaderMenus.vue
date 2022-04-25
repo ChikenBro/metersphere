@@ -46,10 +46,7 @@
             {{ $t("test_track.iteration.iteration_management") }}
           </el-menu-item>
 
-          <el-menu-item
-            :index="'/track/testPlan/reportList'"
-            popper-class="submenu"
-          >
+          <el-menu-item :index="'/track/report'" popper-class="submenu">
             {{ $t("commons.report") }}
           </el-menu-item>
         </el-menu>
@@ -122,6 +119,8 @@ export default {
           this.pathName = "/track/review/all";
         } else if (to.params && to.params.planId) {
           this.pathName = "/track/plan/all";
+        } else if (to.path.includes("/track/report")) {
+          this.pathName = "/track/report";
         } else {
           this.pathName = to.path;
         }

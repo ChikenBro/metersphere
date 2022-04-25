@@ -209,7 +209,7 @@
                   :value="item.value"
                 ></el-option>
               </el-select>
-              <ms-instructions-icon content="选择继承则负责该计划" />
+              <ms-instructions-icon content="选择继承则复制该计划" />
             </el-form-item>
           </el-col>
         </el-row>

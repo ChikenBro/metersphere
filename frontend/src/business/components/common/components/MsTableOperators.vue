@@ -5,6 +5,7 @@
                               :disabled="isDisable(btn)"
                               :class="btn.class"
                               :tip="btn.tip" :icon="btn.icon" :type="btn.type" :isDivButton="btn.isDivButton"
+                              :size="btn.size || 'mini'"
                               @exec="click(btn)" @click.stop="clickStop(btn)"/>
   </span>
 </template>
