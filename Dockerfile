@@ -1,21 +1,11 @@
-FROM alpine:3.11.12
+FROM openjdk:8-jdk-alpine as build
+WORKDIR /app
 
-USER root
+COPY backend/target/*.jar .
 
-RUN mkdir -p /deployments
+RUN mkdir -p dependency && (cd dependency; jar -xf ../*.jar)
 
-# JAVA_APP_DIR is used by run-java.sh for finding the binaries
-ENV JAVA_APP_DIR=/deployments \
-    JAVA_MAJOR_VERSION=8
-
-
-# /dev/urandom is used as random source, which is perfectly safe
-# according to http://www.2uo.de/myths-about-urandom/
-RUN apk add --update \
-    curl \
-    openjdk8=8.275.01-r0 \
- && rm /var/cache/apk/* \
- && echo "securerandom.source=file:/dev/urandom" >> /usr/lib/jvm/default-jvm/jre/lib/security/java.security
+ARG MS_VERSION=dev
 
 # Agent bond including Jolokia and jmx_exporter
 ADD agent-bond-opts /opt/run-java-options
@@ -27,32 +17,15 @@ RUN mkdir -p /opt/agent-bond \
 ADD jmx_exporter_config.yml /opt/agent-bond/
 EXPOSE 8778 9779
 
-# Add run script as /deployments/run-java.sh and make it executable
-COPY run-java.sh /deployments/
-RUN chmod 755 /deployments/run-java.sh
-
-WORKDIR /app
-
-COPY backend/target/*.jar .
-
-RUN mkdir -p dependency && (cd dependency; jar -xf ../*.jar)
-
-
-ARG MS_VERSION=dev
-
-
-
-
 COPY --from=hengyunabc/arthas:latest /opt/arthas /opt/arthas
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo 'Asia/Shanghai' >/etc/timezone && apk add --no-cache tini
 
-
+RUN mkdir -p /deployments
+COPY --from=metersphere/fabric8-java-alpine-openjdk8-jre:latest /deployments/ /deployments/
 
 RUN mv /app/dependency/BOOT-INF/classes/jmeter /opt/
 RUN mkdir -p /opt/jmeter/lib/junit
-
-
 
 ENV FORMAT_MESSAGES_PATTERN_DISABLE_LOOKUPS=true
 ENV JAVA_CLASSPATH=/app/dependency/BOOT-INF/classes:/app/dependency/BOOT-INF/lib/*
