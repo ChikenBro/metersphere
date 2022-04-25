@@ -710,30 +710,33 @@ export default {
         switch (type) {
           case 1:
             this.defectTypeOptions =
-              options &&
-              options.map((item) => ({
-                text: item.name,
-                value: item.id,
-                label: item.name,
-              }));
+              (options &&
+                options.map((item) => ({
+                  text: item.name,
+                  value: item.id,
+                  label: item.name,
+                }))) ||
+              [];
             break;
           case 2:
             this.requirementOptions =
-              options &&
-              options.map((item) => ({
-                text: item.name,
-                value: item.id,
-                label: item.name,
-              }));
+              (options &&
+                options.map((item) => ({
+                  text: item.name,
+                  value: item.id,
+                  label: item.name,
+                }))) ||
+              [];
             break;
           case 3:
             this.iterationOptions =
-              options &&
-              options.map((item) => ({
-                text: item.name,
-                value: item.id,
-                label: item.name,
-              }));
+              (options &&
+                options.map((item) => ({
+                  text: item.name,
+                  value: item.id,
+                  label: item.name,
+                }))) ||
+              [];
             break;
         }
       });
