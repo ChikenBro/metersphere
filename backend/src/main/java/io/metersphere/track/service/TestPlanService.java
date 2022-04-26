@@ -151,6 +151,9 @@ public class TestPlanService {
         if (getTestPlanByName(testPlan.getName()).size() > 0) {
             MSException.throwException(Translator.get("plan_name_already_exists"));
         }
+        if (null != testPlan.getPlannedStartTime() && null != testPlan.getPlannedEndTime() && testPlan.getPlannedStartTime() >= testPlan.getPlannedEndTime()) {
+            MSException.throwException("计划结束时间应大于计划开始时间");
+        }
         testPlan.setStatus(TestPlanStatus.Prepare.name());
         testPlan.setCreateTime(System.currentTimeMillis());
         testPlan.setUpdateTime(System.currentTimeMillis());
@@ -163,6 +166,7 @@ public class TestPlanService {
             iteration = iteration.stream().filter(s -> s.getProjectId().equals(testPlan.getProjectId())).collect(Collectors.toList());
             if (!iteration.isEmpty()) {
                 testPlan.setIterationId(iteration.get(0).getId());
+                checkTestPlanSuper(iteration.get(0).getId(), testPlan.getTestPlanInherit());
             }
         }
         testPlanMapper.insert(testPlan);
@@ -176,7 +180,7 @@ public class TestPlanService {
         NoticeModel noticeModel = NoticeModel.builder().context(context).relatedUsers(userIds).subject(Translator.get("test_plan_notification")).mailTemplate("TestPlanStart").paramMap(paramMap).event(NoticeConstants.Event.CREATE).build();
         noticeSendService.send(NoticeConstants.TaskType.TEST_PLAN_TASK, noticeModel);
         //继承用例内容
-        if (null != testPlan.getTestPlanInherit()) {
+        if (null != testPlan.getTestPlanInherit() && !testPlan.getTestPlanInherit().equals("")) {
             TestPlanTestCaseExample testPlanTestCaseExample = new TestPlanTestCaseExample();
             testPlanTestCaseExample.createCriteria().andPlanIdEqualTo(testPlan.getTestPlanInherit());
             List<TestPlanTestCase> testPlanTestCases = testPlanTestCaseMapper.selectByExample(testPlanTestCaseExample);
@@ -189,6 +193,31 @@ public class TestPlanService {
         }
         return testPlan.getId();
     }
+
+
+    /**
+     * 校验测试计划继承字段是否正确
+     *
+     * @param iterationId     迭代id
+     * @param superTestPlanID 继承的测试计划id
+     */
+    private void checkTestPlanSuper(String iterationId, String superTestPlanID) {
+        if (null == superTestPlanID || superTestPlanID.equals("")) {
+            return;
+        }
+        //校验迭代id下是否有此测试计划-计划继承
+        try {
+            List<TestPlan> testPlans = testPlanMapper.selectByIterationId(iterationId);
+            List<TestPlan> TestPlan = testPlans.stream().filter(s -> s.getId().equals(superTestPlanID)).collect(Collectors.toList());
+            if (TestPlan.isEmpty()) {
+                MSException.throwException("所属迭代下计划继承的测试计划有误");
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            MSException.throwException("所属迭代下计划继承的测试计划有误");
+        }
+    }
+
 
     /**
      * 根据是否

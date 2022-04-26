@@ -298,8 +298,10 @@
         </trim>
     </insert>
 
-    <select id="selectByIterationId" parameterType="java.lang.String" resultType="io.metersphere.base.domain.Iteration">
-        select * from
+    <select id="selectByIterationId" parameterType="java.lang.String" resultType="io.metersphere.base.domain.TestPlan">
+        select
+        <include refid="Base_Column_List"/>
+        from
         test_plan
         where iteration_id = #{iterationId,jdbcType=VARCHAR}
     </select>
