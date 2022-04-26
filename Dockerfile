@@ -5,7 +5,12 @@ COPY backend/target/*.jar .
 
 RUN mkdir -p dependency && (cd dependency; jar -xf ../*.jar)
 
-FROM metersphere/fabric8-java-alpine-openjdk8-jre
+FROM shenlei1/fabric8-java-alpine-openjdk8
+
+COPY --from=hengyunabc/arthas:latest /opt/arthas /opt/arthas
+
+RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo 'Asia/Shanghai' >/etc/timezone && apk add --no-cache tini
+
 
 LABEL maintainer="FIT2CLOUD <support@fit2cloud.com>"
 
@@ -27,4 +32,4 @@ ENV AB_OFF=true
 ENV MS_VERSION=${MS_VERSION}
 ENV JAVA_OPTIONS="-Dfile.encoding=utf-8 -Djava.awt.headless=true  -Dlog4j2.formatMsgNoLookups=true"
 
-CMD ["/deployments/run-java.sh"]
+CMD ["/sbin/tini", "--", "/bin/sh", "-c", "/deployments/run-java.sh"]
