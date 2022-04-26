@@ -514,6 +514,8 @@ export default {
     getPlanInheritOptions(iterationCode) {
       const url = `/test/plan/iteration/plan`;
       this.planInheritOptions = [];
+      this.form.testPlanInherit = "";
+      this.form.ifRetain = false;
       this.$post(url, { iterationCode }, (response) => {
         let tempArr = response?.data || [];
         const planInheritOptions = [];
