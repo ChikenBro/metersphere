@@ -481,7 +481,7 @@ export default {
       this.$emit("openTestPlanEditDialog");
     },
     handleEdit(testPlan) {
-      this.$emit("testPlanEdit", testPlan);
+      this.$emit("testPlanEdit", { ...testPlan, isEdit: true });
     },
     statusChange(data) {
       if (!hasPermission("PROJECT_TRACK_PLAN:READ+EDIT")) {

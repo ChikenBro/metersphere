@@ -146,6 +146,7 @@
               <el-select
                 v-model="form.iterationCode"
                 clearable
+                :disabled="isDisable"
                 placeholder="请选择迭代"
                 @clear="getIterationOptions('')"
                 @blur="handleBlur"
@@ -194,6 +195,7 @@
             >
               <el-select
                 v-model="form.testPlanInherit"
+                :disabled="isDisable"
                 clearable
                 placeholder="选择迭代中计划"
                 @clear="resetRetain"
@@ -217,7 +219,7 @@
               :label-width="formLabelWidth"
               prop="ifRetain"
             >
-              <el-switch v-model="form.ifRetain" />
+              <el-switch v-model="form.ifRetain" :disabled="isDisable" />
               <ms-instructions-icon
                 content='选择是否保留用例"阻塞"状态,重置其它用例状态'
               />
@@ -363,6 +365,7 @@ export default {
         { label: "线上环境", value: "pord" },
       ],
       planInheritOptions: [],
+      isDisable: false,
     };
   },
   created() {
@@ -381,6 +384,7 @@ export default {
       this.resetForm();
       this.setPrincipalOptions();
       this.operationType = "add";
+      this.isDisable = !!testPlan?.isEdit;
       if (testPlan) {
         //修改
         this.operationType = "edit";
