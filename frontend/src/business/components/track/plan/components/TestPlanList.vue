@@ -11,6 +11,7 @@
     </template>
 
     <el-table
+      ref="table"
       v-loading="result.loading"
       border
       class="adjust-table"
@@ -411,6 +412,14 @@ export default {
         this.initTableData();
       }
     },
+    tableData: {
+      handler() {
+        this.$nextTick(() => {
+          this.$refs.table.doLayout();
+        });
+      },
+      immediate: true,
+    },
   },
   created() {
     this.projectId = this.$route.params.projectId;
@@ -571,20 +580,18 @@ export default {
     // 获取迭代版本筛选下拉列表
     getIterationFilters() {
       this.$post(
-        "/field/template/issue/templates/list/1/30",
+        "/iteration/list/1/30",
         {
           projectId: getCurrentProjectID(),
-          type: 3,
-          name: "",
         },
         (response) => {
           const { data } = response;
-          if (data?.options) {
+          if (data?.listObject) {
             const iterationFilters = [];
-            data.options.forEach((item) => {
+            data.listObject.forEach((item) => {
               iterationFilters.push({
                 text: item.name,
-                value: item.iterationId,
+                value: item.id,
               });
             });
             this.iterationFilters = iterationFilters;
@@ -605,6 +612,14 @@ export default {
 
 .el-table {
   cursor: pointer;
+}
+
+.el-table >>> .el-table__body {
+  height: 100%;
+}
+.el-table >>> .el-table__empty-block {
+  position: absolute;
+  top: 0;
 }
 
 .schedule-btn >>> .el-button {
