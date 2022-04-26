@@ -142,11 +142,7 @@
 
           <!-- 所属迭代 -->
           <el-col :span="8" :push="2">
-            <el-form-item
-              :label="$t('所属迭代')"
-              :label-width="formLabelWidth"
-              prop="iterationCode"
-            >
+            <el-form-item :label="$t('所属迭代')" :label-width="formLabelWidth">
               <el-select
                 v-model="form.iterationCode"
                 clearable
@@ -351,9 +347,6 @@ export default {
             message: this.$t("test_track.length_less_than") + "200",
             trigger: "blur",
           },
-        ],
-        iterationCode: [
-          { required: true, message: "请选择所属迭代", trigger: "blur" },
         ],
         environment: [
           { required: true, message: "请选择环境", trigger: "blur" },
