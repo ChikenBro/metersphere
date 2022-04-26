@@ -24,7 +24,7 @@
           </el-col>
           <el-col :span="12" class="head-right">
             <el-button
-              v-if="!isReport"
+              v-if="false"
               :disabled="!isTestManagerOrTestUser"
               plain
               size="mini"
@@ -33,7 +33,7 @@
               {{ $t("commons.save") }}
             </el-button>
             <el-button
-              v-if="!isReport"
+              v-if="false"
               :disabled="!isTestManagerOrTestUser"
               plain
               size="mini"

@@ -10,9 +10,9 @@
           :default-active="path"
         >
           <el-menu-item index="/track/report/testPlan"> 测试报告 </el-menu-item>
-          <el-menu-item index="/track/report/iteration">
+          <!-- <el-menu-item index="/track/report/iteration">
             迭代报告
-          </el-menu-item>
+          </el-menu-item> -->
         </el-menu>
       </el-col>
     </el-row>
