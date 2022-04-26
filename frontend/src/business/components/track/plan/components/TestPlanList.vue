@@ -128,6 +128,8 @@
         <el-table-column
           v-if="item.id == 'iterationName'"
           prop="iterationName"
+          column-key="iterationId"
+          min-width="120"
           :filters="iterationFilters"
           :label="$t('test_track.issue.iteration')"
           show-overflow-tooltip
@@ -580,7 +582,10 @@ export default {
           if (data?.options) {
             const iterationFilters = [];
             data.options.forEach((item) => {
-              iterationFilters.push({ text: item.name, value: item.id });
+              iterationFilters.push({
+                text: item.name,
+                value: item.iterationId,
+              });
             });
             this.iterationFilters = iterationFilters;
           }
