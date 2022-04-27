@@ -498,18 +498,18 @@ export default {
     },
     // 获取迭代列表
     getIterationOptions(name = "") {
-      const url = "/field/template/issue/templates/list/1/20";
+      const url = "/iteration/list/1/30";
       this.form.iterationCode = name;
       this.$post(
         url,
-        { projectId: getCurrentProjectID(), type: 3, name },
+        { projectId: getCurrentProjectID(), name },
         (response) => {
-          let tempArr = response?.data?.options || [];
+          let tempArr = response?.data?.listObject || [];
           const iterationOptions = [];
           tempArr.forEach((item) => {
             iterationOptions.push({
               label: item.name,
-              value: item.id,
+              value: item.code,
             });
           });
           this.iterationOptions = iterationOptions;

@@ -614,12 +614,8 @@ export default {
   cursor: pointer;
 }
 
-.el-table >>> .el-table__body {
-  height: 100%;
-}
-.el-table >>> .el-table__empty-block {
-  position: absolute;
-  top: 0;
+.el-table >>> .el-table__row {
+  height: 48px;
 }
 
 .schedule-btn >>> .el-button {
