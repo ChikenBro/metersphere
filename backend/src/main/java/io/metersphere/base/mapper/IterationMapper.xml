@@ -17,7 +17,7 @@
         <result column="sync_start_time" jdbcType="BIGINT" property="syncStartTime"/>
         <result column="sync_update_time" jdbcType="BIGINT" property="syncUpdateTime"/>
         <result column="number_of_executions" jdbcType="INTEGER" property="numberOfExecutions"/>
-        <result column="last_pass_rate" jdbcType="INTEGER" property="lastPassRate"/>
+        <result column="last_pass_rate" jdbcType="VARCHAR" property="lastPassRate"/>
         <result column="deleted" jdbcType="INTEGER" property="deleted"/>
         <result column="report_id" jdbcType="BIT" property="reportId"/>
     </resultMap>
@@ -33,11 +33,14 @@
         where code = #{iterationCode,jdbcType=VARCHAR}
         and deleted = 0;
     </select>
-    <select id="getIterationByIterationId" resultType="io.metersphere.base.domain.Iteration">
+    <select id="getIterationsByIterationId" resultType="io.metersphere.base.domain.Iteration">
         select
         <include refid="Base_Column_List"/>
         from coding_iteration
-        where id = #{iterationId,jdbcType=VARCHAR}
+        where id in
+        <foreach collection="iterationIds" item="iterationId" separator="," index="index" open="(" close=")">
+            #{iterationId,jdbcType=VARCHAR}
+        </foreach>
         and deleted = 0;
     </select>
 </mapper>

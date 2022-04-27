@@ -25,7 +25,7 @@ public class Iteration {
     private Long syncStartTime;
     private Long syncUpdateTime;
     private Integer numberOfExecutions;
-    private Integer lastPassRate;
+    private String lastPassRate;
     private Integer deleted;
     private String reportId;
 

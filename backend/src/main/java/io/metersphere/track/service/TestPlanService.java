@@ -384,6 +384,7 @@ public class TestPlanService {
     }
 
     private void calcTestPlanRate(List<TestPlanDTOWithMetric> testPlans) {
+        // todo 优化查询方式，数据库一次取出来
         testPlans.forEach(testPlan -> {
             testPlan.setTested(0);
             testPlan.setPassed(0);
@@ -436,20 +437,26 @@ public class TestPlanService {
         });
     }
 
+
     public List<TestPlanDTOWithMetric> listTestPlan(QueryTestPlanRequest request) {
         request.setOrders(ServiceUtils.getDefaultOrder(request.getOrders()));
         if (StringUtils.isNotBlank(request.getProjectId())) {
             request.setProjectId(request.getProjectId());
         }
         List<TestPlanDTOWithMetric> testPlans = extTestPlanMapper.list(request);
+        if (testPlans.isEmpty()) {
+            return testPlans;
+        }
+        List<String> iterationIds = testPlans.stream().map(TestPlanDTOWithMetric::getIterationId).collect(Collectors.toList());
+        List<Iteration> iterations = iterationMapper.getIterationsByIterationId(iterationIds);
         testPlans.forEach(item -> {
             TestPlanReportExample example = new TestPlanReportExample();
             example.createCriteria().andTestPlanIdEqualTo(item.getId());
-            if (null != item.getIterationId()) {
-                Iteration iteration = iterationMapper.getIterationByIterationId(item.getIterationId());
-                if (null != iteration) {
-                    item.setIterationName(iteration.getName());
-                    item.setIterationCode(iteration.getCode());
+            if (null != item.getIterationId() && !iterations.isEmpty()) {
+                List<Iteration> iteration = iterations.stream().filter(s -> s.getId().equals(item.getIterationId())).collect(Collectors.toList());
+                if (!iteration.isEmpty()) {
+                    item.setIterationName(iteration.get(0).getName());
+                    item.setIterationCode(iteration.get(0).getCode());
                 }
             }
             item.setExecutionTimes((int) testPlanReportMapper.countByExample(example));
