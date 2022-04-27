@@ -29,7 +29,9 @@ public class TestPlanReportDTO {
     private FailureTestCasesAdvanceDTO failureTestCases;
     private List<Issues> Issues;
     private List<String> executors;
+    private List<String> executorNames;
     private String principal;
+    private String principalName;
     private Long startTime;
     private Long endTime;
     private String projectName;

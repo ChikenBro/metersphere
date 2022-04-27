@@ -88,6 +88,16 @@
         id, plan_id, case_id, report_id, executor, `status`, results, issues, remark, create_time, update_time,
         actual_result, create_user, issues_count, module_id
     </sql>
+    <select id="selectTestPlanTestCase" resultType="io.metersphere.base.domain.TestPlanTestCase">
+        select
+        <include refid="Base_Column_List"/>
+        from
+        test_plan_test_case
+        where plan_id in
+        <foreach collection="testPlanIds" item="item" index="index" open="(" close=")" separator=",">
+            #{item,jdbcType=VARCHAR}
+        </foreach>
+    </select>
     <sql id="Blob_Column_List">
         results, issues, actual_result
     </sql>

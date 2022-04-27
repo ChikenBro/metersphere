@@ -21,6 +21,14 @@ public interface TestPlanTestCaseMapper {
 
     int insertTestPlanTestCases(@Param("testPlanTestCases") List<TestPlanTestCase> testPlanTestCases);
 
+    /**
+     * 查询测试计划下的测试用例
+     *
+     * @param testPlanIds
+     * @return
+     */
+    List<TestPlanTestCase> selectTestPlanTestCase(@Param("testPlanIds") List<String> testPlanIds);
+
     List<TestPlanTestCaseWithBLOBs> selectByExampleWithBLOBs(TestPlanTestCaseExample example);
 
     List<TestPlanTestCase> selectByExample(TestPlanTestCaseExample example);

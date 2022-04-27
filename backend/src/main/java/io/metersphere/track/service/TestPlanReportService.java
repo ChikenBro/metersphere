@@ -22,6 +22,7 @@ import io.metersphere.notice.sender.NoticeModel;
 import io.metersphere.notice.service.NoticeSendService;
 import io.metersphere.service.SystemParameterService;
 import io.metersphere.track.Factory.ReportComponentFactory;
+import io.metersphere.track.domain.ReportBaseInfoComponent;
 import io.metersphere.track.domain.ReportComponent;
 import io.metersphere.track.domain.ReportResultComponent;
 import io.metersphere.track.dto.*;
@@ -67,6 +68,8 @@ public class TestPlanReportService {
     ExtTestPlanMapper extTestPlanMapper;
     @Resource
     ExtTestPlanApiCaseMapper extTestPlanApiCaseMapper;
+    @Resource
+    TestPlanTestCaseMapper testPlanTestCaseMapper;
     //    @Resource
 //    TestPlanLoadCaseService testPlanLoadCaseService;
 //    @Resource
@@ -280,12 +283,26 @@ public class TestPlanReportService {
                     returnDTO.setIssues(JSONArray.parseArray(reportData.getIssuesInfo(), Issues.class));
                 }
                 List<String> creatorList = new ArrayList<>();
-                creatorList.add(report.getCreator());
-                returnDTO.setExecutors(creatorList);
+                List<String> testPlanIds = new ArrayList<>();
+                testPlanIds.add(report.getTestPlanId());
+                List<TestPlanTestCase> testPlanTestCaseDaoList = testPlanTestCaseMapper.selectTestPlanTestCase(testPlanIds);
+                List<String> executors = testPlanTestCaseDaoList.stream().map(TestPlanTestCase::getExecutor).distinct().collect(Collectors.toList());
+                returnDTO.setExecutors(executors);
                 returnDTO.setPrincipal(report.getPrincipal());
                 returnDTO.setStartTime(report.getStartTime());
                 returnDTO.setEndTime(report.getEndTime());
-
+                List<String> userIds = new ArrayList<>();
+                userIds.add(returnDTO.getPrincipal());
+                userIds.addAll(returnDTO.getExecutors());
+                Map<String, String> userMap = ServiceUtils.getUserNameMap(userIds);
+                returnDTO.setPrincipalName(userMap.get(returnDTO.getPrincipal()));
+                List<String> names = new ArrayList<>();
+                returnDTO.getExecutors().forEach(item -> {
+                    if (StringUtils.isNotBlank(item)) {
+                        names.add(userMap.get(item));
+                    }
+                });
+                returnDTO.setExecutorNames(names);
                 String testProject = extTestPlanMapper.findTestProjectNameByTestPlanID(report.getTestPlanId());
                 returnDTO.setProjectName(testProject);
             }
