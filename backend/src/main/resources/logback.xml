@@ -143,6 +143,7 @@
     <!-- 自定义JMETER输出日志 -->
     <appender name="JMETER_LOG" class="io.metersphere.api.jmeter.JmeterLoggerAppender"/>
 
+<!--	<root level="DEBUG">-->
 	<root level="INFO">
 		<appender-ref ref="infoAsyncAppender" />
 		<appender-ref ref="console"/>

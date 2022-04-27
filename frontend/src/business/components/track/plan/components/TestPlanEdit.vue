@@ -290,6 +290,7 @@ import {
   getCurrentWorkspaceId,
   listenGoBack,
   removeGoBackListener,
+  getCurrentUserId,
 } from "@/common/js/utils";
 import MsInputTag from "@/business/components/api/automation/scenario/MsInputTag";
 import MsInstructionsIcon from "@/business/components/common/components/MsInstructionsIcon";
@@ -315,6 +316,7 @@ export default {
         testPlanInherit: "",
         ifRetain: false,
         projectId: getCurrentProjectID(),
+        creator: getCurrentUserId(),
       },
       rules: {
         name: [

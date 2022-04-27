@@ -13,6 +13,7 @@ import io.metersphere.commons.constants.NoticeConstants;
 import io.metersphere.commons.exception.CodingException;
 import io.metersphere.commons.exception.MSException;
 import io.metersphere.commons.user.SessionUser;
+import io.metersphere.commons.user.UserCommons;
 import io.metersphere.commons.utils.BeanUtils;
 import io.metersphere.commons.utils.LogUtil;
 import io.metersphere.commons.utils.ServiceUtils;
@@ -107,6 +108,9 @@ public class IssuesService {
 //            issuesRequest.set(creatorUser.getName());
             // 获取token秘钥
             issuesRequest.setToken(getCodingToken(creatorUser));
+        } else {
+            log.info("当前操作者: {}", issuesRequest.getCreator());
+            MSException.throwException(issuesRequest.getCreator() + "不存在");
         }
         User assigneeUser = userMapper.selectByPrimaryKey(issuesRequest.getFields().getAssignee());
         if (null != assigneeUser) {
@@ -117,19 +121,19 @@ public class IssuesService {
 //            platform.addIssue(issuesRequest);
             CodingException.checkCodingResult(platform.addIssue(issuesRequest), "新增");
         });
-        issuesRequest.getTestCaseIds().forEach(l -> {
-            try {
-                List<IssuesDao> issues = this.getIssues(l);
-                if (org.apache.commons.collections4.CollectionUtils.isEmpty(issues)) {
-                    LogUtil.error(l + "下的缺陷为空");
-                }
-                int issuesCount = issues.size();
-                testPlanTestCaseService.updateIssues(issuesCount, "", l, JSON.toJSONString(issues));
-            } catch (Exception e) {
-                LogUtil.error("处理bug数量报错caseId: {}, message: {}", l, ExceptionUtils.getStackTrace(e));
-            }
-        });
-        noticeIssueEven(issuesRequest, "IssuesCreate");
+//        issuesRequest.getTestCaseIds().forEach(l -> {
+//            try {
+//                List<IssuesDao> issues = this.getIssues(l);
+//                if (org.apache.commons.collections4.CollectionUtils.isEmpty(issues)) {
+//                    LogUtil.error(l + "下的缺陷为空");
+//                }
+//                int issuesCount = issues.size();
+//                testPlanTestCaseService.updateIssues(issuesCount, "", l, JSON.toJSONString(issues));
+//            } catch (Exception e) {
+//                LogUtil.error("处理bug数量报错caseId: {}, message: {}", l, ExceptionUtils.getStackTrace(e));
+//            }
+//        });
+//        noticeIssueEven(issuesRequest, "IssuesCreate");
     }
 
 
@@ -203,7 +207,6 @@ public class IssuesService {
             // 获取token秘钥
             CodingException.checkCodingResult(platform.updateIssue(issuesRequest), "编辑");
         });
-        // todo 缺陷更新事件？
     }
 
     public List<AbstractIssuePlatform> getUpdatePlatforms(IssuesUpdateRequest updateRequest) {
@@ -248,7 +251,7 @@ public class IssuesService {
     public List<IssuesDao> getIssuesByProject(IssuesRequest issueRequest, Project project) {
         List<IssuesDao> list = new ArrayList<>();
         List<String> platforms = getPlatforms(project);
-        platforms.add(IssuesManagePlatform.Local.toString());
+        platforms.add(IssuesManagePlatform.Coding.toString());
         List<AbstractIssuePlatform> platformList = IssueFactory.createPlatforms(platforms, issueRequest);
         platformList.forEach(platform -> {
             List<IssuesDao> issue = platform.getIssue(issueRequest);
@@ -434,17 +437,24 @@ public class IssuesService {
         request.setOrders(ServiceUtils.getDefaultOrder(request.getOrders()));
         String search = request.getOrders().get(0).getName();
         List<IssuesDao> issues;
+        //替换创建者
+        if (null != request.getFilters() && null != request.getFilters().get("creator_name")) {
+            List<String> creatorIds = request.getFilters().get("creator_name");
+            List<User> userList = UserCommons.userList;
+            List<String> userName = new ArrayList<>();
+            creatorIds.forEach(creatorId -> {
+                List<User> user = userList.stream().filter(s -> s.getId().equals(creatorId)).collect(Collectors.toList());
+                if (!user.isEmpty()) {
+                    userName.add(user.get(0).getName());
+                }
+            });
+            request.getFilters().put("creator_name", userName);
+        }
         if (search.equals("priority") || search.equals("assignee_name") || search.equals("due_date") || search.equals("start_date")) {
             request.getOrders().get(0).setName("update_time");
-            issues = extIssuesMapper.getIssuesByProjectId(request);
-//            issues.forEach(issue->{
-//                JSONObject result = JSON.parseObject(issue.getCustomFields());
-//                issue.set.setresult.get("priority")
-//            });
-        } else {
-            issues = extIssuesMapper.getIssuesByProjectId(request);
-        }
 
+        }
+        issues = extIssuesMapper.getIssuesByProjectId(request);
         List<String> names = issues.stream().map(IssuesDao::getCreator).collect(Collectors.toList());
         Map<String, User> userMap = ServiceUtils.getUserMapIds(names);
         List<String> resourceIds = issues.stream().map(IssuesDao::getResourceId).collect(Collectors.toList());

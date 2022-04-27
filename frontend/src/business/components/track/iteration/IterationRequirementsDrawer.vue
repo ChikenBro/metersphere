@@ -11,7 +11,7 @@
       <el-main class="container" :style="'height: calc(100vh - 75px)'">
         <el-scrollbar>
           <el-table
-            :data="pagedTableData"
+            :data="tableData"
             row-key="id"
             border
             :tree-props="{

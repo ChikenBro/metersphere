@@ -175,8 +175,47 @@ public class TestPlanService {
         paramMap.put("creator", user.getName());
         NoticeModel noticeModel = NoticeModel.builder().context(context).relatedUsers(userIds).subject(Translator.get("test_plan_notification")).mailTemplate("TestPlanStart").paramMap(paramMap).event(NoticeConstants.Event.CREATE).build();
         noticeSendService.send(NoticeConstants.TaskType.TEST_PLAN_TASK, noticeModel);
+        //继承用例内容
+        if (null != testPlan.getTestPlanInherit()) {
+            TestPlanTestCaseExample testPlanTestCaseExample = new TestPlanTestCaseExample();
+            testPlanTestCaseExample.createCriteria().andPlanIdEqualTo(testPlan.getTestPlanInherit());
+            List<TestPlanTestCase> testPlanTestCases = testPlanTestCaseMapper.selectByExample(testPlanTestCaseExample);
+            if (!testPlanTestCases.isEmpty()) {
+                testPlanTestCases = syncTestPlanStatusByRetain(testPlanTestCases, testPlan);
+                //入库
+                int count = testPlanTestCaseMapper.insertTestPlanTestCases(testPlanTestCases);
+                System.out.println(count);
+            }
+        }
         return testPlan.getId();
     }
+
+    /**
+     * 根据是否
+     *
+     * @param testPlanTestCases 继承的测试用例内容
+     */
+    public List<TestPlanTestCase> syncTestPlanStatusByRetain(List<TestPlanTestCase> testPlanTestCases, AddTestPlanRequest testPlan) {
+        testPlanTestCases.forEach(testPlanTestCase -> {
+            testPlanTestCase.setId(UUID.randomUUID().toString());
+            testPlanTestCase.setPlanId(testPlan.getId());
+            testPlanTestCase.setReportId(null);
+            //
+            if (testPlanTestCase.getStatus().equals("Blocking") && testPlan.getIfRetain()) {
+                testPlanTestCase.setStatus("Blocking");
+            } else {
+                testPlanTestCase.setStatus("Prepare");
+            }
+            testPlanTestCase.setResults(null);
+            testPlanTestCase.setRemark(null);
+            testPlanTestCase.setCreateTime(System.currentTimeMillis());
+            testPlanTestCase.setUpdateTime(System.currentTimeMillis());
+            testPlanTestCase.setActualResult(null);
+            testPlanTestCase.setCreateUser(testPlan.getCreator());
+        });
+        return testPlanTestCases;
+    }
+
 
     public List<TestPlan> getTestPlanByName(String name) {
         TestPlanExample example = new TestPlanExample();
@@ -1128,8 +1167,8 @@ public class TestPlanService {
     public List<TestPlan> selectIterationTestPlan(RequirementRequest testPlanBody) {
         List<TestPlan> testPlans = new ArrayList<>();
         List<Iteration> iteration = iterationMapper.getIterationByIterationCode(testPlanBody.getIterationCode());
-        if(null != testPlanBody.getProjectId()){
-            iteration = iteration.stream().filter(s->s.getProjectId().equals(testPlanBody.getProjectId())).collect(Collectors.toList());
+        if (null != testPlanBody.getProjectId()) {
+            iteration = iteration.stream().filter(s -> s.getProjectId().equals(testPlanBody.getProjectId())).collect(Collectors.toList());
         }
         if (iteration.isEmpty()) {
             return testPlans;

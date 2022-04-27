@@ -15,11 +15,17 @@ public class TestPlanTestCase implements Serializable {
 
     private String status;
 
+    private String results;
+
+    private String issues;
+
     private String remark;
 
     private Long createTime;
 
     private Long updateTime;
+
+    private String actualResult;
 
     private String reportId;
 
