@@ -142,14 +142,11 @@
 
           <!-- 所属迭代 -->
           <el-col :span="8" :push="2">
-            <el-form-item
-              :label="$t('所属迭代')"
-              :label-width="formLabelWidth"
-              prop="iterationCode"
-            >
+            <el-form-item :label="$t('所属迭代')" :label-width="formLabelWidth">
               <el-select
                 v-model="form.iterationCode"
                 clearable
+                :disabled="isDisable"
                 placeholder="请选择迭代"
                 @clear="getIterationOptions('')"
                 @blur="handleBlur"
@@ -198,6 +195,7 @@
             >
               <el-select
                 v-model="form.testPlanInherit"
+                :disabled="isDisable"
                 clearable
                 placeholder="选择迭代中计划"
                 @clear="resetRetain"
@@ -221,7 +219,7 @@
               :label-width="formLabelWidth"
               prop="ifRetain"
             >
-              <el-switch v-model="form.ifRetain" />
+              <el-switch v-model="form.ifRetain" :disabled="isDisable" />
               <ms-instructions-icon
                 content='选择是否保留用例"阻塞"状态,重置其它用例状态'
               />
@@ -354,9 +352,6 @@ export default {
             trigger: "blur",
           },
         ],
-        iterationCode: [
-          { required: true, message: "请选择所属迭代", trigger: "blur" },
-        ],
         environment: [
           { required: true, message: "请选择环境", trigger: "blur" },
         ],
@@ -372,6 +367,7 @@ export default {
         { label: "线上环境", value: "pord" },
       ],
       planInheritOptions: [],
+      isDisable: false,
     };
   },
   created() {
@@ -390,6 +386,7 @@ export default {
       this.resetForm();
       this.setPrincipalOptions();
       this.operationType = "add";
+      this.isDisable = !!testPlan?.isEdit;
       if (testPlan) {
         //修改
         this.operationType = "edit";
@@ -523,6 +520,8 @@ export default {
     getPlanInheritOptions(iterationCode) {
       const url = `/test/plan/iteration/plan`;
       this.planInheritOptions = [];
+      this.form.testPlanInherit = "";
+      this.form.ifRetain = false;
       this.$post(url, { iterationCode }, (response) => {
         let tempArr = response?.data || [];
         const planInheritOptions = [];

@@ -93,7 +93,6 @@
           <el-col :span="8">
             <el-form-item
               :label="$t('test_track.issue.related_requirements')"
-              prop="fields.requirementCode"
               :label-width="formLabelWidth"
             >
               <el-select
@@ -121,7 +120,6 @@
           <el-col :span="8">
             <el-form-item
               :label="$t('test_track.issue.iteration')"
-              prop="fields.iterationCode"
               :label-width="formLabelWidth"
             >
               <el-select
@@ -571,20 +569,6 @@ export default {
           },
         ],
         "fields.defectTypeId": [
-          {
-            required: true,
-            message: this.$t("commons.please_fill_content"),
-            trigger: "blur",
-          },
-        ],
-        "fields.iterationCode": [
-          {
-            required: true,
-            message: this.$t("commons.please_fill_content"),
-            trigger: "blur",
-          },
-        ],
-        "fields.requirementCode": [
           {
             required: true,
             message: this.$t("commons.please_fill_content"),

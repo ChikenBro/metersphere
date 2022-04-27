@@ -11,6 +11,7 @@
     </template>
 
     <el-table
+      ref="table"
       v-loading="result.loading"
       border
       class="adjust-table"
@@ -128,6 +129,8 @@
         <el-table-column
           v-if="item.id == 'iterationName'"
           prop="iterationName"
+          column-key="iterationId"
+          min-width="120"
           :filters="iterationFilters"
           :label="$t('test_track.issue.iteration')"
           show-overflow-tooltip
@@ -409,6 +412,14 @@ export default {
         this.initTableData();
       }
     },
+    tableData: {
+      handler() {
+        this.$nextTick(() => {
+          this.$refs.table.doLayout();
+        });
+      },
+      immediate: true,
+    },
   },
   created() {
     this.projectId = this.$route.params.projectId;
@@ -479,7 +490,7 @@ export default {
       this.$emit("openTestPlanEditDialog");
     },
     handleEdit(testPlan) {
-      this.$emit("testPlanEdit", testPlan);
+      this.$emit("testPlanEdit", { ...testPlan, isEdit: true });
     },
     statusChange(data) {
       if (!hasPermission("PROJECT_TRACK_PLAN:READ+EDIT")) {
@@ -569,18 +580,19 @@ export default {
     // 获取迭代版本筛选下拉列表
     getIterationFilters() {
       this.$post(
-        "/field/template/issue/templates/list/1/30",
+        "/iteration/list/1/30",
         {
           projectId: getCurrentProjectID(),
-          type: 3,
-          name: "",
         },
         (response) => {
           const { data } = response;
-          if (data?.options) {
+          if (data?.listObject) {
             const iterationFilters = [];
-            data.options.forEach((item) => {
-              iterationFilters.push({ text: item.name, value: item.id });
+            data.listObject.forEach((item) => {
+              iterationFilters.push({
+                text: item.name,
+                value: item.id,
+              });
             });
             this.iterationFilters = iterationFilters;
           }
@@ -600,6 +612,14 @@ export default {
 
 .el-table {
   cursor: pointer;
+}
+
+.el-table >>> .el-table__body {
+  height: 100%;
+}
+.el-table >>> .el-table__empty-block {
+  position: absolute;
+  top: 0;
 }
 
 .schedule-btn >>> .el-button {
