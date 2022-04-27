@@ -257,7 +257,8 @@ public class TestPlanService {
     }
 
     public String editTestPlan(TestPlanDTO testPlan, Boolean isSendMessage) {
-        checkTestPlanExist(testPlan);
+        checkTestPlan(testPlan);
+
         TestPlan res = testPlanMapper.selectByPrimaryKey(testPlan.getId()); //  先查一次库
         testPlan.setUpdateTime(System.currentTimeMillis());
         if (!res.getStatus().equals(testPlan.getStatus())) {    //  若有改变才更新时间
@@ -340,12 +341,15 @@ public class TestPlanService {
     }
 
 
-    private void checkTestPlanExist(TestPlan testPlan) {
+    private void checkTestPlan(TestPlan testPlan) {
         if (testPlan.getName() != null) {
             TestPlanExample example = new TestPlanExample();
             example.createCriteria().andNameEqualTo(testPlan.getName()).andWorkspaceIdEqualTo(SessionUtils.getCurrentWorkspaceId()).andIdNotEqualTo(testPlan.getId());
             if (testPlanMapper.selectByExample(example).size() > 0) {
                 MSException.throwException(Translator.get("plan_name_already_exists"));
+            }
+            if (null != testPlan.getPlannedStartTime() && null != testPlan.getPlannedEndTime() && testPlan.getPlannedStartTime() >= testPlan.getPlannedEndTime()) {
+                MSException.throwException("计划结束时间应大于计划开始时间");
             }
         }
     }
