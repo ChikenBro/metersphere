@@ -518,6 +518,7 @@ public class TestPlanService {
      * @param testCaseList 数据库测试计划的用例
      */
     public void checkTestPlanTestCaseRepeat(PlanCaseRelevanceRequest request, List<TestCase> testCaseList) {
+        List<String> repeatTestCases = new ArrayList<>();
         try {
             List<String> testPlanIds = Stream.of(request.getPlanId()).collect(Collectors.toList());
             List<TestPlanTestCase> testPlanTestCases = testPlanTestCaseMapper.selectTestPlanTestCase(testPlanIds);
@@ -525,11 +526,14 @@ public class TestPlanService {
                 List<TestPlanTestCase> testCase = testPlanTestCases.stream().filter(s -> s.getCaseId().equals(id)).collect(Collectors.toList());
                 if (!testCase.isEmpty()) {
                     String name = testCaseList.stream().filter(s -> s.getId().equals(id)).collect(Collectors.toList()).get(0).getName();
-                    MSException.throwException(String.format("用例: %s 在当前测试计划中已存在", name));
+                    repeatTestCases.add(name);
                 }
             });
         } catch (Exception e) {
             log.error("校验测试计划下测试用例是否唯一 error,ids: {}", request.getIds());
+        }
+        if (!repeatTestCases.isEmpty()) {
+            MSException.throwException(String.format("用例: %s 在当前测试计划中已存在", repeatTestCases));
         }
     }
 
