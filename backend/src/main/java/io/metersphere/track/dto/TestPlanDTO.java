@@ -14,6 +14,7 @@ public class TestPlanDTO extends TestPlan {
     private String iterationName;
     private Integer iterationCode;
     private List<String> projectIds;
+    private String environment;
 
     /**
      * 定时任务ID

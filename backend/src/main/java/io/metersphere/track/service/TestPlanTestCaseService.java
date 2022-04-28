@@ -77,7 +77,7 @@ public class TestPlanTestCaseService {
     }
 
     public List<TestPlanCaseDTO> list(QueryTestPlanCaseRequest request) {
-        request.setOrders(ServiceUtils.getDefaultOrder(request.getOrders()));
+        request.setOrders(ServiceUtils.setDefaultOrder(request.getOrders()));
         List<TestPlanCaseDTO> list = extTestPlanTestCaseMapper.list(request);
         QueryMemberRequest queryMemberRequest = new QueryMemberRequest();
         queryMemberRequest.setProjectId(request.getProjectId());

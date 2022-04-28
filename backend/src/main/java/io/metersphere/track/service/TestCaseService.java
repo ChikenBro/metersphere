@@ -1264,8 +1264,7 @@ public class TestCaseService {
                 .map(TestCaseWithBLOBs::getId).collect(Collectors.toList());
 
         Map<String, TestCaseWithBLOBs> testCaseMap = new HashMap<>();
-        if (CollectionUtils.isNotEmpty(editIds)) {
-            TestCaseExample example = new TestCaseExample();
+        if (CollectionUtils.isNotEmpty(editIds)) {TestCaseExample example = new TestCaseExample();
             example.createCriteria().andIdIn(editIds);
             List<TestCaseWithBLOBs> testCaseWithBLOBs = testCaseMapper.selectByExampleWithBLOBs(example);
             testCaseMap = testCaseWithBLOBs.stream().collect(Collectors.toMap(TestCaseWithBLOBs::getId, t -> t));
@@ -1328,7 +1327,7 @@ public class TestCaseService {
     }
 
     public List<TestCaseWithBLOBs> listTestCaseForMinder(QueryTestCaseRequest request) {
-        request.setOrders(ServiceUtils.getDefaultOrder(request.getOrders()));
+        request.setOrders(ServiceUtils.setDefaultOrder(request.getOrders()));
         return extTestCaseMapper.listForMinder(request);
     }
 

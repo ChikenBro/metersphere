@@ -523,7 +523,8 @@
         project_id = #{projectId,jdbcType=VARCHAR},
         execution_times = #{executionTimes,jdbcType=INTEGER},
         automatic_status_update = #{automaticStatusUpdate,jdbcType=BIT},
-        tags = #{tags,jdbcType=LONGVARCHAR}
+        tags = #{tags,jdbcType=LONGVARCHAR},
+        environment = #{environment,jdbcType=LONGVARCHAR}
         where id = #{id,jdbcType=VARCHAR}
     </update>
     <update id="updateByPrimaryKey" parameterType="io.metersphere.base.domain.TestPlan">

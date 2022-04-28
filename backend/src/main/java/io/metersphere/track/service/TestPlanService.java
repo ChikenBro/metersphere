@@ -60,6 +60,7 @@ import javax.annotation.Resource;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -509,12 +510,34 @@ public class TestPlanService {
         return testPlans;
     }
 
+
+    /**
+     * 校验测试计划下测试用例是否唯一
+     *
+     * @param request      请求
+     * @param testCaseList 数据库测试计划的用例
+     */
+    public void checkTestPlanTestCaseRepeat(PlanCaseRelevanceRequest request, List<TestCase> testCaseList) {
+        try {
+            List<String> testPlanIds = Stream.of(request.getPlanId()).collect(Collectors.toList());
+            List<TestPlanTestCase> testPlanTestCases = testPlanTestCaseMapper.selectTestPlanTestCase(testPlanIds);
+            request.getIds().forEach(id -> {
+                List<TestPlanTestCase> testCase = testPlanTestCases.stream().filter(s -> s.getCaseId().equals(id)).collect(Collectors.toList());
+                if (!testCase.isEmpty()) {
+                    String name = testCaseList.stream().filter(s -> s.getId().equals(id)).collect(Collectors.toList()).get(0).getName();
+                    MSException.throwException(String.format("用例: %s 在当前测试计划中已存在", name));
+                }
+            });
+        } catch (Exception e) {
+            log.error("校验测试计划下测试用例是否唯一 error,ids: {}", request.getIds());
+        }
+    }
+
     public void testPlanRelevance(PlanCaseRelevanceRequest request) {
 
         ServiceUtils.getSelectAllIds(request, request.getRequest(), (query) -> extTestCaseMapper.selectRelateIdsByQuery(query));
 
         List<String> testCaseIds = request.getIds();
-
         if (testCaseIds.isEmpty()) {
             return;
         }
@@ -522,6 +545,7 @@ public class TestPlanService {
         TestCaseExample testCaseExample = new TestCaseExample();
         testCaseExample.createCriteria().andIdIn(testCaseIds);
         List<TestCase> testCaseList = testCaseMapper.selectByExample(testCaseExample);
+        checkTestPlanTestCaseRepeat(request, testCaseList);
         Map<String, String> userMap = testCaseList.stream().collect(Collectors.toMap(TestCase::getId, TestCase::getMaintainer));
 
         SqlSession sqlSession = sqlSessionFactory.openSession(ExecutorType.BATCH);
@@ -1207,6 +1231,7 @@ public class TestPlanService {
     public List<TestPlan> selectIterationTestPlan(RequirementRequest testPlanBody) {
         List<TestPlan> testPlans = new ArrayList<>();
         List<Iteration> iteration = iterationMapper.getIterationByIterationCode(testPlanBody.getIterationCode());
+        log.info("根据迭代id获取测试计划列表 iteration: {}", iteration);
         if (null != testPlanBody.getProjectId()) {
             iteration = iteration.stream().filter(s -> s.getProjectId().equals(testPlanBody.getProjectId())).collect(Collectors.toList());
         }
