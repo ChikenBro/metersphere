@@ -352,6 +352,9 @@ export default {
       this.$emit("saveSortField", this.fieldKey, this.condition.orders);
       this.handleRefresh();
     },
+    clearSort() {
+      this.$refs.table.clearSort();
+    },
     handleBatchEdit() {
       this.getMaintainerOptions();
       this.$refs.batchEdit.open();

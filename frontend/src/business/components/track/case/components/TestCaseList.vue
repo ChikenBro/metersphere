@@ -449,10 +449,7 @@ export default {
     } else {
       this.condition.filters = { reviewStatus: ["Prepare", "Pass", "UnPass"] };
     }
-    let orderArr = this.getSortField();
-    if (orderArr) {
-      this.condition.orders = orderArr;
-    }
+    this.condition.orders = [{ name: "num", type: "asc" }];
     this.initTableData();
     let redirectParam = this.$route.query.dataSelectRange;
     this.checkRedirectEditPage(redirectParam);
@@ -476,6 +473,10 @@ export default {
     }
     this.initTableData();
     this.condition.ids = null;
+  },
+  deactivated() {
+    this.$refs.table.clearSort();
+    this.condition.orders = [{ name: "num", type: "asc" }];
   },
   methods: {
     getTemplateField() {
