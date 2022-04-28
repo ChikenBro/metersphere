@@ -427,12 +427,13 @@ export default {
       this.projectId = getCurrentProjectID();
     }
     this.hasEditPermission = hasPermission("PROJECT_TRACK_PLAN:READ+EDIT");
-    let orderArr = this.getSortField();
-    if (orderArr) {
-      this.condition.orders = orderArr;
-    }
+    this.condition.orders = [{ name: "create_time", type: "desc" }];
     this.initTableData();
     this.getIterationFilters();
+  },
+  deactivated() {
+    this.$refs.table.clearSort();
+    this.condition.orders = [{ name: "create_time", type: "desc" }];
   },
   methods: {
     inite() {
@@ -547,7 +548,7 @@ export default {
         this.condition.orders = [];
       }
       _sort(column, this.condition);
-      this.saveSortField(this.tableHeaderKey, this.condition.orders);
+      // this.saveSortField(this.tableHeaderKey, this.condition.orders);
       this.initTableData();
     },
     openTestReportTemplate(data) {

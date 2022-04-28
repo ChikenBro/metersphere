@@ -522,17 +522,21 @@ export default {
       this.planInheritOptions = [];
       this.form.testPlanInherit = "";
       this.form.ifRetain = false;
-      this.$post(url, { iterationCode }, (response) => {
-        let tempArr = response?.data || [];
-        const planInheritOptions = [];
-        tempArr.forEach((item) => {
-          planInheritOptions.push({
-            label: item.name,
-            value: item.id,
+      this.$post(
+        url,
+        { iterationCode, projectId: getCurrentProjectID() },
+        (response) => {
+          let tempArr = response?.data || [];
+          const planInheritOptions = [];
+          tempArr.forEach((item) => {
+            planInheritOptions.push({
+              label: item.name,
+              value: item.id,
+            });
           });
-        });
-        this.planInheritOptions = planInheritOptions;
-      });
+          this.planInheritOptions = planInheritOptions;
+        }
+      );
     },
     // 重置保留缺陷状态
     resetRetain() {
