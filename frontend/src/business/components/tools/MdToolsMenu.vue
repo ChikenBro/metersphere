@@ -15,7 +15,7 @@
         <span>{{ issueTrend }}</span>
       </template>
       <el-menu-item
-        v-for="menu in trends"
+        v-for="menu in issues"
         :key="menu.index"
         v-permission="menu.permissions"
         :index="menu.index"
@@ -77,7 +77,8 @@ export default {
       return menus;
     };
     return {
-      trends: getMenus("trend"),
+      // trends: getMenus("trend"),
+      issues: getMenus("issue"),
       streams: getMenus("stream"),
       issueTrend: "报告图表",
       streamTools: "流媒体工具",

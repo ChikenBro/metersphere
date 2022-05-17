@@ -17,10 +17,23 @@ import MsSettingMenu from "./MdToolsMenu";
 import MsAsideContainer from "../common/components/MsAsideContainer";
 import MsContainer from "../common/components/MsContainer";
 import MsMainContainer from "../common/components/MsMainContainer";
-
+import { getCurrentOrganizationId, getCurrentUserId } from "@/common/js/utils";
 export default {
   name: "MdTools",
   components: { MsMainContainer, MsContainer, MsAsideContainer, MsSettingMenu },
+  created() {
+    this.getToken();
+  },
+  methods: {
+    getToken() {
+      this.$get("/user/info/" + getCurrentUserId(), (response) => {
+        const platformInfo = JSON.parse(response.data.platformInfo);
+        const token =
+          platformInfo[getCurrentOrganizationId()]?.codingToken || "";
+        sessionStorage.setItem("codingToken", token);
+      });
+    },
+  },
 };
 </script>
 
