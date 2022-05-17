@@ -1,21 +1,18 @@
 <template>
   <div>
-    {{name}}
+    {{ name }}
   </div>
 </template>
 
 <script>
-    export default {
-        name: "StreamTools.vue",
-        data() {
-            return{
-                name: "hello"
-            }
-
-        }
-    }
+export default {
+  name: "StreamTools",
+  data() {
+    return {
+      name: "hello",
+    };
+  },
+};
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>
