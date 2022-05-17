@@ -1,8 +1,8 @@
 <template>
   <div class="issue-form-header">
     <el-row>
-      <el-col :span="2" class="title">{{ title }}</el-col>
-      <el-col :span="22">
+      <el-col :span="3" class="title">{{ title }}</el-col>
+      <el-col :span="21">
         <el-form
           ref="form"
           :inline="true"
