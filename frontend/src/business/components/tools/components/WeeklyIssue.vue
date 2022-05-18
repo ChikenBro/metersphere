@@ -12,7 +12,7 @@
         row-key="id"
         border
         class="adjust-table"
-        :data="tableData"
+        :data="pagedTableData"
         height="500px"
       >
         <el-table-column
@@ -46,16 +46,23 @@
           show-overflow-tooltip
         />
       </el-table>
+      <ms-table-pagination
+        :change="() => {}"
+        :current-page.sync="page.currentPage"
+        :page-size.sync="page.pageSize"
+        :total="page.total"
+      />
     </el-card>
   </div>
 </template>
 
 <script>
-import MsChart from "@/business/components/common/chart/MsChart";
 import IssueFormHeader from "../common/IssueFormHeader";
+import MsTablePagination from "@/business/components/common/pagination/TablePagination.vue";
+
 export default {
   name: "WeeklyIssue",
-  components: { MsChart, IssueFormHeader },
+  components: { IssueFormHeader, MsTablePagination },
   data() {
     return {
       tableData: [],
@@ -67,11 +74,29 @@ export default {
       title: "本周Bug统计",
       headerComps: [],
       isLoading: true,
+      page: {
+        currentPage: 1,
+        pageSize: 10,
+        total: 0,
+      },
+      pagedTableData: [],
     };
   },
   computed: {
     token() {
       return sessionStorage.getItem("codingToken");
+    },
+  },
+  watch: {
+    page: {
+      handler(newPage) {
+        const { currentPage, pageSize } = newPage;
+        const startIndex = (currentPage - 1) * pageSize;
+        const endIndex = currentPage * pageSize;
+        this.pagedTableData = this.tableData.slice(startIndex, endIndex);
+      },
+      deep: true,
+      immediate: true,
     },
   },
   created() {
@@ -109,6 +134,11 @@ export default {
               ...item.data,
             };
           });
+          this.page = {
+            currentPage: 1,
+            pageSize: 10,
+            total: this.tableData.length,
+          };
         } else {
           this.$message.warning(data);
         }
@@ -137,7 +167,7 @@ export default {
       const { form, token } = this;
       url += `?token=${token}`;
       if (form.projectName) {
-        url += `&projectName={form.projectName}`;
+        url += `&projectName=${form.projectName}`;
       }
       if (form.dateRange.length > 0) {
         url += `&startDate=${form.dateRange[0]}&endDate=${form.dateRange[1]}`;
@@ -152,5 +182,8 @@ export default {
 .issues-wrapper {
   width: 100%;
   padding-top: 10px;
+}
+.adjust-table >>> .el-table__row {
+  height: 46px;
 }
 </style>

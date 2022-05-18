@@ -39,13 +39,17 @@
               style="width: 200px"
             >
             </el-date-picker>
-            <el-input-number
+            <el-input
               v-if="attr.type === 'inputNumber'"
               v-model="form[attr.prop]"
-            />
+              style="width: 120px"
+              @keyup.native="fixToNumber"
+            >
+              <i slot="suffix">&emsp;天</i>
+            </el-input>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="onSearch" size="mini">
+            <el-button type="primary" size="mini" @click="onSearch">
               查询
             </el-button>
           </el-form-item>
@@ -82,6 +86,10 @@ export default {
   methods: {
     onSearch() {
       this.$emit("onSearch");
+    },
+    fixToNumber({ target }) {
+      target.value = target.value.replace(/[^\d]/g, "");
+      this.$nextTick(() => (this.form.duation = target.value));
     },
   },
 };

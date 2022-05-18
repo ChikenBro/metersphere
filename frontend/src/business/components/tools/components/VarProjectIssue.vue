@@ -1,6 +1,6 @@
 <template>
   <div class="issue-wrapper">
-    <el-card>
+    <el-card v-loading="isLoading">
       <issue-form-header
         :title="title"
         :attrs="headerComps"
@@ -14,19 +14,19 @@
               style="width: 100%"
               :options="option"
               :autoresize="false"
-            /> </el-col
-        ></el-row>
+            />
+          </el-col>
+        </el-row>
         <div v-else class="empty">
           <el-empty description="暂无数据" :image-size="200" />
         </div>
       </el-card>
       <el-card>
         <el-table
-          v-loading="isLoading"
           row-key="id"
           border
           class="adjust-table"
-          :data="tableData"
+          :data="pagedTableData"
           height="500px"
         >
           <el-table-column
@@ -48,8 +48,18 @@
             prop="unresolvedIssuePercent"
             label="未解决问题率"
             show-overflow-tooltip
-          />
+          >
+            <template v-slot:default="scope">
+              {{ scope.row.unresolvedIssuePercent + "%" }}
+            </template>
+          </el-table-column>
         </el-table>
+        <ms-table-pagination
+          :change="() => {}"
+          :current-page.sync="page.currentPage"
+          :page-size.sync="page.pageSize"
+          :total="page.total"
+        />
       </el-card>
     </el-card>
   </div>
@@ -58,6 +68,8 @@
 <script>
 import MsChart from "@/business/components/common/chart/MsChart";
 import IssueFormHeader from "../common/IssueFormHeader";
+import MsTablePagination from "@/business/components/common/pagination/TablePagination.vue";
+
 const templateOption = {
   color: ["#41F73C", "#D43030"],
   title: {
@@ -67,7 +79,7 @@ const templateOption = {
   },
   tooltip: {
     trigger: "item",
-    formatter: "{b} {d}%",
+    formatter: "{b}({c}) {d}%",
   },
   // legend: {
   //   orient: "vertical",
@@ -77,22 +89,12 @@ const templateOption = {
 
   series: [
     {
-      labelLine: false,
       name: "各项目Bug统计",
       type: "pie",
       radius: "45%",
       center: ["50%", "55%"],
-      data: [
-        {
-          name: "已解决问题",
-          value: 52,
-        },
-        {
-          name: "未解决问题",
-          value: 48,
-        },
-      ],
-      stillShowZeroSum: false,
+      data: [],
+      // stillShowZeroSum: false,
       itemStyle: {
         emphasis: {
           shadowBlur: 10,
@@ -105,7 +107,7 @@ const templateOption = {
 };
 export default {
   name: "VarProjectIssue",
-  components: { MsChart, IssueFormHeader },
+  components: { MsChart, IssueFormHeader, MsTablePagination },
   data() {
     return {
       tableData: [],
@@ -116,6 +118,13 @@ export default {
       projectList: [],
       headerComps: [],
       pieOptions: [],
+      isLoading: true,
+      page: {
+        currentPage: 1,
+        pageSize: 10,
+        total: 0,
+      },
+      pagedTableData: [],
     };
   },
   computed: {
@@ -123,8 +132,23 @@ export default {
       return sessionStorage.getItem("codingToken");
     },
   },
+  watch: {
+    page: {
+      handler(newPage) {
+        const { currentPage, pageSize } = newPage;
+        const startIndex = (currentPage - 1) * pageSize;
+        const endIndex = currentPage * pageSize;
+        this.pagedTableData = this.tableData.slice(startIndex, endIndex);
+
+        this.setPieOption();
+      },
+      deep: true,
+      immediate: true,
+    },
+  },
   created() {
     this.getProjectList();
+    this.getIssueList();
   },
   methods: {
     getProjectList() {
@@ -167,7 +191,12 @@ export default {
               ...item.data,
             };
           });
-          this.setPieOption();
+          this.page = {
+            currentPage: 1,
+            pageSize: 10,
+            total: this.tableData.length,
+          };
+          this.$nextTick(() => this.setPieOption());
         } else {
           this.$message.warning(data);
         }
@@ -179,20 +208,20 @@ export default {
       const { form, token } = this;
       url += `?token=${token}`;
       if (form.projectName) {
-        url += `&projectName={form.projectName}`;
+        url += `&projectName=${form.projectName}`;
       }
       return url;
     },
     setPieOption() {
       const pieOptions = [];
-      this.tableData.forEach((item) => {
+      this.pagedTableData.forEach((item) => {
         let option = JSON.parse(JSON.stringify(templateOption));
-        option.title = item.projectName;
-        option.series.data.push({
+        option.title.text = item.projectName;
+        option.series[0].data.push({
           name: "已解决问题",
           value: item.allIssue - item.allUnresolvedIssue,
         });
-        option.series.data.push({
+        option.series[0].data.push({
           name: "未解决问题",
           value: item.allUnresolvedIssue,
         });
@@ -218,5 +247,8 @@ export default {
 .empty >>> .el-empty__description {
   text-align: center;
   color: rgba(0, 0, 0, 0.5);
+}
+.adjust-table >>> .el-table__row {
+  height: 46px;
 }
 </style>

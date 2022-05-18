@@ -1,5 +1,5 @@
 <template>
-  <el-card>
+  <el-card v-loading="isLoading">
     <issue-form-header
       :title="title"
       :attrs="headerComps"
@@ -7,22 +7,38 @@
       @onSearch="getIssueList"
     />
     <el-table
-      v-loading="isLoading"
       row-key="id"
       border
       class="adjust-table"
-      :data="tableData"
+      :data="pagedTableData"
       height="500px"
     >
-      <el-table-column prop="name" label="名称" show-overflow-tooltip />
-      <el-table-column prop="issueStatus" label="状态" show-overflow-tooltip />
-      <el-table-column prop="dueDate" label="截止时间" show-overflow-tooltip />
       <el-table-column
+        prop="name"
+        label="名称"
+        show-overflow-tooltip
+        width="400"
+      />
+      <el-table-column
+        prop="issueStatus"
+        label="状态"
+        show-overflow-tooltip
+        width="120"
+      />
+      <el-table-column
+        v-if="bugInfo.type !== 'test'"
+        prop="dueDate"
+        label="截止时间"
+        show-overflow-tooltip
+      />
+      <el-table-column
+        v-if="bugInfo.type !== 'test'"
         prop="startDate"
         label="开始修复时间"
         show-overflow-tooltip
       />
       <el-table-column
+        v-if="bugInfo.type !== 'unplan'"
         prop="updatedAt"
         label="完成修复时间"
         show-overflow-tooltip
@@ -44,11 +60,18 @@
         show-overflow-tooltip
       />
     </el-table>
+    <ms-table-pagination
+      :change="() => {}"
+      :current-page.sync="page.currentPage"
+      :page-size.sync="page.pageSize"
+      :total="page.total"
+    />
   </el-card>
 </template>
 
 <script>
 import IssueFormHeader from "../common/IssueFormHeader";
+import MsTablePagination from "@/business/components/common/pagination/TablePagination.vue";
 
 const titleEnum = {
   dev: "开发处理超时Bug",
@@ -57,7 +80,7 @@ const titleEnum = {
 };
 export default {
   name: "AbnormalIssueTable",
-  components: { IssueFormHeader },
+  components: { IssueFormHeader, MsTablePagination },
   props: {
     bugInfo: {
       type: Object,
@@ -76,14 +99,32 @@ export default {
       tableData: [],
       form: {
         projectName: "",
-        duation: "",
+        duation: "7",
       },
       isLoading: true,
+      page: {
+        currentPage: 1,
+        pageSize: 10,
+        total: 0,
+      },
+      pagedTableData: [],
     };
   },
   computed: {
     token() {
       return sessionStorage.getItem("codingToken");
+    },
+  },
+  watch: {
+    page: {
+      handler(newPage) {
+        const { currentPage, pageSize } = newPage;
+        const startIndex = (currentPage - 1) * pageSize;
+        const endIndex = currentPage * pageSize;
+        this.pagedTableData = this.tableData.slice(startIndex, endIndex);
+      },
+      deep: true,
+      immediate: true,
     },
   },
   created() {
@@ -115,13 +156,25 @@ export default {
       this.$get(url, (response) => {
         let data = response.data;
         if (Array.isArray(data)) {
-          this.tableData = data.map((item) => {
-            return {
-              projectName: item.projectName,
-              ...item.data,
-            };
+          const tableData = [];
+          data.forEach((item) => {
+            if (Array.isArray(item?.data)) {
+              tableData.push(
+                ...item.data.map((obj) => ({
+                  ...obj,
+                  projectName: item.projectName,
+                }))
+              );
+            }
           });
+          this.tableData = [...tableData];
+          this.page = {
+            currentPage: 1,
+            pageSize: 10,
+            total: tableData.length,
+          };
         } else {
+          this.$message.closeAll();
           this.$message.warning(data);
         }
         this.isLoading = false;
@@ -139,7 +192,7 @@ export default {
         headerComps.push({
           type: "inputNumber",
           label: "超时时长:",
-          prop: "duration",
+          prop: "duation",
         });
       }
       this.headerComps = headerComps;
@@ -149,10 +202,10 @@ export default {
       const { form, token } = this;
       url += `?token=${token}`;
       if (form.projectName) {
-        url += `&projectName={form.projectName}`;
+        url += `&projectName=${form.projectName}`;
       }
-      if (form.duration !== "" && this.bugInfo.type !== "unplan") {
-        url += `&duration=${form.duration}`;
+      if (form.duation !== "" && this.bugInfo.type !== "unplan") {
+        url += `&duation=${form.duation}`;
       }
       return url;
     },
@@ -160,4 +213,8 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.adjust-table >>> .el-table__row {
+  height: 46px;
+}
+</style>
