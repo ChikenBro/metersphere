@@ -33,10 +33,12 @@
               v-model="form[attr.prop]"
               type="daterange"
               range-separator=" - "
+              unlink-panels
               start-placeholder="开始日期"
               end-placeholder="结束日期"
               value-format="yyyy-MM-dd"
-              style="width: 200px"
+              style="width: 220px"
+              :picker-options="pickerOptions"
             >
             </el-date-picker>
             <el-input
@@ -60,6 +62,7 @@
 </template>
 
 <script>
+import { pickerOptions } from "./constant";
 export default {
   name: "IssueFormHeader",
   props: {
@@ -83,6 +86,7 @@ export default {
   data() {
     return {
       projectOptions: [],
+      pickerOptions,
     };
   },
   computed: {
