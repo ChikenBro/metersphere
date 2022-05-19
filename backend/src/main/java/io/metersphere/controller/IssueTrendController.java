@@ -41,26 +41,28 @@ public class IssueTrendController {
     }
     @GetMapping("/issue/total/projectquality/resolved/list")
     public ResultHolder issueTrendTotal(@RequestParam HashMap<String, String> hashMap)  {
+        List<Map<String,Object>>  result = new ArrayList<>();
         try {
+
 //            System.out.println(hashMap.get("token"));
             JSONObject resultToken = issueTrendStatisticsService.checkToken(hashMap.get("token"));
             System.out.println(resultToken);
             if(resultToken.get("team") == null ){
                 return ResultHolder.selfInface(1,"fail","请检查环境或者个人令牌权限",0);
             }
-            List<Map<String,Object>> result = issueTrendStatisticsService.getIssueTrendTotal(hashMap);
+            result = issueTrendStatisticsService.getIssueTrendTotal(hashMap);
 //        if (result.size()==0){
 //            return ResultHolder.selfInface(1,"fail","请检查环境或者个人令牌权限",0);
 //        }
             return ResultHolder.selfInface(0,"success",result,result.size());
         }          catch (Exception e) {
-            return ResultHolder.selfInface(1,"fail","请检查请求消息体",0);
+            return ResultHolder.selfInface(1,"fail",result,0);
         }
     }
     //    @RequestMapping(value = "/queryStmp", method = RequestMethod.GET)
     @GetMapping("/issue/total/getAllProject")
     public ResultHolder getAllProject(@RequestParam HashMap<String, String> hashMap) throws HttpProcessException {
-
+        ArrayList<Object>  testMap = new ArrayList<>();
         try {
             String token = "";
             if (hashMap.get("token") == null){
@@ -79,7 +81,7 @@ public class IssueTrendController {
             if(resultToken.get("team") == null ){
                 return ResultHolder.selfInface(1,"fail","请检查环境或者个人令牌权限",0);
             }
-            ArrayList<Object>  testMap = new ArrayList<>();
+
 
 
             JSONObject json_test =  issueTrendStatisticsService.codingGetProjectAll(token);
@@ -101,13 +103,14 @@ public class IssueTrendController {
 
             return ResultHolder.selfInface(0,"success",testMap,testMap.size());
         } catch (Exception e) {
-            return ResultHolder.selfInface(1,"fail","请检查请求消息体",0);
+            return ResultHolder.selfInface(1,"fail",testMap,0);
         }
     }
     @GetMapping("/issue/total/projectquality/unresolved/list")
     public ResultHolder fromProjectUnresolved(@RequestParam HashMap<String, String> hashMap) throws HttpProcessException {
+        ArrayList<Object>  testMap = new ArrayList<>();
         try {
-            ArrayList<Object>  testMap = new ArrayList<>();
+
 
             JSONObject resultToken = issueTrendStatisticsService.checkToken(hashMap.get("token"));
             if(resultToken.get("team") == null ){
@@ -130,15 +133,17 @@ public class IssueTrendController {
                     }
                     newMap.put("data",result);
                     newMap.put("projectName",e1.get("Name").toString());
+                    newMap.put("displayName",  e1.get("DisplayName"));
                     testMap.add(newMap);
 
                 }
             }
             else {
                 HashMap<String, Object> newMap = new HashMap<>();
-                Map<String,Object> result = issueTrendStatisticsService.fromProjectUnresolved(hashMap.get("token"),hashMap.get("projectName"));
+                Map<String,Object> result = issueTrendStatisticsService.fromProjectUnresolved(hashMap.get("token"),hashMap.get("projectName").split(";")[0]);
                 newMap.put("data",result);
-                newMap.put("projectName",hashMap.get("projectName").toString());
+                newMap.put("projectName",hashMap.get("projectName").toString().split(";")[0]);
+                newMap.put("displayName",hashMap.get("projectName").toString().split(";")[1]);
                 testMap.add(newMap);
             }
 //        if (result.size()==0){
@@ -146,13 +151,14 @@ public class IssueTrendController {
 //        }
             return ResultHolder.selfInface(0,"success",testMap,testMap.size());
         } catch (Exception e) {
-            return ResultHolder.selfInface(1,"fail","请检查请求消息体",0);
+            return ResultHolder.selfInface(1,"fail",testMap,0);
         }
     }
     @GetMapping("/issue/total/projectquality/duedate/null/list")
     public ResultHolder fromProjectBugCheckNull(@RequestParam HashMap<String, String> hashMap) throws HttpProcessException {
+        ArrayList<Object>  testMap = new ArrayList<>();
         try {
-            ArrayList<Object>  testMap = new ArrayList<>();
+
             JSONObject resultToken = issueTrendStatisticsService.checkToken(hashMap.get("token"));
             if(resultToken.get("team") == null ){
                 return ResultHolder.selfInface(1,"fail","请检查环境或者个人令牌权限",0);
@@ -174,14 +180,16 @@ public class IssueTrendController {
                     newMap.put("count",result.size());
                     newMap.put("data",result);
                     newMap.put("projectName",e1.get("Name").toString());
+                    newMap.put("displayName",  e1.get("DisplayName").toString());
                     testMap.add(newMap);
                 }
             }else{
                 HashMap<String, Object> newMap = new HashMap<>();
-                ArrayList<Object> result = issueTrendStatisticsService.fromProjectBugCheckNull(hashMap.get("token"),hashMap.get("projectName"));
+                ArrayList<Object> result = issueTrendStatisticsService.fromProjectBugCheckNull(hashMap.get("token"),hashMap.get("projectName").split(";")[0]);
                 newMap.put("count",result.size());
                 newMap.put("data",result);
-                newMap.put("projectName",hashMap.get("projectName"));
+                newMap.put("projectName",hashMap.get("projectName").toString().split(";")[0]);
+                newMap.put("displayName",hashMap.get("projectName").toString().split(";")[1]);
                 testMap.add(newMap);
             }
 
@@ -190,13 +198,14 @@ public class IssueTrendController {
 //        }
             return ResultHolder.selfInface(0,"success",testMap,testMap.size());
         } catch (Exception e) {
-            return ResultHolder.selfInface(1,"fail","请检查请求消息体",0);
+            return ResultHolder.selfInface(1,"fail",testMap,0);
         }
     }
     @GetMapping("/issue/total/projectquality/lastday/list")
     public ResultHolder fromProjectBugCheck(@RequestParam HashMap<String, String> hashMap)  {
+        ArrayList<Object>  testMap = new ArrayList<>();
         try {
-            ArrayList<Object>  testMap = new ArrayList<>();
+
             JSONObject resultToken = issueTrendStatisticsService.checkToken(hashMap.get("token"));
             if(resultToken.get("team") == null ){
                 return ResultHolder.selfInface(1,"fail","请检查环境或者个人令牌权限",0);
@@ -216,14 +225,16 @@ public class IssueTrendController {
                     newMap.put("count",result.size());
                     newMap.put("data",result);
                     newMap.put("projectName",(String) e1.get("Name"));
+                    newMap.put("displayName",  e1.get("DisplayName"));
                     testMap.add(newMap);
                 }
             }else{
                 HashMap<String, Object> newMap = new HashMap<>();
-                ArrayList<Object> result = issueTrendStatisticsService.fromProjectBugCheck(hashMap.get("token"),hashMap.get("projectName"),hashMap.get("duation"));
+                ArrayList<Object> result = issueTrendStatisticsService.fromProjectBugCheck(hashMap.get("token"),hashMap.get("projectName").split(";")[0],hashMap.get("duation"));
                 newMap.put("count",result.size());
                 newMap.put("data",result);
-                newMap.put("projectName",hashMap.get("projectName"));
+                newMap.put("projectName",hashMap.get("projectName").toString().split(";")[0]);
+                newMap.put("displayName",hashMap.get("projectName").toString().split(";")[1]);
                 testMap.add(newMap);
             }
 
@@ -232,13 +243,14 @@ public class IssueTrendController {
 //        }
             return ResultHolder.selfInface(0,"success",testMap,testMap.size());
         } catch (Exception e) {
-            return ResultHolder.selfInface(1,"fail","请检查请求消息体",0);
+            return ResultHolder.selfInface(1,"fail",testMap,0);
         }
     }
     @GetMapping("/issue/total/projectquality/duedate/overtime/list")
     public ResultHolder fromProjectBugCheckOvertime(@RequestParam HashMap<String, String> hashMap)  {
+        ArrayList<Object>  testMap = new ArrayList<>();
         try {
-            ArrayList<Object>  testMap = new ArrayList<>();
+
             JSONObject resultToken = issueTrendStatisticsService.checkToken(hashMap.get("token"));
             if(resultToken.get("team") == null ){
                 return ResultHolder.selfInface(1,"fail","请检查环境或者个人令牌权限",0);
@@ -258,15 +270,17 @@ public class IssueTrendController {
                     newMap.put("count",result.size());
                     newMap.put("data",result);
                     newMap.put("projectName",(String) e1.get("Name"));
+                    newMap.put("displayName",  e1.get("DisplayName"));
                     testMap.add(newMap);
                 }
             }else{
                 HashMap<String, Object> newMap = new HashMap<>();
-                ArrayList<Object> result = issueTrendStatisticsService.fromProjectBugCheckOvertime(hashMap.get("token"),hashMap.get("projectName"),hashMap.get("duation"));
+                ArrayList<Object> result = issueTrendStatisticsService.fromProjectBugCheckOvertime(hashMap.get("token"),hashMap.get("projectName").split(";")[0],hashMap.get("duation"));
 
                 newMap.put("count",result.size());
                 newMap.put("data",result);
-                newMap.put("projectName",hashMap.get("projectName"));
+                newMap.put("projectName",hashMap.get("projectName").toString().split(";")[0]);
+                newMap.put("displayName",hashMap.get("projectName").toString().split(";")[1]);
                 testMap.add(newMap);
             }
 
@@ -275,7 +289,7 @@ public class IssueTrendController {
 //        }
             return ResultHolder.selfInface(0,"success",testMap,testMap.size());
         } catch (Exception e) {
-            return ResultHolder.selfInface(1,"fail","请检查请求消息体",0);
+            return ResultHolder.selfInface(1,"fail",testMap,0);
         }
     }
 }

@@ -728,6 +728,7 @@ public class IssueTrendStatisticsService{
             testMap2.put("weekResolvedIssue",a5.toString());
             testMap.put("data",testMap2);
             testMap.put("projectName",e1.get("Name"));
+            testMap.put("displayName",e1.get("DisplayName"));
             returnmsg=new AsyncResult(testMap);
             return returnmsg;
 //            testMap.put("error","token异常");
@@ -792,6 +793,7 @@ public class IssueTrendStatisticsService{
 //            testMap.put(e1.get("Name").toString(),testMap2);
             testMap.put("data",testMap2);
             testMap.put("projectName",e1.get("Name"));
+            testMap.put("displayName",e1.get("DisplayName"));
 //            modulName.add(testMap);
         }
         returnmsg=new AsyncResult(testMap);
@@ -873,7 +875,8 @@ public class IssueTrendStatisticsService{
         if ((hashMap.get("projectName") != null) ){
 
 
-            JSONObject respResult_AddBug = this.codingGetProjectIssueList(hashMap.get("projectName") ,hashMap.get("token") );
+            JSONObject respResult_AddBug = this.codingGetProjectIssueList(hashMap.get("projectName").split(";")[0] ,hashMap.get("token") );
+            System.out.println(respResult_AddBug);
             if (respResult_AddBug == null){
                 modulName.add(testMap);
                 return modulName;
@@ -942,7 +945,8 @@ public class IssueTrendStatisticsService{
 //                RepairBug = a3;
             testMap2.put("weekResolvedIssue",a5.toString());
             testMap.put("data",testMap2);
-            testMap.put("projectName",hashMap.get("projectName"));
+            testMap.put("projectName",hashMap.get("projectName").split(";")[0]);
+            testMap.put("displayName",hashMap.get("projectName").split(";")[1]);
             modulName.add(testMap);
             return modulName;
 
