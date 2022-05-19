@@ -26,8 +26,8 @@
           row-key="id"
           border
           class="adjust-table"
-          :data="pagedTableData"
-          height="500px"
+          :data="tableData"
+          :default-sort="{ prop: 'allIssue', order: 'descending' }"
         >
           <el-table-column
             prop="displayName"
@@ -38,28 +38,25 @@
             prop="allIssue"
             label="所有问题"
             show-overflow-tooltip
+            sortable
           />
           <el-table-column
             prop="allUnresolvedIssue"
             label="未解决问题"
             show-overflow-tooltip
+            sortable
           />
           <el-table-column
             prop="unresolvedIssuePercent"
             label="未解决问题率"
             show-overflow-tooltip
+            sortable
           >
             <template v-slot:default="scope">
               {{ scope.row.unresolvedIssuePercent + "%" }}
             </template>
           </el-table-column>
         </el-table>
-        <ms-table-pagination
-          :change="() => {}"
-          :current-page.sync="page.currentPage"
-          :page-size.sync="page.pageSize"
-          :total="page.total"
-        />
       </el-card>
     </el-card>
   </div>
@@ -68,7 +65,6 @@
 <script>
 import MsChart from "@/business/components/common/chart/MsChart";
 import IssueFormHeader from "../common/IssueFormHeader";
-import MsTablePagination from "@/business/components/common/pagination/TablePagination.vue";
 
 const templateOption = {
   color: ["#41F73C", "#D43030"],
@@ -107,7 +103,7 @@ const templateOption = {
 };
 export default {
   name: "VarProjectIssue",
-  components: { MsChart, IssueFormHeader, MsTablePagination },
+  components: { MsChart, IssueFormHeader },
   data() {
     return {
       tableData: [],
@@ -118,31 +114,11 @@ export default {
       headerComps: [],
       pieOptions: [],
       isLoading: true,
-      page: {
-        currentPage: 1,
-        pageSize: 10,
-        total: 0,
-      },
-      pagedTableData: [],
     };
   },
   computed: {
     token() {
       return sessionStorage.getItem("codingToken");
-    },
-  },
-  watch: {
-    page: {
-      handler(newPage) {
-        const { currentPage, pageSize } = newPage;
-        const startIndex = (currentPage - 1) * pageSize;
-        const endIndex = currentPage * pageSize;
-        this.pagedTableData = this.tableData.slice(startIndex, endIndex);
-
-        this.setPieOption();
-      },
-      deep: true,
-      immediate: true,
     },
   },
   created() {
@@ -165,20 +141,13 @@ export default {
       this.$get(url, (response) => {
         let data = response.data;
         if (Array.isArray(data)) {
-          this.tableData = data
-            .map((item) => {
-              return {
-                projectName: item.projectName,
-                displayName: item.displayName,
-                ...item.data,
-              };
-            })
-            .sort((a, b) => b.allIssue - a.allIssue);
-          this.page = {
-            currentPage: 1,
-            pageSize: 10,
-            total: this.tableData.length,
-          };
+          this.tableData = data.map((item) => {
+            return {
+              projectName: item.projectName,
+              displayName: item.displayName,
+              ...item.data,
+            };
+          });
           this.$nextTick(() => this.setPieOption());
         } else {
           this.$message.warning(data);
@@ -197,7 +166,7 @@ export default {
     },
     setPieOption() {
       const pieOptions = [];
-      this.pagedTableData.forEach((item) => {
+      this.tableData.forEach((item) => {
         let option = JSON.parse(JSON.stringify(templateOption));
         option.title.text = item.displayName;
         option.series[0].data.push({
@@ -233,8 +202,5 @@ export default {
 }
 .adjust-table >>> .el-table__row {
   height: 46.2px;
-}
-.adjust-table >>> .el-table__body-wrapper {
-  height: calc(100% - 36px) !important;
 }
 </style>

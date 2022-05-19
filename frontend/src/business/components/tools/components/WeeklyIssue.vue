@@ -11,8 +11,8 @@
         row-key="id"
         border
         class="adjust-table"
-        :data="pagedTableData"
-        height="500px"
+        :data="tableData"
+        :default-sort="{ prop: 'weekResolvedIssue', order: 'descending' }"
       >
         <el-table-column
           prop="displayName"
@@ -23,45 +23,43 @@
           prop="weekResolvedIssue"
           label="本周解决的问题"
           show-overflow-tooltip
+          sortable
         />
         <el-table-column
           prop="weekResolvedHistoryIssue"
           label="本周解决的历史问题"
           show-overflow-tooltip
+          sortable
         />
         <el-table-column
           prop="allUnresolvedIssue"
           label="所有解决的问题"
           show-overflow-tooltip
+          sortable
         />
         <el-table-column
           prop="newCreateIssue"
           label="本周新增的问题"
           show-overflow-tooltip
+          sortable
         />
         <el-table-column
           prop="weekResolvedWeekIssue"
           label="本周解决本周的问题"
           show-overflow-tooltip
+          sortable
         />
       </el-table>
-      <ms-table-pagination
-        :change="() => {}"
-        :current-page.sync="page.currentPage"
-        :page-size.sync="page.pageSize"
-        :total="page.total"
-      />
     </el-card>
   </div>
 </template>
 
 <script>
 import IssueFormHeader from "../common/IssueFormHeader";
-import MsTablePagination from "@/business/components/common/pagination/TablePagination.vue";
 
 export default {
   name: "WeeklyIssue",
-  components: { IssueFormHeader, MsTablePagination },
+  components: { IssueFormHeader },
   data() {
     return {
       tableData: [],
@@ -72,29 +70,11 @@ export default {
       title: "本周Bug统计",
       headerComps: [],
       isLoading: true,
-      page: {
-        currentPage: 1,
-        pageSize: 10,
-        total: 0,
-      },
-      pagedTableData: [],
     };
   },
   computed: {
     token() {
       return sessionStorage.getItem("codingToken");
-    },
-  },
-  watch: {
-    page: {
-      handler(newPage) {
-        const { currentPage, pageSize } = newPage;
-        const startIndex = (currentPage - 1) * pageSize;
-        const endIndex = currentPage * pageSize;
-        this.pagedTableData = this.tableData.slice(startIndex, endIndex);
-      },
-      deep: true,
-      immediate: true,
     },
   },
   created() {
@@ -108,20 +88,13 @@ export default {
       this.$get(url, (response) => {
         let data = response.data;
         if (Array.isArray(data)) {
-          this.tableData = data
-            .map((item) => {
-              return {
-                projectName: item.projectName,
-                displayName: item.displayName,
-                ...item.data,
-              };
-            })
-            .sort((a, b) => b.weekResolvedIssue - a.weekResolvedIssue);
-          this.page = {
-            currentPage: 1,
-            pageSize: 10,
-            total: this.tableData.length,
-          };
+          this.tableData = data.map((item) => {
+            return {
+              projectName: item.projectName,
+              displayName: item.displayName,
+              ...item.data,
+            };
+          });
         } else {
           this.$message.warning(data);
         }
@@ -167,8 +140,5 @@ export default {
 }
 .adjust-table >>> .el-table__row {
   height: 46.2px;
-}
-.adjust-table >>> .el-table__body-wrapper {
-  height: calc(100% - 36px) !important;
 }
 </style>
