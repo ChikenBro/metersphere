@@ -108,13 +108,15 @@ export default {
       this.$get(url, (response) => {
         let data = response.data;
         if (Array.isArray(data)) {
-          this.tableData = data.map((item) => {
-            return {
-              projectName: item.projectName,
-              displayName: item.displayName,
-              ...item.data,
-            };
-          });
+          this.tableData = data
+            .map((item) => {
+              return {
+                projectName: item.projectName,
+                displayName: item.displayName,
+                ...item.data,
+              };
+            })
+            .sort((a, b) => b.weekResolvedIssue - a.weekResolvedIssue);
           this.page = {
             currentPage: 1,
             pageSize: 10,

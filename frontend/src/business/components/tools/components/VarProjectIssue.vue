@@ -165,13 +165,15 @@ export default {
       this.$get(url, (response) => {
         let data = response.data;
         if (Array.isArray(data)) {
-          this.tableData = data.map((item) => {
-            return {
-              projectName: item.projectName,
-              displayName: item.displayName,
-              ...item.data,
-            };
-          });
+          this.tableData = data
+            .map((item) => {
+              return {
+                projectName: item.projectName,
+                displayName: item.displayName,
+                ...item.data,
+              };
+            })
+            .sort((a, b) => b.allIssue - a.allIssue);
           this.page = {
             currentPage: 1,
             pageSize: 10,
@@ -197,7 +199,7 @@ export default {
       const pieOptions = [];
       this.pagedTableData.forEach((item) => {
         let option = JSON.parse(JSON.stringify(templateOption));
-        option.title.text = item.projectName;
+        option.title.text = item.displayName;
         option.series[0].data.push({
           name: "已解决问题",
           value: item.allIssue - item.allUnresolvedIssue,
