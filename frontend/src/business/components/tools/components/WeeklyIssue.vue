@@ -13,6 +13,7 @@
         class="adjust-table"
         :data="tableData"
         :default-sort="{ prop: 'weekResolvedIssue', order: 'descending' }"
+        height="calc(100vh - 150px)"
       >
         <el-table-column
           prop="displayName"
@@ -140,5 +141,8 @@ export default {
 }
 .adjust-table >>> .el-table__row {
   height: 46.2px;
+}
+.adjust-table >>> .el-table__body-wrapper {
+  height: calc(100% - 47px) !important;
 }
 </style>
