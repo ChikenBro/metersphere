@@ -55,7 +55,7 @@
         show-overflow-tooltip
       />
       <el-table-column
-        prop="projectName"
+        prop="displayName"
         label="所属项目"
         show-overflow-tooltip
       />
@@ -128,28 +128,10 @@ export default {
     },
   },
   created() {
-    this.getProjectList();
     this.getIssueList();
+    this.initHeader();
   },
   methods: {
-    getProjectList() {
-      this.$get(
-        `/trend/issue/total/getAllProject/?token=${this.token}`,
-        (response) => {
-          const data = response.data;
-          if (Array.isArray(data)) {
-            this.projectList = data.map((item) => {
-              return {
-                label: item.displayName,
-                value: item.projectName,
-                ...item,
-              };
-            });
-          }
-          this.initHeader();
-        }
-      );
-    },
     getIssueList() {
       this.isLoading = true;
       const url = this.buildUrl();
@@ -163,6 +145,7 @@ export default {
                 ...item.data.map((obj) => ({
                   ...obj,
                   projectName: item.projectName,
+                  displayName: item.displayName,
                 }))
               );
             }
@@ -185,7 +168,6 @@ export default {
       headerComps.push({
         type: "select",
         label: "项目名称:",
-        options: this.projectList,
         prop: "projectName",
       });
       if (this.bugInfo.type !== "unplan") {
@@ -215,6 +197,9 @@ export default {
 
 <style scoped>
 .adjust-table >>> .el-table__row {
-  height: 46px;
+  height: 46.2px;
+}
+.adjust-table >>> .el-table__body-wrapper {
+  height: calc(100% - 36px) !important;
 }
 </style>

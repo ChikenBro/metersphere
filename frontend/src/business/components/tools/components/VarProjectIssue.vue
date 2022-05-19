@@ -30,7 +30,7 @@
           height="500px"
         >
           <el-table-column
-            prop="projectName"
+            prop="displayName"
             label="项目名称"
             show-overflow-tooltip
           />
@@ -115,7 +115,6 @@ export default {
         projectName: "",
       },
       title: "各项目Bug统计",
-      projectList: [],
       headerComps: [],
       pieOptions: [],
       isLoading: true,
@@ -147,34 +146,15 @@ export default {
     },
   },
   created() {
-    this.getProjectList();
     this.getIssueList();
+    this.initHeader();
   },
   methods: {
-    getProjectList() {
-      this.$get(
-        `/trend/issue/total/getAllProject/?token=${this.token}`,
-        (response) => {
-          const data = response.data;
-          if (Array.isArray(data)) {
-            this.projectList = data.map((item) => {
-              return {
-                label: item.displayName,
-                value: item.projectName,
-                ...item,
-              };
-            });
-          }
-          this.initHeader();
-        }
-      );
-    },
     initHeader() {
       const headerComps = [];
       headerComps.push({
         type: "select",
         label: "项目名称:",
-        options: this.projectList,
         prop: "projectName",
       });
       this.headerComps = headerComps;
@@ -188,6 +168,7 @@ export default {
           this.tableData = data.map((item) => {
             return {
               projectName: item.projectName,
+              displayName: item.displayName,
               ...item.data,
             };
           });
@@ -249,6 +230,9 @@ export default {
   color: rgba(0, 0, 0, 0.5);
 }
 .adjust-table >>> .el-table__row {
-  height: 46px;
+  height: 46.2px;
+}
+.adjust-table >>> .el-table__body-wrapper {
+  height: calc(100% - 36px) !important;
 }
 </style>

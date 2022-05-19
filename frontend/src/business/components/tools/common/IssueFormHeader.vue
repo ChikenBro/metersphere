@@ -22,7 +22,7 @@
               style="width: 150px"
             >
               <el-option
-                v-for="opt in attr.options"
+                v-for="opt in projectOptions"
                 :key="opt.value"
                 :label="opt.label"
                 :value="opt.value"
@@ -81,7 +81,17 @@ export default {
     },
   },
   data() {
-    return {};
+    return {
+      projectOptions: [],
+    };
+  },
+  computed: {
+    token() {
+      return sessionStorage.getItem("codingToken");
+    },
+  },
+  created() {
+    this.getProjectList();
   },
   methods: {
     onSearch() {
@@ -90,6 +100,24 @@ export default {
     fixToNumber({ target }) {
       target.value = target.value.replace(/[^\d]/g, "");
       this.$nextTick(() => (this.form.duation = target.value));
+    },
+    getProjectList() {
+      this.$get(
+        `/trend/issue/total/getAllProject/?token=${this.token}`,
+        (response) => {
+          const data = response.data;
+          if (Array.isArray(data)) {
+            this.projectOptions = data.map((item) => {
+              return {
+                label: item.displayName,
+                value: item.projectName + ";" + item.displayName,
+                ...item,
+              };
+            });
+            this.projectOptions.unshift({ label: "所有项目", value: "" });
+          }
+        }
+      );
     },
   },
 };

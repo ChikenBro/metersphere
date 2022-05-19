@@ -1,6 +1,6 @@
 <template>
   <div class="issues-wrapper">
-    <el-card>
+    <el-card v-loading="isLoading">
       <issue-form-header
         :title="title"
         :attrs="headerComps"
@@ -8,7 +8,6 @@
         @onSearch="getIssueList"
       />
       <el-table
-        v-loading="isLoading"
         row-key="id"
         border
         class="adjust-table"
@@ -16,7 +15,7 @@
         height="500px"
       >
         <el-table-column
-          prop="projectName"
+          prop="displayName"
           label="项目名称"
           show-overflow-tooltip
         />
@@ -66,7 +65,6 @@ export default {
   data() {
     return {
       tableData: [],
-      projectList: [],
       form: {
         projectName: "",
         dateRange: [],
@@ -100,28 +98,10 @@ export default {
     },
   },
   created() {
-    this.getProjectList();
     this.getIssueList();
+    this.initHeader();
   },
   methods: {
-    getProjectList() {
-      this.$get(
-        `/trend/issue/total/getAllProject/?token=${this.token}`,
-        (response) => {
-          const data = response.data;
-          if (Array.isArray(data)) {
-            this.projectList = data.map((item) => {
-              return {
-                label: item.displayName,
-                value: item.projectName,
-                ...item,
-              };
-            });
-          }
-          this.initHeader();
-        }
-      );
-    },
     getIssueList() {
       this.isLoading = true;
       const url = this.buildUrl();
@@ -131,6 +111,7 @@ export default {
           this.tableData = data.map((item) => {
             return {
               projectName: item.projectName,
+              displayName: item.displayName,
               ...item.data,
             };
           });
@@ -151,7 +132,6 @@ export default {
         {
           type: "select",
           label: "项目名称:",
-          options: this.projectList,
           prop: "projectName",
         },
         {
@@ -184,6 +164,9 @@ export default {
   padding-top: 10px;
 }
 .adjust-table >>> .el-table__row {
-  height: 46px;
+  height: 46.2px;
+}
+.adjust-table >>> .el-table__body-wrapper {
+  height: calc(100% - 36px) !important;
 }
 </style>
