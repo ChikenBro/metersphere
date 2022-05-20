@@ -699,7 +699,7 @@ public class IssueTrendStatisticsService{
         Integer a4 = 0;
         Integer a5 = 0;
         Map<String,Object> testMap = new HashMap<>();
-        Map<String,String> testMap2 = new HashMap<>();
+        Map<String,Integer> testMap2 = new HashMap<>();
         JSONObject e1 = JSONObject.parseObject(e.toString());
 //        testMap.put("project",e1.get("display_name").toString());
 //        String jsonString1 = String.format("{\"Action\": \"DescribeIssueListWithPage\", 	\"ProjectName\": \"%s\", 	\"IssueType\": \"DEFECT\", 	\"PageNumber\": 1, 	\"PageSize\": 10  }",  e1.get("Name"));
@@ -709,23 +709,23 @@ public class IssueTrendStatisticsService{
         if (respResult_AddBug.getJSONObject("Response").getJSONObject("Data") == null){
             //                JSONObject json_AddBug = JSONObject.parseObject(respResult_AddBug.getResult());
 //                JSONObject json_AddBug = JSONObject.parseObject(respResult_AddBug.getResult());
-            testMap2.put("newCreateIssue",a1.toString());
+            testMap2.put("newCreateIssue",a1);
 
-            testMap2.put("weekResolvedWeekIssue",a2.toString());
+            testMap2.put("weekResolvedWeekIssue",a2);
 //
 //                JSONObject respResult_RepairHistoryBug = this.codingGetProjectIssueList(jsonString3,e1.get("id").toString());
 ////                JSONObject json_RepairHistoryBug = JSONObject.parseObject(respResult_RepairHistoryBug.getResult());
-            testMap2.put("weekResolvedHistoryIssue", a3 .toString());
+            testMap2.put("weekResolvedHistoryIssue", a3 );
 //
 //                JSONObject respResult_noRepairBug = this.codingGetProjectIssueList(jsonString4,e1.get("id").toString());
 ////                JSONObject json_noRepairBug = JSONObject.parseObject(respResult_noRepairBug.getResult());
-            testMap2.put("allUnresolvedIssue",a4.toString());
+            testMap2.put("allUnresolvedIssue",a4);
 
 
 
 //                Integer RepairBug;
 //                RepairBug = a3;
-            testMap2.put("weekResolvedIssue",a5.toString());
+            testMap2.put("weekResolvedIssue",a5);
             testMap.put("data",testMap2);
             testMap.put("projectName",e1.get("Name"));
             testMap.put("displayName",e1.get("DisplayName"));
@@ -773,23 +773,23 @@ public class IssueTrendStatisticsService{
                 }
             }
 //                JSONObject json_AddBug = JSONObject.parseObject(respResult_AddBug.getResult());
-            testMap2.put("newCreateIssue",a1.toString());
+            testMap2.put("newCreateIssue",a1);
 
-            testMap2.put("weekResolvedWeekIssue",a2.toString());
+            testMap2.put("weekResolvedWeekIssue",a2);
 //
 //                JSONObject respResult_RepairHistoryBug = this.codingGetProjectIssueList(jsonString3,e1.get("id").toString());
 ////                JSONObject json_RepairHistoryBug = JSONObject.parseObject(respResult_RepairHistoryBug.getResult());
-            testMap2.put("weekResolvedHistoryIssue", a3 .toString());
+            testMap2.put("weekResolvedHistoryIssue", a3);
 //
 //                JSONObject respResult_noRepairBug = this.codingGetProjectIssueList(jsonString4,e1.get("id").toString());
 ////                JSONObject json_noRepairBug = JSONObject.parseObject(respResult_noRepairBug.getResult());
-            testMap2.put("allUnresolvedIssue",a4.toString());
+            testMap2.put("allUnresolvedIssue",a4);
 
 
 
 //                Integer RepairBug;
 //                RepairBug = a3;
-            testMap2.put("weekResolvedIssue",a5.toString());
+            testMap2.put("weekResolvedIssue",a5);
 //            testMap.put(e1.get("Name").toString(),testMap2);
             testMap.put("data",testMap2);
             testMap.put("projectName",e1.get("Name"));
@@ -927,23 +927,23 @@ public class IssueTrendStatisticsService{
                 }
             }
 //                JSONObject json_AddBug = JSONObject.parseObject(respResult_AddBug.getResult());
-            testMap2.put("newCreateIssue",a1.toString());
+            testMap2.put("newCreateIssue",a1);
 
-            testMap2.put("weekResolvedWeekIssue",a2.toString());
+            testMap2.put("weekResolvedWeekIssue",a2);
 //
 //                JSONObject respResult_RepairHistoryBug = this.codingGetProjectIssueList(jsonString3,e1.get("id").toString());
 ////                JSONObject json_RepairHistoryBug = JSONObject.parseObject(respResult_RepairHistoryBug.getResult());
-            testMap2.put("weekResolvedHistoryIssue", a3 .toString());
+            testMap2.put("weekResolvedHistoryIssue", a3 );
 //
 //                JSONObject respResult_noRepairBug = this.codingGetProjectIssueList(jsonString4,e1.get("id").toString());
 ////                JSONObject json_noRepairBug = JSONObject.parseObject(respResult_noRepairBug.getResult());
-            testMap2.put("allUnresolvedIssue",a4.toString());
+            testMap2.put("allUnresolvedIssue",a4);
 
 
 
 //                Integer RepairBug;
 //                RepairBug = a3;
-            testMap2.put("weekResolvedIssue",a5.toString());
+            testMap2.put("weekResolvedIssue",a5);
             testMap.put("data",testMap2);
             testMap.put("projectName",hashMap.get("projectName").split(";")[0]);
             testMap.put("displayName",hashMap.get("projectName").split(";")[1]);
