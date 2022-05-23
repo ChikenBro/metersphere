@@ -381,9 +381,9 @@ export default {
       this.saveSortField(this.tableHeaderKey, this.condition.orders);
       this.initTableData();
     },
-    openReport(iterationCode) {
-      if (iterationCode) {
-        this.$refs.iterationReportView.open(iterationCode, this.projectId);
+    openReport(iterationId) {
+      if (iterationId) {
+        this.$refs.iterationReportView.open(iterationId, this.projectId);
       }
     },
     isSelectDataAll(data) {

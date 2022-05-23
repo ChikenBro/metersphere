@@ -11,6 +11,7 @@
       <el-main class="container" :style="'height: calc(100vh - 75px)'">
         <el-scrollbar>
           <el-table
+            v-loading="isLoading"
             :data="tableData"
             row-key="id"
             border
@@ -104,6 +105,7 @@ export default {
       page: {},
       condition: {},
       requiremnetPriority,
+      isLoading: true,
     };
   },
   computed: {
@@ -130,9 +132,10 @@ export default {
       // this.$refs.issueEditDetail.save();
     },
     fetchRequirements() {
+      this.isLoading = true;
       getIterationRequirements(
         {
-          iterationCode: Number(this.iterationRow.code),
+          iterationId: this.iterationRow.id,
           ...this.condition,
           goPage: this.pagination.currentPage,
           pageSize: this.pagination.pageSize,
@@ -140,6 +143,7 @@ export default {
         (res) => {
           this.tableData = res?.data?.listObject || [];
           this.pagination.total = res.data.itemCount;
+          this.isLoading = false;
         }
       );
     },
