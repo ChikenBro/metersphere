@@ -144,7 +144,7 @@
           <el-col :span="8" :push="2">
             <el-form-item :label="$t('所属迭代')" :label-width="formLabelWidth">
               <el-select
-                v-model="form.iterationCode"
+                v-model="form.iterationId"
                 clearable
                 :disabled="isDisable"
                 placeholder="请选择迭代"
@@ -152,7 +152,7 @@
                 @blur="handleBlur"
                 filterable
                 :filter-method="getIterationOptions"
-                @change="getPlanInheritOptions"
+                @change="handleIterationChange"
               >
                 <el-option
                   v-for="(item, index) in iterationOptions"
@@ -213,7 +213,26 @@
         </el-row>
 
         <el-row>
-          <el-col :span="8" :offset="1" v-if="form.testPlanInherit !== ''">
+          <!-- 所属需求 -->
+          <el-col :span="10" :offset="1">
+            <el-form-item label="所属需求" :label-width="formLabelWidth">
+              <el-select
+                v-model="form.requirementId"
+                clearable
+                :disabled="isDisable"
+                placeholder="请选择需求"
+                filterable
+              >
+                <el-option
+                  v-for="(item, index) in requirementOptions"
+                  :key="index"
+                  :label="item.label"
+                  :value="item.value"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8" v-if="form.testPlanInherit !== ''">
             <el-form-item
               label="保留用例状态"
               :label-width="formLabelWidth"
@@ -311,10 +330,11 @@ export default {
         plannedStartTime: "",
         plannedEndTime: "",
         automaticStatusUpdate: false,
-        iterationCode: "",
+        iterationId: "",
         environment: "",
         testPlanInherit: "",
         ifRetain: false,
+        requirementId: "",
         projectId: getCurrentProjectID(),
         creator: getCurrentUserId(),
       },
@@ -360,6 +380,7 @@ export default {
       operationType: "",
       principalOptions: [],
       iterationOptions: [],
+      requirementOptions: [],
       environmentOptions: [
         { label: "开发环境", value: "dev" },
         { label: "测试环境", value: "test" },
@@ -369,6 +390,15 @@ export default {
       planInheritOptions: [],
       isDisable: false,
     };
+  },
+  watch: {
+    "form.iterationId": {
+      handler() {
+        this.form.requirementId = this.form.testPlanInherit = "";
+        this.requirementOptions = this.planInheritOptions = [];
+        this.form.ifRetain = false;
+      },
+    },
   },
   created() {
     //设置“测试阶段”和“负责人”的默认值
@@ -499,7 +529,7 @@ export default {
     // 获取迭代列表
     getIterationOptions(name = "") {
       const url = "/iteration/list/1/30";
-      this.form.iterationCode = name;
+      this.form.iterationId = name;
       this.$post(
         url,
         { projectId: getCurrentProjectID(), name },
@@ -509,7 +539,7 @@ export default {
           tempArr.forEach((item) => {
             iterationOptions.push({
               label: item.name,
-              value: item.code,
+              value: item.id,
             });
           });
           this.iterationOptions = iterationOptions;
@@ -517,14 +547,15 @@ export default {
       );
     },
     // 获取计划继承列表
-    getPlanInheritOptions(iterationCode) {
+    getPlanInheritOptions() {
       const url = `/test/plan/iteration/plan`;
       this.planInheritOptions = [];
       this.form.testPlanInherit = "";
       this.form.ifRetain = false;
+      const { iterationId } = this.form;
       this.$post(
         url,
-        { iterationCode, projectId: getCurrentProjectID() },
+        { iterationId, projectId: getCurrentProjectID() },
         (response) => {
           let tempArr = response?.data || [];
           const planInheritOptions = [];
@@ -538,19 +569,43 @@ export default {
         }
       );
     },
+    // 获取需求列表
+    getRequirementOptions() {
+      const url = "/iteration/requirement/1/100";
+      const { iterationId } = this.form;
+      this.$post(
+        url,
+        { projectId: getCurrentProjectID(), iterationId },
+        (response) => {
+          let tempArr = response?.data?.listObject || [];
+          const requirementOptions = [];
+          tempArr.forEach((item) => {
+            requirementOptions.push({
+              label: item.name,
+              value: item.id,
+            });
+          });
+          this.requirementOptions = requirementOptions;
+        }
+      );
+    },
     // 重置保留缺陷状态
     resetRetain() {
       this.form.ifRetain = false;
     },
+    handleIterationChange() {
+      this.getPlanInheritOptions();
+      this.getRequirementOptions();
+    },
     handleBlur() {
-      const keywords = this.form.iterationCode;
+      const keywords = this.form.iterationId;
       const obj = this.iterationOptions.find(
         (item) => item.label === keywords || item.value === keywords
       );
       if (obj !== undefined) {
-        this.form.iterationCode = obj.value;
+        this.form.iterationId = obj.value;
       } else {
-        this.form.iterationCode = "";
+        this.form.iterationId = "";
         this.getIterationOptions("");
       }
     },
